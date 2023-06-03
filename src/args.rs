@@ -1,4 +1,5 @@
 use clap::Parser;
+use std::path::PathBuf;
 
 /// Argument parser powered by [`clap`].
 #[derive(Debug, Default, Parser)]
@@ -17,9 +18,9 @@ use clap::Parser;
 ",
 )]
 pub struct Args {
-    /// Command or binary name.
-    #[arg(required = true)]
-    pub bin: String,
+    /// Binary / ELF object file.
+    #[arg(required = true, name = "ELF")]
+    pub file: PathBuf,
 }
 
 #[cfg(test)]

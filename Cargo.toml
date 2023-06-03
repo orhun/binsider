@@ -1,6 +1,8 @@
 [package]
 name = "binsider"
 version = "0.1.0"
+description = "Analyze ELF binaries like a boss"
+authors = ["Orhun Parmaksız <orhunparmaksiz@gmail.com>"]
 edition = "2021"
 
 [dependencies]
