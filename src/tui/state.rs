@@ -1,23 +1,18 @@
-use std::error;
-
-/// Application result type.
-pub type AppResult<T> = std::result::Result<T, Box<dyn error::Error>>;
-
-/// Application.
+/// Application state.
 #[derive(Debug)]
-pub struct App {
+pub struct State {
     /// Is the application running?
     pub running: bool,
 }
 
-impl Default for App {
+impl Default for State {
     fn default() -> Self {
         Self { running: true }
     }
 }
 
-impl App {
-    /// Constructs a new instance of [`App`].
+impl State {
+    /// Constructs a new instance of [`State`].
     pub fn new() -> Self {
         Self::default()
     }
@@ -25,7 +20,7 @@ impl App {
     /// Handles the tick event of the terminal.
     pub fn tick(&self) {}
 
-    /// Set running to false to quit the application.
+    /// Sets [`running`] to `false` to quit the application.
     pub fn quit(&mut self) {
         self.running = false;
     }
