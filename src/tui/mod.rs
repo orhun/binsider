@@ -1,11 +1,22 @@
-use crate::app::{App, AppResult};
-use crate::event::EventHandler;
-use crate::ui;
+/// Application.
+pub mod app;
+
+/// Terminal events handler.
+pub mod event;
+
+/// Widget renderer.
+pub mod ui;
+
+use app::{App, AppResult};
 use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
 use crossterm::terminal::{self, EnterAlternateScreen, LeaveAlternateScreen};
+use event::EventHandler;
 use std::io;
 use tui::backend::Backend;
 use tui::Terminal;
+
+/// Event handler.
+pub mod handler;
 
 /// Representation of a terminal user interface.
 ///

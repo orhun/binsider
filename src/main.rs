@@ -1,6 +1,6 @@
-use binsider::app::{App, AppResult};
-use binsider::event::{Event, EventHandler};
-use binsider::handler::handle_key_events;
+use binsider::tui::app::{App, AppResult};
+use binsider::tui::event::{Event, EventHandler};
+use binsider::tui::handler::handle_key_events;
 use binsider::tui::Tui;
 use std::io;
 use tui::backend::CrosstermBackend;

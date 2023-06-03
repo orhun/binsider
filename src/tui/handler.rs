@@ -1,4 +1,4 @@
-use crate::app::{App, AppResult};
+use crate::tui::app::{App, AppResult};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 /// Handles the key events and updates the state of [`App`].
