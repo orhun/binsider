@@ -1,36 +1,36 @@
 use crate::error::Result;
 use goblin::elf::Elf;
-use std::{fs, path::Path};
 
 /// Binary analyzer.
-pub struct Analyzer {
-    elf: Elf<'static>,
+pub struct Analyzer<'a> {
+    bytes: &'a [u8],
+    elf: Elf<'a>,
 }
 
-impl Analyzer {
+impl<'a> Analyzer<'a> {
     /// Constructs a new instance.
-    pub fn new<P: AsRef<Path>>(path: P) -> Result<Self> {
-        let file_data = fs::read(path)?;
-        let data = Box::leak(file_data.into_boxed_slice());
-        let elf = Elf::parse(data)?;
-        Ok(Self { elf })
+    pub fn new(bytes: &'a [u8]) -> Result<Self> {
+        let elf = Elf::parse(bytes)?;
+        Ok(Self { bytes, elf })
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
+    use std::{fs, path::PathBuf};
 
-    fn get_debug_binary() -> PathBuf {
-        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+    fn get_test_bytes() -> Result<Vec<u8>> {
+        let debug_binary = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("target")
             .join("debug")
-            .join(env!("CARGO_PKG_NAME"))
+            .join(env!("CARGO_PKG_NAME"));
+        Ok(fs::read(debug_binary)?)
     }
 
     #[test]
-    fn test_analyzer_init() {
-        assert!(Analyzer::new(get_debug_binary()).is_ok());
+    fn test_analyzer_init() -> Result<()> {
+        assert!(Analyzer::new(get_test_bytes()?.as_slice()).is_ok());
+        Ok(())
     }
 }
