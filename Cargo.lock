@@ -63,6 +63,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "crossterm",
+ "elf",
  "pretty_assertions",
  "ratatui",
  "thiserror",
@@ -182,6 +183,12 @@ name = "diff"
 version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56254986775e3233ffa9c4d7d3faaf6d36a2c09d30b20687e9f88bc8bafc16c8"
+
+[[package]]
+name = "elf"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e2b183d6ce6ca4cf30e3db37abf5b52568b5f9015c97d9fbdd7026aa5dcdd758"
 
 [[package]]
 name = "errno"

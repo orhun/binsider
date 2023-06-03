@@ -9,6 +9,9 @@ pub enum Error {
     /// Error that may occur while receiving messages from the channel.
     #[error("channel receive error: `{0}`")]
     ChannelReceiveError(#[from] std::sync::mpsc::RecvError),
+    /// Error that may occur while parsing ELF files.
+    #[error("ELF parse error: `{0}`")]
+    ElfParseError(#[from] elf::parse::ParseError),
 }
 
 /// Type alias for the standard [`Result`] type.
