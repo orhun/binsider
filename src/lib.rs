@@ -5,6 +5,9 @@
 /// Terminal user interface.
 pub mod tui;
 
+/// Command-line arguments parser.
+pub mod args;
+
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
 use std::io;

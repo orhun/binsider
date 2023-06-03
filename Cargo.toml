@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 ratatui = "0.20.1"
 crossterm = "0.26.1"
+clap = { version = "4.3.0", features = ["derive", "env", "wrap_help", "cargo"] }
