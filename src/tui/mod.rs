@@ -11,9 +11,9 @@ use app::{App, AppResult};
 use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
 use crossterm::terminal::{self, EnterAlternateScreen, LeaveAlternateScreen};
 use event::EventHandler;
+use ratatui::backend::Backend;
+use ratatui::Terminal;
 use std::io;
-use tui::backend::Backend;
-use tui::Terminal;
 
 /// Event handler.
 pub mod handler;

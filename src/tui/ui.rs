@@ -1,5 +1,5 @@
 use crate::tui::app::App;
-use tui::{
+use ratatui::{
     backend::Backend,
     layout::Alignment,
     style::{Color, Style},
