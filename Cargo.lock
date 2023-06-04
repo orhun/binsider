@@ -66,6 +66,7 @@ dependencies = [
  "goblin",
  "pretty_assertions",
  "ratatui",
+ "rust-strings",
  "thiserror",
 ]
 
@@ -389,6 +390,12 @@ checksum = "fb5a58c1855b4b6819d59012155603f0b22ad30cad752600aadfcb695265519a"
 dependencies = [
  "bitflags",
 ]
+
+[[package]]
+name = "rust-strings"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8d7119567cd5cf73fcb5a7c99457bee37bf879c9a16bc6dcd88afa68c0e8944d"
 
 [[package]]
 name = "rustix"

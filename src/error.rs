@@ -12,6 +12,9 @@ pub enum Error {
     /// Error that may occur while working with ELF files.
     #[error("ELF error: `{0}`")]
     ElfError(#[from] goblin::error::Error),
+    /// Error that may occur while extracting strings from binary data.
+    #[error("String extraction error: `{0}`")]
+    StringsError(String),
 }
 
 /// Type alias for the standard [`Result`] type.
