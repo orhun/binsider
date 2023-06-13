@@ -8,6 +8,9 @@ pub mod app;
 /// Terminal user interface.
 pub mod tui;
 
+/// ELF helper.
+pub mod elf;
+
 /// Command-line arguments parser.
 pub mod args;
 
@@ -17,6 +20,7 @@ pub mod error;
 /// Common types that can be glob-imported for convenience.
 pub mod prelude;
 
+use app::Analyzer;
 use error::Result;
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
@@ -27,9 +31,9 @@ use tui::state::State;
 use tui::Tui;
 
 /// Starts the terminal user interface.
-pub fn start_tui() -> Result<()> {
+pub fn start_tui(analyzer: Analyzer) -> Result<()> {
     // Create an application.
-    let mut app = State::new();
+    let mut state = State::new(analyzer);
 
     // Initialize the terminal user interface.
     let backend = CrosstermBackend::new(io::stderr());
@@ -39,13 +43,13 @@ pub fn start_tui() -> Result<()> {
     tui.init()?;
 
     // Start the main loop.
-    while app.running {
+    while state.running {
         // Render the user interface.
-        tui.draw(&mut app)?;
+        tui.draw(&mut state)?;
         // Handle events.
         match tui.events.next()? {
-            Event::Tick => app.tick(),
-            Event::Key(key_event) => handle_key_events(key_event, &mut app)?,
+            Event::Tick => state.tick(),
+            Event::Key(key_event) => handle_key_events(key_event, &mut state)?,
             Event::Mouse(_) => {}
             Event::Resize(_, _) => {}
         }

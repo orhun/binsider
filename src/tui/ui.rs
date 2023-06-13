@@ -1,7 +1,7 @@
 use crate::tui::state::State;
 use ratatui::{
     backend::Backend,
-    layout::{Alignment, Constraint, Direction, Layout},
+    layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::Line,
     widgets::{Block, Borders, Paragraph, Tabs},
@@ -37,7 +37,7 @@ pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
         frame.render_widget(tabs, chunks[0]);
         frame.render_widget(
             Paragraph::new(format!(
-                "{} {}",
+                "{} {} ",
                 env!("CARGO_PKG_NAME"),
                 env!("CARGO_PKG_VERSION")
             ))
@@ -45,11 +45,27 @@ pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
             chunks[1],
         )
     }
-    let inner = match state.tab_index {
-        0 => Block::default().title("Inner 0").borders(Borders::ALL),
-        1 => Block::default().title("Inner 1").borders(Borders::ALL),
-        2 => Block::default().title("Inner 2").borders(Borders::ALL),
+    match state.tab_index {
+        0 => {
+            render_static_analysis(state, frame, chunks[1]);
+        }
+        1 => {
+            let block = Block::default().borders(Borders::ALL);
+            frame.render_widget(block, chunks[1]);
+        }
+        2 => {
+            let block = Block::default().borders(Borders::ALL);
+            frame.render_widget(block, chunks[1]);
+        }
         _ => unreachable!(),
-    };
-    frame.render_widget(inner, chunks[1]);
+    }
+}
+
+/// Renders the static analysis tab.
+pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>, rect: Rect) {
+    frame.render_widget(
+        Paragraph::new(format!("{:#?}", state.analyzer.get_header()))
+            .block(Block::default().borders(Borders::ALL)),
+        rect,
+    );
 }

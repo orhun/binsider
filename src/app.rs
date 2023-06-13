@@ -1,8 +1,12 @@
-use crate::error::{Error, Result};
+use crate::{
+    elf::header::Header,
+    error::{Error, Result},
+};
 use goblin::elf::Elf;
 use rust_strings::BytesConfig;
 
 /// Binary analyzer.
+#[derive(Debug)]
 pub struct Analyzer<'a> {
     bytes: &'a [u8],
     elf: Elf<'a>,
@@ -13,6 +17,11 @@ impl<'a> Analyzer<'a> {
     pub fn new(bytes: &'a [u8]) -> Result<Self> {
         let elf = Elf::parse(bytes)?;
         Ok(Self { bytes, elf })
+    }
+
+    /// Returns the ELF header.
+    pub fn get_header(&self) -> Header {
+        Header::from(self.elf.header)
     }
 
     /// Returns the sequences of printable characters.
