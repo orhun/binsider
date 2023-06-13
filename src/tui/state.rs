@@ -3,11 +3,16 @@
 pub struct State {
     /// Is the application running?
     pub running: bool,
+    /// Index of the selected tab.
+    pub tab_index: usize,
 }
 
 impl Default for State {
     fn default() -> Self {
-        Self { running: true }
+        Self {
+            running: true,
+            tab_index: 0,
+        }
     }
 }
 

@@ -1,18 +1,31 @@
 use crate::error::Result;
 use crate::tui::state::State;
+use crate::tui::ui::TAB_TITLES;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 /// Handles the key events and updates the state of [`App`].
-pub fn handle_key_events(key_event: KeyEvent, app: &mut State) -> Result<()> {
+pub fn handle_key_events(key_event: KeyEvent, state: &mut State) -> Result<()> {
     match key_event.code {
+        // Next tab.
+        KeyCode::Right | KeyCode::Char('h') => {
+            state.tab_index = (state.tab_index + 1) % TAB_TITLES.len();
+        }
+        // Previous tab.
+        KeyCode::Left | KeyCode::Char('l') => {
+            if state.tab_index > 0 {
+                state.tab_index -= 1;
+            } else {
+                state.tab_index = TAB_TITLES.len() - 1;
+            }
+        }
         // Exit application on `ESC` or `q`
         KeyCode::Esc | KeyCode::Char('q') => {
-            app.quit();
+            state.quit();
         }
         // Exit application on `Ctrl-C`
         KeyCode::Char('c') | KeyCode::Char('C') => {
             if key_event.modifiers == KeyModifiers::CONTROL {
-                app.quit();
+                state.quit();
             }
         }
         _ => {}
