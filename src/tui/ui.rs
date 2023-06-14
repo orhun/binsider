@@ -79,8 +79,49 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             ])
         })
         .collect();
-    frame.render_widget(
-        Paragraph::new(header).block(Block::default().borders(Borders::ALL)),
-        rect,
-    );
+    frame.render_widget(Block::default().borders(Borders::ALL), rect);
+
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .margin(1)
+        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
+        .split(rect);
+    {
+        let chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
+            .split(chunks[0]);
+        frame.render_widget(
+            Paragraph::new(header).block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(Color::Black)),
+            ),
+            chunks[0],
+        );
+        frame.render_widget(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(Color::Black)),
+            chunks[1],
+        );
+    }
+    {
+        let chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
+            .split(chunks[1]);
+        frame.render_widget(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(Color::Black)),
+            chunks[0],
+        );
+        frame.render_widget(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(Color::Black)),
+            chunks[1],
+        );
+    }
 }
