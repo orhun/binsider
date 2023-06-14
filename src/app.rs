@@ -2,26 +2,34 @@ use crate::{
     elf::header::Header,
     error::{Error, Result},
 };
-use goblin::elf::Elf;
+use elf::{endian::AnyEndian, ElfBytes};
 use rust_strings::BytesConfig;
+use std::fmt::{self, Debug, Formatter};
 
 /// Binary analyzer.
-#[derive(Debug)]
 pub struct Analyzer<'a> {
     bytes: &'a [u8],
-    elf: Elf<'a>,
+    elf: ElfBytes<'a, AnyEndian>,
+}
+
+impl Debug for Analyzer<'_> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Analyzer")
+            .field("bytes", &self.bytes)
+            .finish()
+    }
 }
 
 impl<'a> Analyzer<'a> {
     /// Constructs a new instance.
     pub fn new(bytes: &'a [u8]) -> Result<Self> {
-        let elf = Elf::parse(bytes)?;
+        let elf = ElfBytes::<AnyEndian>::minimal_parse(bytes)?;
         Ok(Self { bytes, elf })
     }
 
     /// Returns the ELF header.
     pub fn get_header(&self) -> Header {
-        Header::from(self.elf.header)
+        Header::from(self.elf.ehdr)
     }
 
     /// Returns the sequences of printable characters.

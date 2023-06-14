@@ -9,9 +9,9 @@ pub enum Error {
     /// Error that may occur while receiving messages from the channel.
     #[error("channel receive error: `{0}`")]
     ChannelReceiveError(#[from] std::sync::mpsc::RecvError),
-    /// Error that may occur while working with ELF files.
-    #[error("ELF error: `{0}`")]
-    ElfError(#[from] goblin::error::Error),
+    /// Error that may occur while parsing ELF files.
+    #[error("ELF parse error: `{0}`")]
+    ElfError(#[from] elf::parse::ParseError),
     /// Error that may occur while extracting strings from binary data.
     #[error("String extraction error: `{0}`")]
     StringsError(String),

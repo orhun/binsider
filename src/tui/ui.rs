@@ -64,7 +64,7 @@ pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
 /// Renders the static analysis tab.
 pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>, rect: Rect) {
     frame.render_widget(
-        Paragraph::new(format!("{:#?}", state.analyzer.get_header()))
+        Paragraph::new(state.analyzer.get_header().to_string())
             .block(Block::default().borders(Borders::ALL)),
         rect,
     );
