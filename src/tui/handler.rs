@@ -7,11 +7,11 @@ use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 pub fn handle_key_events(key_event: KeyEvent, state: &mut State) -> Result<()> {
     match key_event.code {
         // Next tab.
-        KeyCode::Right | KeyCode::Char('h') => {
+        KeyCode::Right | KeyCode::Char('l') => {
             state.tab_index = (state.tab_index + 1) % TAB_TITLES.len();
         }
         // Previous tab.
-        KeyCode::Left | KeyCode::Char('l') => {
+        KeyCode::Left | KeyCode::Char('h') => {
             if state.tab_index > 0 {
                 state.tab_index -= 1;
             } else {
