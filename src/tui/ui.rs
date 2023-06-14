@@ -3,7 +3,7 @@ use ratatui::{
     backend::Backend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
-    text::Line,
+    text::{Line, Span},
     widgets::{Block, Borders, Paragraph, Tabs},
     Frame,
 };
@@ -63,9 +63,20 @@ pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
 
 /// Renders the static analysis tab.
 pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>, rect: Rect) {
+    let header: Vec<Line> = state
+        .analyzer
+        .get_headers()
+        .iter()
+        .map(|header| {
+            Line::from(vec![
+                Span::styled(header.name.to_string(), Style::default().fg(Color::Cyan)),
+                Span::raw(": "),
+                Span::styled(header.value.to_string(), Style::default().fg(Color::White)),
+            ])
+        })
+        .collect();
     frame.render_widget(
-        Paragraph::new(state.analyzer.get_header().to_string())
-            .block(Block::default().borders(Borders::ALL)),
+        Paragraph::new(header).block(Block::default().borders(Borders::ALL)),
         rect,
     );
 }

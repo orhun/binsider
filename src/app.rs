@@ -1,5 +1,5 @@
 use crate::{
-    elf::header::Header,
+    elf::header::{Header, Headers},
     error::{Error, Result},
 };
 use elf::{endian::AnyEndian, ElfBytes};
@@ -28,8 +28,8 @@ impl<'a> Analyzer<'a> {
     }
 
     /// Returns the ELF header.
-    pub fn get_header(&self) -> Header {
-        Header::from(self.elf.ehdr)
+    pub fn get_headers(&self) -> Vec<Header> {
+        Headers::from(self.elf.ehdr).get()
     }
 
     /// Returns the sequences of printable characters.
