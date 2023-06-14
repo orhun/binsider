@@ -9,7 +9,7 @@ use ratatui::{
 };
 
 /// Titles of the tabs.
-pub const TAB_TITLES: &[&str] = &["Static", "Dynamic", "Hexdump"];
+pub const TAB_TITLES: &[&str] = &["Static", "Dynamic", "Strings", "Hexdump"];
 
 /// Renders the user interface widgets.
 pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
@@ -54,6 +54,10 @@ pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
             frame.render_widget(block, chunks[1]);
         }
         2 => {
+            let block = Block::default().borders(Borders::ALL);
+            frame.render_widget(block, chunks[1]);
+        }
+        3 => {
             let block = Block::default().borders(Borders::ALL);
             frame.render_widget(block, chunks[1]);
         }
