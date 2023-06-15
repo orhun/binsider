@@ -1,5 +1,5 @@
 use crate::{
-    elf::header::{Header, Headers},
+    elf::Elf,
     error::{Error, Result},
 };
 use elf::{endian::AnyEndian, ElfBytes};
@@ -9,7 +9,8 @@ use std::fmt::{self, Debug, Formatter};
 /// Binary analyzer.
 pub struct Analyzer<'a> {
     bytes: &'a [u8],
-    elf: ElfBytes<'a, AnyEndian>,
+    /// Elf properties.
+    pub elf: Elf,
 }
 
 impl Debug for Analyzer<'_> {
@@ -23,13 +24,9 @@ impl Debug for Analyzer<'_> {
 impl<'a> Analyzer<'a> {
     /// Constructs a new instance.
     pub fn new(bytes: &'a [u8]) -> Result<Self> {
-        let elf = ElfBytes::<AnyEndian>::minimal_parse(bytes)?;
+        let elf_bytes = ElfBytes::<AnyEndian>::minimal_parse(bytes)?;
+        let elf = Elf::from(elf_bytes);
         Ok(Self { bytes, elf })
-    }
-
-    /// Returns the ELF header.
-    pub fn get_headers(&self) -> Vec<Header> {
-        Headers::from(self.elf.ehdr).get()
     }
 
     /// Returns the sequences of printable characters.

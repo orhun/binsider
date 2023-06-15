@@ -18,6 +18,10 @@ pub fn handle_key_events(key_event: KeyEvent, state: &mut State) -> Result<()> {
                 state.tab_index = TAB_TITLES.len() - 1;
             }
         }
+        // Scroll down the list.
+        KeyCode::Down | KeyCode::Char('j') => state.list.next(),
+        // Scroll up the list.
+        KeyCode::Up | KeyCode::Char('k') => state.list.previous(),
         // Exit application on `ESC` or `q`
         KeyCode::Esc | KeyCode::Char('q') => {
             state.quit();

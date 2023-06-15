@@ -7,6 +7,12 @@ pub mod event;
 /// Widget renderer.
 pub mod ui;
 
+/// Event handler.
+pub mod handler;
+
+/// Custom widgets.
+pub mod widgets;
+
 use crate::error::Result;
 use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
 use crossterm::terminal::{self, EnterAlternateScreen, LeaveAlternateScreen};
@@ -15,9 +21,6 @@ use ratatui::backend::Backend;
 use ratatui::Terminal;
 use state::State;
 use std::io;
-
-/// Event handler.
-pub mod handler;
 
 /// Representation of a terminal user interface.
 ///

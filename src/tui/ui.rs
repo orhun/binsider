@@ -4,7 +4,7 @@ use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span},
-    widgets::{Block, Borders, Paragraph, Tabs},
+    widgets::{Block, Borders, Cell, Paragraph, Row, Table, Tabs},
     Frame,
 };
 
@@ -66,10 +66,21 @@ pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
 }
 
 /// Renders the static analysis tab.
+///
+/// This tab consists of:
+/// - file header
+/// - program headers
+/// - section headers
+/// - symbols
+/// - dynamic symbols
+/// - dynamics
+/// - relocations
+/// - notes
 pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>, rect: Rect) {
     let header: Vec<Line> = state
         .analyzer
-        .get_headers()
+        .elf
+        .file_headers
         .iter()
         .map(|header| {
             Line::from(vec![
@@ -99,11 +110,22 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             ),
             chunks[0],
         );
-        frame.render_widget(
-            Block::default()
-                .borders(Borders::ALL)
-                .border_style(Style::default().fg(Color::Black)),
+        frame.render_stateful_widget(
+            Table::new(state.list.items.iter().map(|item| {
+                Row::new(vec![
+                    Cell::from(Span::raw(item.p_type.to_string())),
+                    Cell::from(Span::raw(item.p_offset.to_string())),
+                ])
+            }))
+            .block(
+                Block::default()
+                    .title_alignment(Alignment::Left)
+                    .borders(Borders::all()),
+            )
+            .highlight_style(Style::default().fg(Color::Green))
+            .widths(&[Constraint::Percentage(50), Constraint::Percentage(50)]),
             chunks[1],
+            &mut state.list.state,
         );
     }
     {
