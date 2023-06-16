@@ -11,6 +11,11 @@ use ratatui::{
 /// Titles of the tabs.
 pub const TAB_TITLES: &[&str] = &["Static", "Dynamic", "Strings", "Hexdump"];
 
+/// Titles for the program headers.
+pub const PROGRAM_HEADERS: &[&str] = &[
+    "p_type", "p_offset", "p_vaddr", "p_paddr", "p_filesz", "p_memsz", "p_align", "p_flags",
+];
+
 /// Renders the user interface widgets.
 pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
     let chunks = Layout::default()
@@ -112,10 +117,20 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
         );
         frame.render_stateful_widget(
             Table::new(state.list.items.iter().map(|item| {
-                Row::new(vec![
-                    Cell::from(Span::raw(item.p_type.to_string())),
-                    Cell::from(Span::raw(item.p_offset.to_string())),
-                ])
+                Row::new(
+                    vec![
+                        elf::to_str::p_type_to_string(item.p_type),
+                        format!("{:#x}", item.p_offset),
+                        format!("{:#x}", item.p_vaddr),
+                        format!("{:#x}", item.p_paddr),
+                        format!("{:#x}", item.p_filesz),
+                        format!("{:#x}", item.p_memsz),
+                        item.p_align.to_string(),
+                        elf::to_str::p_flags_to_string(item.p_flags),
+                    ]
+                    .into_iter()
+                    .map(|v| Cell::from(Span::raw(v))),
+                )
             }))
             .block(
                 Block::default()
@@ -123,7 +138,13 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
                     .borders(Borders::all()),
             )
             .highlight_style(Style::default().fg(Color::Green))
-            .widths(&[Constraint::Percentage(50), Constraint::Percentage(50)]),
+            .header(Row::new(PROGRAM_HEADERS.to_vec()))
+            .widths(
+                &[Constraint::Percentage(
+                    (100 / PROGRAM_HEADERS.len()).try_into().unwrap_or_default(),
+                )]
+                .repeat(PROGRAM_HEADERS.len()),
+            ),
             chunks[1],
             &mut state.list.state,
         );
