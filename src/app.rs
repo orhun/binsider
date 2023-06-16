@@ -8,6 +8,9 @@ use std::fmt::{self, Debug, Formatter};
 
 /// Binary analyzer.
 pub struct Analyzer<'a> {
+    /// Path of the ELF file.
+    pub path: &'a str,
+    /// Bytes of the file.
     bytes: &'a [u8],
     /// Elf properties.
     pub elf: Elf,
@@ -23,10 +26,10 @@ impl Debug for Analyzer<'_> {
 
 impl<'a> Analyzer<'a> {
     /// Constructs a new instance.
-    pub fn new(bytes: &'a [u8]) -> Result<Self> {
+    pub fn new(path: &'a str, bytes: &'a [u8]) -> Result<Self> {
         let elf_bytes = ElfBytes::<AnyEndian>::minimal_parse(bytes)?;
         let elf = Elf::from(elf_bytes);
-        Ok(Self { bytes, elf })
+        Ok(Self { path, bytes, elf })
     }
 
     /// Returns the sequences of printable characters.

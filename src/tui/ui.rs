@@ -25,7 +25,17 @@ pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
         .split(frame.size());
 
     {
-        frame.render_widget(Block::default().borders(Borders::ALL), chunks[0]);
+        frame.render_widget(
+            Block::default()
+                .title(format!(
+                    "{} {}",
+                    env!("CARGO_PKG_NAME"),
+                    env!("CARGO_PKG_VERSION")
+                ))
+                .title_alignment(Alignment::Center)
+                .borders(Borders::ALL),
+            chunks[0],
+        );
         let chunks = Layout::default()
             .direction(Direction::Horizontal)
             .margin(1)
@@ -41,12 +51,7 @@ pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
             );
         frame.render_widget(tabs, chunks[0]);
         frame.render_widget(
-            Paragraph::new(format!(
-                "{} {} ",
-                env!("CARGO_PKG_NAME"),
-                env!("CARGO_PKG_VERSION")
-            ))
-            .alignment(Alignment::Right),
+            Paragraph::new(state.analyzer.path).alignment(Alignment::Right),
             chunks[1],
         )
     }
