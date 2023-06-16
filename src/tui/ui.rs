@@ -115,6 +115,14 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             ),
             chunks[0],
         );
+        frame.render_widget(
+            Block::default()
+                .borders(Borders::ALL)
+                .border_style(Style::default().fg(Color::Black)),
+            chunks[1],
+        );
+    }
+    {
         frame.render_stateful_widget(
             Table::new(state.list.items.iter().map(|item| {
                 Row::new(
@@ -134,6 +142,7 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             }))
             .block(
                 Block::default()
+                    .title("Program Headers / Segments")
                     .title_alignment(Alignment::Left)
                     .borders(Borders::all()),
             )
@@ -147,24 +156,6 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             ),
             chunks[1],
             &mut state.list.state,
-        );
-    }
-    {
-        let chunks = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
-            .split(chunks[1]);
-        frame.render_widget(
-            Block::default()
-                .borders(Borders::ALL)
-                .border_style(Style::default().fg(Color::Black)),
-            chunks[0],
-        );
-        frame.render_widget(
-            Block::default()
-                .borders(Borders::ALL)
-                .border_style(Style::default().fg(Color::Black)),
-            chunks[1],
         );
     }
 }
