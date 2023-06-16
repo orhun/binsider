@@ -19,8 +19,8 @@ use std::path::PathBuf;
 )]
 pub struct Args {
     /// Binary / ELF object file.
-    #[arg(required = true, name = "ELF")]
-    pub file: PathBuf,
+    #[arg(name = "ELF")]
+    pub file: Option<PathBuf>,
 }
 
 #[cfg(test)]
