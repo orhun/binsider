@@ -1,8 +1,6 @@
-use elf::segment::ProgramHeader;
-
+use crate::elf::Info;
 use crate::prelude::Analyzer;
-
-use super::widgets::SelectableList;
+use crate::tui::widgets::SelectableList;
 
 /// Application state.
 #[derive(Debug)]
@@ -14,14 +12,14 @@ pub struct State<'a> {
     /// Index of the selected tab.
     pub tab_index: usize,
     /// List items.
-    pub list: SelectableList<ProgramHeader>,
+    pub list: SelectableList<Vec<String>>,
 }
 
 impl<'a> State<'a> {
     /// Constructs a new instance of [`State`].
     pub fn new(analyzer: Analyzer<'a>) -> Self {
         Self {
-            list: SelectableList::with_items(analyzer.elf.program_headers.clone()),
+            list: SelectableList::with_items(analyzer.elf.info(Info::ProgramHeaders).items()),
             running: true,
             tab_index: 0,
             analyzer,

@@ -1,4 +1,4 @@
-use crate::tui::state::State;
+use crate::{elf::Info, tui::state::State};
 use ratatui::{
     backend::Backend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
@@ -90,13 +90,14 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
     let header: Vec<Line> = state
         .analyzer
         .elf
-        .file_headers
+        .info(Info::FileHeaders)
+        .items()
         .iter()
-        .map(|header| {
+        .map(|items| {
             Line::from(vec![
-                Span::styled(header.name.to_string(), Style::default().fg(Color::Cyan)),
+                Span::styled(items[0].to_string(), Style::default().fg(Color::Cyan)),
                 Span::raw(": "),
-                Span::styled(header.value.to_string(), Style::default().fg(Color::White)),
+                Span::styled(items[1].to_string(), Style::default().fg(Color::White)),
             ])
         })
         .collect();
@@ -129,22 +130,13 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
     }
     {
         frame.render_stateful_widget(
-            Table::new(state.list.items.iter().map(|item| {
-                Row::new(
-                    vec![
-                        elf::to_str::p_type_to_string(item.p_type),
-                        format!("{:#x}", item.p_offset),
-                        format!("{:#x}", item.p_vaddr),
-                        format!("{:#x}", item.p_paddr),
-                        format!("{:#x}", item.p_filesz),
-                        format!("{:#x}", item.p_memsz),
-                        item.p_align.to_string(),
-                        elf::to_str::p_flags_to_string(item.p_flags),
-                    ]
-                    .into_iter()
-                    .map(|v| Cell::from(Span::raw(v))),
-                )
-            }))
+            Table::new(
+                state
+                    .list
+                    .items
+                    .iter()
+                    .map(|items| Row::new(items.iter().map(|v| Cell::from(Span::raw(v))))),
+            )
             .block(
                 Block::default()
                     .title("Program Headers / Segments")
