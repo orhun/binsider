@@ -117,7 +117,10 @@ impl From<Vec<ElfProgramHeader>> for ProgramHeaders {
 }
 
 impl<'a> Property<'a> for ProgramHeaders {
-    fn headers() -> Option<&'a [&'a str]> {
+    fn title(&self) -> Option<&'a str> {
+        Some("Program Headers / Segments")
+    }
+    fn headers(&self) -> Option<&'a [&'a str]> {
         Some(&[
             "p_type", "p_offset", "p_vaddr", "p_paddr", "p_filesz", "p_memsz", "p_align", "p_flags",
         ])

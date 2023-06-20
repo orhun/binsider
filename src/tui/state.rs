@@ -7,6 +7,8 @@ use crate::tui::widgets::SelectableList;
 pub struct State<'a> {
     /// Binary analyzer.
     pub analyzer: Analyzer<'a>,
+    /// Elf info.
+    pub selected_info: Info,
     /// Is the application running?
     pub running: bool,
     /// Index of the selected tab.
@@ -19,10 +21,11 @@ impl<'a> State<'a> {
     /// Constructs a new instance of [`State`].
     pub fn new(analyzer: Analyzer<'a>) -> Self {
         Self {
-            list: SelectableList::with_items(analyzer.elf.info(Info::ProgramHeaders).items()),
+            list: SelectableList::with_items(analyzer.elf.info(&Info::ProgramHeaders).items()),
             running: true,
             tab_index: 0,
             analyzer,
+            selected_info: Info::ProgramHeaders,
         }
     }
 

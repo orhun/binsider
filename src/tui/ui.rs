@@ -11,11 +11,6 @@ use ratatui::{
 /// Titles of the tabs.
 pub const TAB_TITLES: &[&str] = &["Static", "Dynamic", "Strings", "Hexdump"];
 
-/// Titles for the program headers.
-pub const PROGRAM_HEADERS: &[&str] = &[
-    "p_type", "p_offset", "p_vaddr", "p_paddr", "p_filesz", "p_memsz", "p_align", "p_flags",
-];
-
 /// Renders the user interface widgets.
 pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
     let chunks = Layout::default()
@@ -90,7 +85,7 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
     let header: Vec<Line> = state
         .analyzer
         .elf
-        .info(Info::FileHeaders)
+        .info(&Info::FileHeaders)
         .items()
         .iter()
         .map(|items| {
@@ -129,6 +124,9 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
         );
     }
     {
+        let property = state.analyzer.elf.info(&state.selected_info);
+        let headers = property.headers().unwrap_or_default();
+        let title = property.title().unwrap_or_default();
         frame.render_stateful_widget(
             Table::new(
                 state
@@ -139,17 +137,17 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             )
             .block(
                 Block::default()
-                    .title("Program Headers / Segments")
+                    .title(title)
                     .title_alignment(Alignment::Left)
                     .borders(Borders::all()),
             )
             .highlight_style(Style::default().fg(Color::Green))
-            .header(Row::new(PROGRAM_HEADERS.to_vec()))
+            .header(Row::new(headers.to_vec()))
             .widths(
                 &[Constraint::Percentage(
-                    (100 / PROGRAM_HEADERS.len()).try_into().unwrap_or_default(),
+                    (100 / headers.len()).try_into().unwrap_or_default(),
                 )]
-                .repeat(PROGRAM_HEADERS.len()),
+                .repeat(headers.len()),
             ),
             chunks[1],
             &mut state.list.state,

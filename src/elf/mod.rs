@@ -8,16 +8,18 @@ use header::{FileHeaders, ProgramHeaders};
 pub trait Property<'a> {
     /// Returns the items.
     fn items(&self) -> Vec<Vec<String>>;
-    /// Returns the table header (if needed).
-    fn headers() -> Option<&'a [&'a str]>
-    where
-        Self: Sized,
-    {
+    /// Returns the table headers (optional).
+    fn headers(&self) -> Option<&'a [&'a str]> {
+        None
+    }
+    /// Returns the title (optional).
+    fn title(&self) -> Option<&'a str> {
         None
     }
 }
 
 /// ELF information.
+#[derive(Debug)]
 pub enum Info {
     /// File headers.
     FileHeaders,
@@ -38,6 +40,7 @@ pub enum Info {
 }
 
 /// Elf wrapper.
+#[derive(Debug)]
 pub struct Elf {
     /// File headers.
     pub file_headers: FileHeaders,
@@ -59,7 +62,7 @@ impl<'a> From<ElfBytes<'a, AnyEndian>> for Elf {
 
 impl Elf {
     /// Returns the information about the ELF file.
-    pub fn info<'a>(&self, info: Info) -> Box<dyn Property<'a>>
+    pub fn info<'a>(&self, info: &Info) -> Box<dyn Property<'a>>
     where
         FileHeaders: Property<'a>,
         ProgramHeaders: Property<'a>,
