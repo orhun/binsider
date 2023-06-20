@@ -12,7 +12,7 @@ use ratatui::{
 pub const MAIN_TABS: &[&str] = &["Static", "Dynamic", "Strings", "Hexdump"];
 
 /// Titles of the ELF info tabs.
-pub const ELF_INFO_TABS: &[&str] = &["Program Headers / Segments"];
+pub const ELF_INFO_TABS: &[&str] = &[Info::ProgramHeaders.title()];
 
 /// Renders the user interface widgets.
 pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {

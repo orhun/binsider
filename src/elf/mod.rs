@@ -32,6 +32,20 @@ pub enum Info {
 }
 
 impl Info {
+    /// Returns the title.
+    pub const fn title(&self) -> &str {
+        match self {
+            Info::FileHeaders => todo!(),
+            Info::ProgramHeaders => "Program Headers / Segments",
+            Info::SectionHeaders => todo!(),
+            Info::Symbols => todo!(),
+            Info::DynamicSymbols => todo!(),
+            Info::Dynamics => todo!(),
+            Info::Relocations => todo!(),
+            Info::Notes => todo!(),
+        }
+    }
+
     /// Returns the headers.
     pub fn headers(&self) -> &[&str] {
         match self {
