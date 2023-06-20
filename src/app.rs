@@ -26,10 +26,20 @@ impl Debug for Analyzer<'_> {
 
 impl<'a> Analyzer<'a> {
     /// Constructs a new instance.
-    pub fn new(path: &'a str, bytes: &'a [u8]) -> Result<Self> {
+    pub fn new(bytes: &'a [u8]) -> Result<Self> {
         let elf_bytes = ElfBytes::<AnyEndian>::minimal_parse(bytes)?;
         let elf = Elf::from(elf_bytes);
-        Ok(Self { path, bytes, elf })
+        Ok(Self {
+            path: "",
+            bytes,
+            elf,
+        })
+    }
+
+    /// Sets the path of the ELF file.
+    pub fn with_path(mut self, path: &'a str) -> Self {
+        self.path = path;
+        self
     }
 
     /// Returns the sequences of printable characters.
