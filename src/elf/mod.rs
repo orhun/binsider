@@ -8,14 +8,6 @@ use header::{FileHeaders, ProgramHeaders};
 pub trait Property<'a> {
     /// Returns the items.
     fn items(&self) -> Vec<Vec<String>>;
-    /// Returns the table headers (optional).
-    fn headers(&self) -> Option<&'a [&'a str]> {
-        None
-    }
-    /// Returns the title (optional).
-    fn title(&self) -> Option<&'a str> {
-        None
-    }
 }
 
 /// ELF information.
@@ -37,6 +29,25 @@ pub enum Info {
     Relocations,
     /// Notes.
     Notes,
+}
+
+impl Info {
+    /// Returns the headers.
+    pub fn headers(&self) -> &[&str] {
+        match self {
+            Info::FileHeaders => todo!(),
+            Info::ProgramHeaders => &[
+                "p_type", "p_offset", "p_vaddr", "p_paddr", "p_filesz", "p_memsz", "p_align",
+                "p_flags",
+            ],
+            Info::SectionHeaders => todo!(),
+            Info::Symbols => todo!(),
+            Info::DynamicSymbols => todo!(),
+            Info::Dynamics => todo!(),
+            Info::Relocations => todo!(),
+            Info::Notes => todo!(),
+        }
+    }
 }
 
 /// Elf wrapper.

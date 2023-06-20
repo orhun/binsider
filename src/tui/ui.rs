@@ -4,12 +4,15 @@ use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span},
-    widgets::{Block, Borders, Cell, Paragraph, Row, Table, Tabs},
+    widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, Tabs},
     Frame,
 };
 
-/// Titles of the tabs.
-pub const TAB_TITLES: &[&str] = &["Static", "Dynamic", "Strings", "Hexdump"];
+/// Titles of the main tabs.
+pub const MAIN_TABS: &[&str] = &["Static", "Dynamic", "Strings", "Hexdump"];
+
+/// Titles of the ELF info tabs.
+pub const ELF_INFO_TABS: &[&str] = &["Program Headers / Segments"];
 
 /// Renders the user interface widgets.
 pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
@@ -36,7 +39,7 @@ pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
             .margin(1)
             .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
             .split(chunks[0]);
-        let tabs = Tabs::new(TAB_TITLES.iter().map(|v| Line::from(*v)).collect())
+        let tabs = Tabs::new(MAIN_TABS.iter().map(|v| Line::from(*v)).collect())
             .select(state.tab_index)
             .style(Style::default().fg(Color::Cyan))
             .highlight_style(
@@ -97,7 +100,6 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
         })
         .collect();
     frame.render_widget(Block::default().borders(Borders::ALL), rect);
-
     let chunks = Layout::default()
         .direction(Direction::Vertical)
         .margin(1)
@@ -124,9 +126,22 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
         );
     }
     {
-        let property = state.analyzer.elf.info(&state.selected_info);
-        let headers = property.headers().unwrap_or_default();
-        let title = property.title().unwrap_or_default();
+        let area = chunks[1];
+        let chunks = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([Constraint::Length(1), Constraint::Percentage(100)].as_ref())
+            .split(area);
+
+        let tabs = Tabs::new(MAIN_TABS.iter().map(|v| Line::from(*v)).collect())
+            .select(state.tab_index)
+            .style(Style::default().fg(Color::Cyan))
+            .highlight_style(
+                Style::default()
+                    .add_modifier(Modifier::BOLD)
+                    .bg(Color::Black),
+            );
+        frame.render_widget(tabs, chunks[0]);
+        let headers = state.selected_info.headers();
         frame.render_stateful_widget(
             Table::new(
                 state
@@ -135,22 +150,40 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
                     .iter()
                     .map(|items| Row::new(items.iter().map(|v| Cell::from(Span::raw(v))))),
             )
-            .block(
-                Block::default()
-                    .title(title)
-                    .title_alignment(Alignment::Left)
-                    .borders(Borders::all()),
-            )
+            .block(Block::default().borders(Borders::ALL))
             .highlight_style(Style::default().fg(Color::Green))
-            .header(Row::new(headers.to_vec()))
+            .header(Row::new(state.selected_info.headers().to_vec()))
             .widths(
                 &[Constraint::Percentage(
                     (100 / headers.len()).try_into().unwrap_or_default(),
                 )]
                 .repeat(headers.len()),
             ),
-            chunks[1],
+            area,
             &mut state.list.state,
         );
+        let chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints(
+                [
+                    Constraint::Length(1),
+                    Constraint::Length(
+                        ELF_INFO_TABS.iter().map(|v| v.len() as u16).sum::<u16>() + 2,
+                    ),
+                    Constraint::Percentage(100),
+                ]
+                .as_ref(),
+            )
+            .split(chunks[0]);
+        frame.render_widget(Clear, chunks[1]);
+        let tabs = Tabs::new(ELF_INFO_TABS.iter().map(|v| Line::from(*v)).collect())
+            .select(state.tab_index)
+            .style(Style::default().fg(Color::Cyan))
+            .highlight_style(
+                Style::default()
+                    .add_modifier(Modifier::BOLD)
+                    .bg(Color::Black),
+            );
+        frame.render_widget(tabs, chunks[1]);
     }
 }
