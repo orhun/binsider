@@ -51,8 +51,7 @@ impl Info {
         match self {
             Info::FileHeaders => todo!(),
             Info::ProgramHeaders => &[
-                "p_type", "p_offset", "p_vaddr", "p_paddr", "p_filesz", "p_memsz", "p_align",
-                "p_flags",
+                "Type", "Offset", "VirtAddr", "PhysAddr", "FileSiz", "MemSiz", "Flags", "Align",
             ],
             Info::SectionHeaders => todo!(),
             Info::Symbols => todo!(),
