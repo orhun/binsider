@@ -1,8 +1,8 @@
 /// ELF header.
 pub mod header;
 
-use elf::{endian::AnyEndian, ElfBytes};
-use header::{FileHeaders, ProgramHeaders};
+use elf::{endian::AnyEndian, ElfBytes, ParseError};
+use header::{FileHeaders, ProgramHeaders, SectionHeaders};
 
 /// ELF property for receiving information.
 pub trait Property<'a> {
@@ -33,11 +33,11 @@ pub enum Info {
 
 impl Info {
     /// Returns the title.
-    pub const fn title(&self) -> &str {
+    pub fn title(&self) -> &str {
         match self {
             Info::FileHeaders => todo!(),
             Info::ProgramHeaders => "Program Headers / Segments",
-            Info::SectionHeaders => todo!(),
+            Info::SectionHeaders => "Section Headers",
             Info::Symbols => todo!(),
             Info::DynamicSymbols => todo!(),
             Info::Dynamics => todo!(),
@@ -53,7 +53,19 @@ impl Info {
             Info::ProgramHeaders => &[
                 "Type", "Offset", "VirtAddr", "PhysAddr", "FileSiz", "MemSiz", "Flags", "Align",
             ],
-            Info::SectionHeaders => todo!(),
+            Info::SectionHeaders => &[
+                "index",
+                "name",
+                "sh_type",
+                "sh_addr",
+                "sh_offset",
+                "sh_size",
+                "sh_entsize",
+                "sh_flags",
+                "sh_link",
+                "sh_info",
+                "sh_addralign",
+            ],
             Info::Symbols => todo!(),
             Info::DynamicSymbols => todo!(),
             Info::Dynamics => todo!(),
@@ -70,17 +82,21 @@ pub struct Elf {
     pub file_headers: FileHeaders,
     /// Program headers.
     pub program_headers: ProgramHeaders,
+    /// Section headers.
+    pub section_headers: SectionHeaders,
 }
 
-impl<'a> From<ElfBytes<'a, AnyEndian>> for Elf {
-    fn from(elf_bytes: ElfBytes<'a, AnyEndian>) -> Self {
-        Self {
+impl<'a> TryFrom<ElfBytes<'a, AnyEndian>> for Elf {
+    type Error = ParseError;
+    fn try_from(elf_bytes: ElfBytes<'a, AnyEndian>) -> Result<Self, Self::Error> {
+        Ok(Self {
             file_headers: FileHeaders::from(elf_bytes.ehdr),
             program_headers: ProgramHeaders::from(match elf_bytes.segments() {
                 Some(segments) => segments.iter().collect(),
                 None => vec![],
             }),
-        }
+            section_headers: SectionHeaders::try_from(elf_bytes.section_headers_with_strtab()?)?,
+        })
     }
 }
 
@@ -90,11 +106,12 @@ impl Elf {
     where
         FileHeaders: Property<'a>,
         ProgramHeaders: Property<'a>,
+        SectionHeaders: Property<'a>,
     {
         match info {
             Info::FileHeaders => Box::new(self.file_headers),
             Info::ProgramHeaders => Box::new(self.program_headers.clone()),
-            Info::SectionHeaders => todo!(),
+            Info::SectionHeaders => Box::new(self.section_headers.clone()),
             Info::Symbols => todo!(),
             Info::DynamicSymbols => todo!(),
             Info::Dynamics => todo!(),

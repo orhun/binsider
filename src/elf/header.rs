@@ -1,7 +1,11 @@
 use crate::elf::Property;
-use elf::segment::ProgramHeader as ElfProgramHeader;
-use elf::to_str::*;
+use elf::parse::ParsingTable;
+use elf::section::SectionHeader;
+use elf::segment::ProgramHeader;
+use elf::string_table::StringTable;
 use elf::{endian::AnyEndian, file::FileHeader as ElfFileHeader};
+use elf::{to_str::*, ParseError};
+use std::io::{Error as IoError, ErrorKind as IoErrorKind};
 
 /// ELF file file header wrapper.
 #[derive(Clone, Copy, Debug)]
@@ -107,11 +111,11 @@ impl<'a> Property<'a> for FileHeaders {
 #[derive(Clone, Debug)]
 pub struct ProgramHeaders {
     /// Inner type.
-    inner: Vec<ElfProgramHeader>,
+    inner: Vec<ProgramHeader>,
 }
 
-impl From<Vec<ElfProgramHeader>> for ProgramHeaders {
-    fn from(inner: Vec<ElfProgramHeader>) -> Self {
+impl From<Vec<ProgramHeader>> for ProgramHeaders {
+    fn from(inner: Vec<ProgramHeader>) -> Self {
         Self { inner }
     }
 }
@@ -132,6 +136,81 @@ impl<'a> Property<'a> for ProgramHeaders {
                     format!("{:#x}", item.p_memsz),
                     elf::to_str::p_flags_to_string(item.p_flags),
                     format!("{:#x}", item.p_align),
+                ]
+            })
+            .collect()
+    }
+}
+
+/// ELF file section header wrapper.
+#[derive(Clone, Debug)]
+pub struct SectionHeaders {
+    /// Inner type.
+    inner: Vec<SectionHeader>,
+    /// Section names.
+    names: Vec<String>,
+}
+
+impl<'a>
+    TryFrom<(
+        Option<ParsingTable<'a, AnyEndian, SectionHeader>>,
+        Option<StringTable<'a>>,
+    )> for SectionHeaders
+{
+    type Error = ParseError;
+    fn try_from(
+        value: (
+            Option<ParsingTable<'a, AnyEndian, SectionHeader>>,
+            Option<StringTable<'a>>,
+        ),
+    ) -> Result<Self, Self::Error> {
+        let (parsing_table, string_table) = (
+            value.0.ok_or_else(|| {
+                ParseError::IOError(IoError::new(
+                    IoErrorKind::Other,
+                    "parsing table does not exist",
+                ))
+            })?,
+            value.1.ok_or_else(|| {
+                ParseError::IOError(IoError::new(
+                    IoErrorKind::Other,
+                    "string table does not exist",
+                ))
+            })?,
+        );
+        Ok(Self {
+            inner: parsing_table.iter().collect(),
+            names: parsing_table
+                .iter()
+                .map(|v| {
+                    string_table
+                        .get(v.sh_name as usize)
+                        .map(|v| v.to_string())
+                        .unwrap_or_else(|_| String::from("unknown"))
+                })
+                .collect(),
+        })
+    }
+}
+
+impl<'a> Property<'a> for SectionHeaders {
+    fn items(&self) -> Vec<Vec<String>> {
+        self.inner
+            .iter()
+            .enumerate()
+            .map(|(i, header)| {
+                vec![
+                    i.to_string(),
+                    self.names[i].to_string(),
+                    elf::to_str::sh_type_to_string(header.sh_type),
+                    format!("{:#x}", header.sh_addr),
+                    format!("{:#x}", header.sh_offset),
+                    format!("{:#x}", header.sh_size),
+                    header.sh_entsize.to_string(),
+                    format!("{:#x}", header.sh_flags),
+                    header.sh_link.to_string(),
+                    header.sh_info.to_string(),
+                    header.sh_addralign.to_string(),
                 ]
             })
             .collect()

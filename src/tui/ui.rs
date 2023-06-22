@@ -12,7 +12,7 @@ use ratatui::{
 pub const MAIN_TABS: &[&str] = &["Static", "Dynamic", "Strings", "Hexdump"];
 
 /// Titles of the ELF info tabs.
-pub const ELF_INFO_TABS: &[&str] = &[Info::ProgramHeaders.title()];
+pub const ELF_INFO_TABS: &[Info] = &[Info::ProgramHeaders, Info::SectionHeaders];
 
 /// Renders the user interface widgets.
 pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
@@ -131,7 +131,6 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             .direction(Direction::Vertical)
             .constraints([Constraint::Length(1), Constraint::Percentage(100)].as_ref())
             .split(area);
-
         let tabs = Tabs::new(MAIN_TABS.iter().map(|v| Line::from(*v)).collect())
             .select(state.tab_index)
             .style(Style::default().fg(Color::Cyan))
@@ -141,7 +140,7 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
                     .bg(Color::Black),
             );
         frame.render_widget(tabs, chunks[0]);
-        let headers = state.selected_info.headers();
+        let headers = ELF_INFO_TABS[state.info_index].headers();
         frame.render_stateful_widget(
             Table::new(
                 state
@@ -152,7 +151,7 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             )
             .block(Block::default().borders(Borders::ALL))
             .highlight_style(Style::default().fg(Color::Green))
-            .header(Row::new(state.selected_info.headers().to_vec()))
+            .header(Row::new(headers.to_vec()))
             .widths(
                 &[Constraint::Percentage(
                     (100 / headers.len()).try_into().unwrap_or_default(),
@@ -168,7 +167,12 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
                 [
                     Constraint::Length(1),
                     Constraint::Length(
-                        ELF_INFO_TABS.iter().map(|v| v.len() as u16).sum::<u16>() + 2,
+                        ELF_INFO_TABS
+                            .iter()
+                            .map(|v| v.title().len() as u16)
+                            .sum::<u16>()
+                            + ((ELF_INFO_TABS.len() as u16 - 1) * 3)
+                            + 2,
                     ),
                     Constraint::Percentage(100),
                 ]
@@ -176,14 +180,19 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             )
             .split(chunks[0]);
         frame.render_widget(Clear, chunks[1]);
-        let tabs = Tabs::new(ELF_INFO_TABS.iter().map(|v| Line::from(*v)).collect())
-            .select(state.tab_index)
-            .style(Style::default().fg(Color::Cyan))
-            .highlight_style(
-                Style::default()
-                    .add_modifier(Modifier::BOLD)
-                    .bg(Color::Black),
-            );
+        let tabs = Tabs::new(
+            ELF_INFO_TABS
+                .iter()
+                .map(|v| Line::from(v.title()))
+                .collect(),
+        )
+        .select(state.info_index)
+        .style(Style::default().fg(Color::Cyan))
+        .highlight_style(
+            Style::default()
+                .add_modifier(Modifier::BOLD)
+                .bg(Color::Black),
+        );
         frame.render_widget(tabs, chunks[1]);
     }
 }

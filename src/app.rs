@@ -28,7 +28,7 @@ impl<'a> Analyzer<'a> {
     /// Constructs a new instance.
     pub fn new(bytes: &'a [u8]) -> Result<Self> {
         let elf_bytes = ElfBytes::<AnyEndian>::minimal_parse(bytes)?;
-        let elf = Elf::from(elf_bytes);
+        let elf = Elf::try_from(elf_bytes)?;
         Ok(Self {
             path: "",
             bytes,
