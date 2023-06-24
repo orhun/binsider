@@ -41,8 +41,7 @@ impl<'a> Property<'a> for FileHeaders {
         headers.push(vec![
             String::from("OS/ABI"),
             e_osabi_to_string(self.inner.osabi)
-                .strip_prefix("ELFOSABI_")
-                .unwrap_or("unknown")
+                .trim_start_matches("ELFOSABI_")
                 .to_string(),
         ]);
         headers.push(vec![
@@ -200,9 +199,10 @@ impl<'a> Property<'a> for SectionHeaders {
             .enumerate()
             .map(|(i, header)| {
                 vec![
-                    i.to_string(),
                     self.names[i].to_string(),
-                    elf::to_str::sh_type_to_string(header.sh_type),
+                    elf::to_str::sh_type_to_string(header.sh_type)
+                        .trim_start_matches("SHT_")
+                        .to_string(),
                     format!("{:#x}", header.sh_addr),
                     format!("{:#x}", header.sh_offset),
                     format!("{:#x}", header.sh_size),
