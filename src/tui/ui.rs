@@ -3,10 +3,11 @@ use ratatui::{
     backend::Backend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
-    text::{Line, Span},
+    text::{Line, Span, Text},
     widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, Tabs},
     Frame,
 };
+use unicode_width::UnicodeWidthStr;
 
 /// Titles of the main tabs.
 pub const MAIN_TABS: &[&str] = &["Static", "Dynamic", "Strings", "Hexdump"];
@@ -194,5 +195,48 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
                 .bg(Color::Black),
         );
         frame.render_widget(tabs, chunks[1]);
+        render_item_index(
+            frame,
+            rect,
+            format!(
+                "{}/{}",
+                state.list.state.selected().map(|v| v + 1).unwrap_or(0),
+                state.list.items.len()
+            ),
+        );
+    }
+}
+
+/// Renders the text for displaying the selected index.
+fn render_item_index<B: Backend>(frame: &mut Frame<'_, B>, rect: Rect, selection_text: String) {
+    let selection_text_width = u16::try_from(selection_text.width()).unwrap_or_default();
+    if let Some(horizontal_area_width) = rect.width.checked_sub(selection_text_width + 3) {
+        let vertical_area = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints(
+                [
+                    Constraint::Min(rect.height.checked_sub(3).unwrap_or(rect.height)),
+                    Constraint::Min(1),
+                    Constraint::Min(1),
+                ]
+                .as_ref(),
+            )
+            .split(rect);
+        let horizontal_area = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints(
+                [
+                    Constraint::Min(horizontal_area_width),
+                    Constraint::Min(selection_text_width),
+                    Constraint::Min(1),
+                    Constraint::Min(1),
+                ]
+                .as_ref(),
+            )
+            .split(vertical_area[1]);
+        frame.render_widget(Clear, horizontal_area[1]);
+        frame.render_widget(Paragraph::new(selection_text), horizontal_area[1]);
+        frame.render_widget(Clear, horizontal_area[2]);
+        frame.render_widget(Paragraph::new(Text::default()), horizontal_area[2]);
     }
 }

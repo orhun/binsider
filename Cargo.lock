@@ -68,6 +68,7 @@ dependencies = [
  "ratatui",
  "rust-strings",
  "thiserror",
+ "unicode-width",
 ]
 
 [[package]]
