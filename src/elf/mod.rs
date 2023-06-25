@@ -1,8 +1,11 @@
 /// ELF header.
 pub mod header;
+/// ELF symbols.
+pub mod symbols;
 
 use elf::{endian::AnyEndian, ElfBytes, ParseError};
 use header::{FileHeaders, ProgramHeaders, SectionHeaders};
+use symbols::Symbols;
 
 /// ELF property for receiving information.
 pub trait Property<'a> {
@@ -38,7 +41,7 @@ impl Info {
             Info::FileHeaders => todo!(),
             Info::ProgramHeaders => "Program Headers / Segments",
             Info::SectionHeaders => "Section Headers",
-            Info::Symbols => todo!(),
+            Info::Symbols => "Symbols",
             Info::DynamicSymbols => todo!(),
             Info::Dynamics => todo!(),
             Info::Relocations => todo!(),
@@ -57,7 +60,7 @@ impl Info {
                 "Name", "Type", "Addr", "Offset", "Size", "EntSiz", "Flags", "Link", "Info",
                 "Align",
             ],
-            Info::Symbols => todo!(),
+            Info::Symbols => &["Value", "Siz", "Type", "Bind", "Vis", "Ndx", "Name"],
             Info::DynamicSymbols => todo!(),
             Info::Dynamics => todo!(),
             Info::Relocations => todo!(),
@@ -66,7 +69,7 @@ impl Info {
     }
 }
 
-/// Elf wrapper.
+/// ELF wrapper.
 #[derive(Debug)]
 pub struct Elf {
     /// File headers.
@@ -75,6 +78,8 @@ pub struct Elf {
     pub program_headers: ProgramHeaders,
     /// Section headers.
     pub section_headers: SectionHeaders,
+    /// Symbols.
+    pub symbols: Symbols,
 }
 
 impl<'a> TryFrom<ElfBytes<'a, AnyEndian>> for Elf {
@@ -87,23 +92,19 @@ impl<'a> TryFrom<ElfBytes<'a, AnyEndian>> for Elf {
                 None => vec![],
             }),
             section_headers: SectionHeaders::try_from(elf_bytes.section_headers_with_strtab()?)?,
+            symbols: Symbols::try_from(elf_bytes.symbol_table()?)?,
         })
     }
 }
 
 impl Elf {
     /// Returns the information about the ELF file.
-    pub fn info<'a>(&self, info: &Info) -> Box<dyn Property<'a>>
-    where
-        FileHeaders: Property<'a>,
-        ProgramHeaders: Property<'a>,
-        SectionHeaders: Property<'a>,
-    {
+    pub fn info<'a>(&self, info: &Info) -> Box<dyn Property<'a>> {
         match info {
             Info::FileHeaders => Box::new(self.file_headers),
             Info::ProgramHeaders => Box::new(self.program_headers.clone()),
             Info::SectionHeaders => Box::new(self.section_headers.clone()),
-            Info::Symbols => todo!(),
+            Info::Symbols => Box::new(self.symbols.clone()),
             Info::DynamicSymbols => todo!(),
             Info::Dynamics => todo!(),
             Info::Relocations => todo!(),

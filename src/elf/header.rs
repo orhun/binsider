@@ -7,7 +7,7 @@ use elf::{endian::AnyEndian, file::FileHeader as ElfFileHeader};
 use elf::{to_str::*, ParseError};
 use std::io::{Error as IoError, ErrorKind as IoErrorKind};
 
-/// ELF file file header wrapper.
+/// ELF file header wrapper.
 #[derive(Clone, Copy, Debug)]
 pub struct FileHeaders {
     /// Inner type.
@@ -106,7 +106,7 @@ impl<'a> Property<'a> for FileHeaders {
     }
 }
 
-/// ELF file program header wrapper.
+/// ELF program header wrapper.
 #[derive(Clone, Debug)]
 pub struct ProgramHeaders {
     /// Inner type.
