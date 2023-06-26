@@ -45,14 +45,25 @@ impl<'a> Property<'a> for Symbols {
             .iter()
             .enumerate()
             .map(|(i, symbol)| {
+                let name = self.names[i].to_string();
                 vec![
                     format!("{:#x}", symbol.st_value),
                     symbol.st_size.to_string(),
-                    elf::to_str::st_symtype_to_string(symbol.st_symtype()),
-                    elf::to_str::st_bind_to_string(symbol.st_bind()),
-                    elf::to_str::st_vis_to_string(symbol.st_vis()),
+                    elf::to_str::st_symtype_to_string(symbol.st_symtype())
+                        .trim_start_matches("STT_")
+                        .to_string(),
+                    elf::to_str::st_bind_to_string(symbol.st_bind())
+                        .trim_start_matches("STB_")
+                        .to_string(),
+                    elf::to_str::st_vis_to_string(symbol.st_vis())
+                        .trim_start_matches("STV_")
+                        .to_string(),
                     symbol.st_shndx.to_string(),
-                    self.names[i].to_string(),
+                    format!(
+                        "{}{}",
+                        name.chars().take(15).collect::<String>(),
+                        if name.is_empty() { "" } else { "[...]" }
+                    ),
                 ]
             })
             .collect()
