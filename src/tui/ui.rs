@@ -13,7 +13,12 @@ use unicode_width::UnicodeWidthStr;
 pub const MAIN_TABS: &[&str] = &["Static", "Dynamic", "Strings", "Hexdump"];
 
 /// Titles of the ELF info tabs.
-pub const ELF_INFO_TABS: &[Info] = &[Info::ProgramHeaders, Info::SectionHeaders, Info::Symbols];
+pub const ELF_INFO_TABS: &[Info] = &[
+    Info::ProgramHeaders,
+    Info::SectionHeaders,
+    Info::Symbols,
+    Info::DynamicSymbols,
+];
 
 /// Renders the user interface widgets.
 pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {

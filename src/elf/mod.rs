@@ -5,7 +5,7 @@ pub mod symbols;
 
 use elf::{endian::AnyEndian, ElfBytes, ParseError};
 use header::{FileHeaders, ProgramHeaders, SectionHeaders};
-use symbols::Symbols;
+use symbols::{DynamicSymbols, Symbols};
 
 /// ELF property for receiving information.
 pub trait Property<'a> {
@@ -42,7 +42,7 @@ impl Info {
             Info::ProgramHeaders => "Program Headers / Segments",
             Info::SectionHeaders => "Section Headers",
             Info::Symbols => "Symbols",
-            Info::DynamicSymbols => todo!(),
+            Info::DynamicSymbols => "Dynamic Symbols",
             Info::Dynamics => todo!(),
             Info::Relocations => todo!(),
             Info::Notes => todo!(),
@@ -61,7 +61,7 @@ impl Info {
                 "Align",
             ],
             Info::Symbols => &["Value", "Siz", "Type", "Bind", "Vis", "Ndx", "Name"],
-            Info::DynamicSymbols => todo!(),
+            Info::DynamicSymbols => &["Value", "Siz", "Type", "Bind", "Vis", "Ndx", "Reqs", "Name"],
             Info::Dynamics => todo!(),
             Info::Relocations => todo!(),
             Info::Notes => todo!(),
@@ -80,6 +80,8 @@ pub struct Elf {
     pub section_headers: SectionHeaders,
     /// Symbols.
     pub symbols: Symbols,
+    /// Dynamic symbols.
+    pub dynamic_symbols: DynamicSymbols,
 }
 
 impl<'a> TryFrom<ElfBytes<'a, AnyEndian>> for Elf {
@@ -93,6 +95,10 @@ impl<'a> TryFrom<ElfBytes<'a, AnyEndian>> for Elf {
             }),
             section_headers: SectionHeaders::try_from(elf_bytes.section_headers_with_strtab()?)?,
             symbols: Symbols::try_from(elf_bytes.symbol_table()?)?,
+            dynamic_symbols: DynamicSymbols::try_from((
+                elf_bytes.dynamic_symbol_table()?,
+                elf_bytes.symbol_version_table()?,
+            ))?,
         })
     }
 }
@@ -105,7 +111,7 @@ impl Elf {
             Info::ProgramHeaders => Box::new(self.program_headers.clone()),
             Info::SectionHeaders => Box::new(self.section_headers.clone()),
             Info::Symbols => Box::new(self.symbols.clone()),
-            Info::DynamicSymbols => todo!(),
+            Info::DynamicSymbols => Box::new(self.dynamic_symbols.clone()),
             Info::Dynamics => todo!(),
             Info::Relocations => todo!(),
             Info::Notes => todo!(),
