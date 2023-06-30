@@ -1,8 +1,11 @@
+/// ELF dynamic section.
+pub mod dynamic;
 /// ELF header.
 pub mod header;
 /// ELF symbols.
 pub mod symbols;
 
+use dynamic::Dynamic;
 use elf::{endian::AnyEndian, ElfBytes, ParseError};
 use header::{FileHeaders, ProgramHeaders, SectionHeaders};
 use symbols::{DynamicSymbols, Symbols};
@@ -43,7 +46,7 @@ impl Info {
             Info::SectionHeaders => "Section Headers",
             Info::Symbols => "Symbols",
             Info::DynamicSymbols => "Dynamic Symbols",
-            Info::Dynamics => todo!(),
+            Info::Dynamics => "Dynamic",
             Info::Relocations => todo!(),
             Info::Notes => todo!(),
         }
@@ -62,7 +65,7 @@ impl Info {
             ],
             Info::Symbols => &["Value", "Siz", "Type", "Bind", "Vis", "Ndx", "Name"],
             Info::DynamicSymbols => &["Value", "Siz", "Type", "Bind", "Vis", "Ndx", "Reqs", "Name"],
-            Info::Dynamics => todo!(),
+            Info::Dynamics => &["d_tag", "d_ptr/d_val"],
             Info::Relocations => todo!(),
             Info::Notes => todo!(),
         }
@@ -82,6 +85,8 @@ pub struct Elf {
     pub symbols: Symbols,
     /// Dynamic symbols.
     pub dynamic_symbols: DynamicSymbols,
+    /// Dynamic.
+    pub dynamic: Dynamic,
 }
 
 impl<'a> TryFrom<ElfBytes<'a, AnyEndian>> for Elf {
@@ -99,6 +104,7 @@ impl<'a> TryFrom<ElfBytes<'a, AnyEndian>> for Elf {
                 elf_bytes.dynamic_symbol_table()?,
                 elf_bytes.symbol_version_table()?,
             ))?,
+            dynamic: Dynamic::try_from(elf_bytes.dynamic()?)?,
         })
     }
 }
@@ -112,7 +118,7 @@ impl Elf {
             Info::SectionHeaders => Box::new(self.section_headers.clone()),
             Info::Symbols => Box::new(self.symbols.clone()),
             Info::DynamicSymbols => Box::new(self.dynamic_symbols.clone()),
-            Info::Dynamics => todo!(),
+            Info::Dynamics => Box::new(self.dynamic.clone()),
             Info::Relocations => todo!(),
             Info::Notes => todo!(),
         }

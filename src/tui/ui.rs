@@ -18,6 +18,7 @@ pub const ELF_INFO_TABS: &[Info] = &[
     Info::SectionHeaders,
     Info::Symbols,
     Info::DynamicSymbols,
+    Info::Dynamics,
 ];
 
 /// Renders the user interface widgets.
