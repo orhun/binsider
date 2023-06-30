@@ -65,7 +65,7 @@ impl Info {
             ],
             Info::Symbols => &["Value", "Siz", "Type", "Bind", "Vis", "Ndx", "Name"],
             Info::DynamicSymbols => &["Value", "Siz", "Type", "Bind", "Vis", "Ndx", "Reqs", "Name"],
-            Info::Dynamics => &["d_tag", "d_ptr/d_val"],
+            Info::Dynamics => &["Tag", "Value"],
             Info::Relocations => todo!(),
             Info::Notes => todo!(),
         }

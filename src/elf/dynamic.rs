@@ -32,7 +32,7 @@ impl<'a> Property<'a> for Dynamic {
                 let d_tag_str = elf::to_str::d_tag_to_str(dynamic.d_tag)
                     .map_or(format!("{:#X?}", dynamic.d_tag), |val| val.to_string());
                 vec![
-                    format!("{d_tag_str}"),
+                    format!("{d_tag_str}").trim_start_matches("DT_").to_string(),
                     format!("{:#X?}", dynamic.clone().d_val()),
                 ]
             })
