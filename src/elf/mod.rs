@@ -2,12 +2,15 @@
 pub mod dynamic;
 /// ELF header.
 pub mod header;
+/// ELF relocations.
+pub mod relocations;
 /// ELF symbols.
 pub mod symbols;
 
 use dynamic::Dynamic;
 use elf::{endian::AnyEndian, ElfBytes, ParseError};
 use header::{FileHeaders, ProgramHeaders, SectionHeaders};
+use relocations::Relocations;
 use symbols::{DynamicSymbols, Symbols};
 
 /// ELF property for receiving information.
@@ -47,7 +50,7 @@ impl Info {
             Info::Symbols => "Symbols",
             Info::DynamicSymbols => "Dynamic Symbols",
             Info::Dynamics => "Dynamic",
-            Info::Relocations => todo!(),
+            Info::Relocations => "Relocations",
             Info::Notes => todo!(),
         }
     }
@@ -66,7 +69,7 @@ impl Info {
             Info::Symbols => &["Value", "Siz", "Type", "Bind", "Vis", "Ndx", "Name"],
             Info::DynamicSymbols => &["Value", "Siz", "Type", "Bind", "Vis", "Ndx", "Reqs", "Name"],
             Info::Dynamics => &["Tag", "Value"],
-            Info::Relocations => todo!(),
+            Info::Relocations => &["r_type", "r_sym", "r_offset", "r_addend"],
             Info::Notes => todo!(),
         }
     }
@@ -87,6 +90,8 @@ pub struct Elf {
     pub dynamic_symbols: DynamicSymbols,
     /// Dynamic.
     pub dynamic: Dynamic,
+    /// Relocations.
+    pub relocations: Relocations,
 }
 
 impl<'a> TryFrom<ElfBytes<'a, AnyEndian>> for Elf {
@@ -105,6 +110,7 @@ impl<'a> TryFrom<ElfBytes<'a, AnyEndian>> for Elf {
                 elf_bytes.symbol_version_table()?,
             ))?,
             dynamic: Dynamic::try_from(elf_bytes.dynamic()?)?,
+            relocations: Relocations::try_from(elf_bytes)?,
         })
     }
 }
@@ -119,7 +125,7 @@ impl Elf {
             Info::Symbols => Box::new(self.symbols.clone()),
             Info::DynamicSymbols => Box::new(self.dynamic_symbols.clone()),
             Info::Dynamics => Box::new(self.dynamic.clone()),
-            Info::Relocations => todo!(),
+            Info::Relocations => Box::new(self.relocations.clone()),
             Info::Notes => todo!(),
         }
     }
