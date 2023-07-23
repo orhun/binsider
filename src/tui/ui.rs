@@ -93,7 +93,7 @@ pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
 /// - relocations
 /// - notes
 pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>, rect: Rect) {
-    let header: Vec<Line> = state
+    let headers: Vec<Line> = state
         .analyzer
         .elf
         .info(&Info::FileHeaders)
@@ -107,6 +107,14 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             ])
         })
         .collect();
+    let notes: Vec<Line> = state
+        .analyzer
+        .elf
+        .notes
+        .text
+        .iter()
+        .map(|v| Line::from(vec![Span::raw(v)]))
+        .collect();
     frame.render_widget(Block::default().borders(Borders::ALL), rect);
     let chunks = Layout::default()
         .direction(Direction::Vertical)
@@ -119,7 +127,7 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
             .split(chunks[0]);
         frame.render_widget(
-            Paragraph::new(header).block(
+            Paragraph::new(headers).block(
                 Block::default()
                     .borders(Borders::ALL)
                     .border_style(Style::default().fg(Color::Black)),
@@ -127,9 +135,11 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             chunks[0],
         );
         frame.render_widget(
-            Block::default()
-                .borders(Borders::ALL)
-                .border_style(Style::default().fg(Color::Black)),
+            Paragraph::new(notes).block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(Color::Black)),
+            ),
             chunks[1],
         );
     }

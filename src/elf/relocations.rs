@@ -15,9 +15,9 @@ pub struct Relocations {
     relas: Vec<Rela>,
 }
 
-impl<'a> TryFrom<ElfBytes<'a, AnyEndian>> for Relocations {
+impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Relocations {
     type Error = ParseError;
-    fn try_from(elf: ElfBytes<'a, AnyEndian>) -> Result<Self, Self::Error> {
+    fn try_from(elf: &'a ElfBytes<'a, AnyEndian>) -> Result<Self, Self::Error> {
         let parsing_table = elf.section_headers().ok_or_else(|| {
             ParseError::IOError(IoError::new(
                 IoErrorKind::Other,

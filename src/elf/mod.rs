@@ -2,6 +2,8 @@
 pub mod dynamic;
 /// ELF header.
 pub mod header;
+/// ELF notes.
+pub mod notes;
 /// ELF relocations.
 pub mod relocations;
 /// ELF symbols.
@@ -10,6 +12,7 @@ pub mod symbols;
 use dynamic::Dynamic;
 use elf::{endian::AnyEndian, ElfBytes, ParseError};
 use header::{FileHeaders, ProgramHeaders, SectionHeaders};
+use notes::Notes;
 use relocations::Relocations;
 use symbols::{DynamicSymbols, Symbols};
 
@@ -92,6 +95,8 @@ pub struct Elf {
     pub dynamic: Dynamic,
     /// Relocations.
     pub relocations: Relocations,
+    /// Notes.
+    pub notes: Notes,
 }
 
 impl<'a> TryFrom<ElfBytes<'a, AnyEndian>> for Elf {
@@ -110,7 +115,8 @@ impl<'a> TryFrom<ElfBytes<'a, AnyEndian>> for Elf {
                 elf_bytes.symbol_version_table()?,
             ))?,
             dynamic: Dynamic::try_from(elf_bytes.dynamic()?)?,
-            relocations: Relocations::try_from(elf_bytes)?,
+            relocations: Relocations::try_from(&elf_bytes)?,
+            notes: Notes::try_from(&elf_bytes)?,
         })
     }
 }
