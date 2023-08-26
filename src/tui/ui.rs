@@ -107,14 +107,25 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             ])
         })
         .collect();
-    let notes: Vec<Line> = state
-        .analyzer
-        .elf
-        .notes
-        .text
-        .iter()
-        .map(|v| Line::from(vec![Span::raw(v)]))
-        .collect();
+    let mut lines = Vec::new();
+    for note in state.analyzer.elf.notes.inner.iter() {
+        lines.push(Line::from(vec![Span::styled(
+            note.name.to_string(),
+            Style::default().fg(Color::Cyan),
+        )]));
+        lines.push(Line::from(
+            note.header
+                .iter()
+                .map(|v| Span::raw(format!("{v} ")))
+                .collect::<Vec<Span>>(),
+        ));
+        lines.push(Line::from(
+            note.text
+                .iter()
+                .map(|v| Span::raw(format!("{v} ")))
+                .collect::<Vec<Span>>(),
+        ));
+    }
     frame.render_widget(Block::default().borders(Borders::ALL), rect);
     let chunks = Layout::default()
         .direction(Direction::Vertical)
@@ -135,7 +146,7 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             chunks[0],
         );
         frame.render_widget(
-            Paragraph::new(notes).block(
+            Paragraph::new(lines).block(
                 Block::default()
                     .borders(Borders::ALL)
                     .border_style(Style::default().fg(Color::Black)),

@@ -1,11 +1,22 @@
-use elf::{endian::AnyEndian, note::Note, ElfBytes, ParseError};
+use elf::{endian::AnyEndian, note::Note as ElfNote, ElfBytes, ParseError};
 use std::io::{Error as IoError, ErrorKind as IoErrorKind};
 
-/// ELF symbols wrapper.
+/// Representation of an ELF note.
+#[derive(Clone, Debug, Default)]
+pub struct Note {
+    /// Name of the note section.
+    pub name: String,
+    /// Header of the notes.
+    pub header: Vec<String>,
+    /// Contents of the note.
+    pub text: Vec<String>,
+}
+
+/// ELF notes wrapper.
 #[derive(Clone, Debug)]
 pub struct Notes {
     /// Notes text.
-    pub text: Vec<String>,
+    pub inner: Vec<Note>,
 }
 
 impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Notes {
@@ -26,7 +37,7 @@ impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Notes {
                 ))
             })?,
         );
-        let mut note_text = Vec::new();
+        let mut notes = Vec::new();
         parsing_table
             .iter()
             .filter(|v| v.sh_type == elf::abi::SHT_NOTE)
@@ -34,33 +45,40 @@ impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Notes {
                 let name = string_table
                     .get(section_header.sh_name as usize)
                     .expect("section name should parse");
-                let notes = elf
+                let elf_notes = elf
                     .section_data_as_notes(&section_header)
                     .expect("Failed to read notes section");
-                note_text.push(format!("Displaying notes found in: {name}"));
-                for note in notes {
-                    match note {
-                        Note::GnuAbiTag(abi) => {
+                let mut note = Note {
+                    name: format!("Displaying notes found in: {name}"),
+                    ..Default::default()
+                };
+                for elf_note in elf_notes {
+                    match elf_note {
+                        ElfNote::GnuAbiTag(abi) => {
                             let os_str = elf::to_str::note_abi_tag_os_to_str(abi.os)
                                 .map_or(format!("{}", abi.os), |val| val.to_string());
-                            note_text.push(format!(
-                                "    OS: {os_str}, ABI: {}.{}.{}",
-                                abi.major, abi.minor, abi.subminor
-                            ));
+                            note.header
+                                .extend(vec![String::from("OS"), String::from("ABI")]);
+                            note.text.extend(vec![
+                                os_str,
+                                format!("{}.{}.{}", abi.major, abi.minor, abi.subminor),
+                            ])
                         }
-                        Note::GnuBuildId(build_id) => {
-                            note_text.push(String::from("    Build ID: "));
-                            for byte in build_id.0 {
-                                note_text.push(format!("{byte:02x}"));
-                            }
+                        ElfNote::GnuBuildId(build_id) => {
+                            note.header.extend(vec![String::from("Build ID")]);
+                            note.text.extend(vec![build_id
+                                .0
+                                .iter()
+                                .map(|v| format!("{v:02x}"))
+                                .collect()]);
                         }
-                        Note::Unknown(any) => {
-                            note_text.extend(vec![
-                                String::from("type"),
-                                String::from("name"),
-                                String::from("desc"),
+                        ElfNote::Unknown(any) => {
+                            note.header.extend(vec![
+                                String::from("Type"),
+                                String::from("Name"),
+                                String::from("Description"),
                             ]);
-                            note_text.extend(vec![
+                            note.text.extend(vec![
                                 any.n_type.to_string(),
                                 any.name.to_string(),
                                 format!("{:02X?}", any.desc),
@@ -68,7 +86,8 @@ impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Notes {
                         }
                     }
                 }
+                notes.push(note);
             });
-        Ok(Self { text: note_text })
+        Ok(Self { inner: notes })
     }
 }
