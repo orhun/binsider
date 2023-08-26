@@ -31,7 +31,6 @@ impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Relocations {
                 .flat_map(|v| {
                     elf.section_data_as_rels(&v)
                         .expect("Failed to read rels section")
-                        .into_iter()
                         .collect::<Vec<Rel>>()
                 })
                 .collect(),
@@ -41,7 +40,6 @@ impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Relocations {
                 .flat_map(|v| {
                     elf.section_data_as_relas(&v)
                         .expect("Failed to read relas section")
-                        .into_iter()
                         .collect::<Vec<Rela>>()
                 })
                 .collect(),
