@@ -6,13 +6,13 @@ authors = ["Orhun Parmaksız <orhunparmaksiz@gmail.com>"]
 edition = "2021"
 
 [dependencies]
-ratatui = "0.21.0"
-crossterm = "0.26.1"
-clap = { version = "4.3.3", features = ["derive", "env", "wrap_help", "cargo"] }
-thiserror = "1.0.40"
+ratatui = "0.23.0"
+crossterm = "0.27.0"
+clap = { version = "4.4.2", features = ["derive", "env", "wrap_help", "cargo"] }
+thiserror = "1.0.48"
 elf = "0.7.1"
 rust-strings = "0.4.0"
 unicode-width = "0.1.10"
 
 [dev-dependencies]
-pretty_assertions = "1.3.0"
+pretty_assertions = "1.4.0"
