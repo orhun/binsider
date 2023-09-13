@@ -5,7 +5,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 /// Terminal events.
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug)]
 pub enum Event {
     /// Terminal tick.
     Tick,
@@ -15,6 +15,8 @@ pub enum Event {
     Mouse(MouseEvent),
     /// Terminal resize.
     Resize(u16, u16),
+    /// Result of `strings` call.
+    FileStrings(Result<Vec<(String, u64)>>),
 }
 
 /// Terminal event handler.
@@ -22,7 +24,7 @@ pub enum Event {
 #[derive(Debug)]
 pub struct EventHandler {
     /// Event sender channel.
-    sender: mpsc::Sender<Event>,
+    pub sender: mpsc::Sender<Event>,
     /// Event receiver channel.
     receiver: mpsc::Receiver<Event>,
     /// Event handler thread.

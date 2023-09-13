@@ -67,7 +67,9 @@ fn handle_tab(state: &mut State) -> Result<()> {
             state.list = SelectableList::with_items(
                 state
                     .analyzer
-                    .extract_strings(10)?
+                    .strings
+                    .clone()
+                    .unwrap_or_default()
                     .iter()
                     .map(|(v, i)| vec![v.to_string(), i.to_string()])
                     .collect(),

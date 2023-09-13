@@ -6,11 +6,11 @@ use std::{env, fs, process};
 
 fn main() -> Result<()> {
     let args = Args::parse();
-    let file = args.file.unwrap_or(env::current_exe()?);
+    let file = args.file.clone().unwrap_or(env::current_exe()?);
     let file_data = fs::read(&file)?;
     let bytes = file_data.as_slice();
     let analyzer = Analyzer::new(bytes)?.with_path(file.to_str().unwrap_or_default());
-    match binsider::start_tui(analyzer) {
+    match binsider::start_tui(analyzer, &args) {
         Ok(_) => process::exit(0),
         Err(e) => {
             eprintln!("{e}");

@@ -1,10 +1,15 @@
 use crate::{
     elf::Elf,
     error::{Error, Result},
+    tui::event::Event,
 };
 use elf::{endian::AnyEndian, ElfBytes};
 use rust_strings::BytesConfig;
-use std::fmt::{self, Debug, Formatter};
+use std::{
+    fmt::{self, Debug, Formatter},
+    sync::mpsc,
+    thread,
+};
 
 /// Binary analyzer.
 pub struct Analyzer<'a> {
@@ -14,6 +19,8 @@ pub struct Analyzer<'a> {
     bytes: &'a [u8],
     /// Elf properties.
     pub elf: Elf,
+    /// Strings.
+    pub strings: Option<Vec<(String, u64)>>,
 }
 
 impl Debug for Analyzer<'_> {
@@ -33,6 +40,7 @@ impl<'a> Analyzer<'a> {
             path: "",
             bytes,
             elf,
+            strings: None,
         })
     }
 
@@ -43,11 +51,15 @@ impl<'a> Analyzer<'a> {
     }
 
     /// Returns the sequences of printable characters.
-    pub fn extract_strings(&self, min_length: usize) -> Result<Vec<(String, u64)>> {
+    pub fn extract_strings(&self, min_length: usize, sender: mpsc::Sender<Event>) {
         let config = BytesConfig::new(self.bytes.to_vec()).with_min_length(min_length);
-        let strings =
-            rust_strings::strings(&config).map_err(|e| Error::StringsError(e.to_string()))?;
-        Ok(strings)
+        thread::spawn(move || {
+            sender
+                .send(Event::FileStrings(
+                    rust_strings::strings(&config).map_err(|e| Error::StringsError(e.to_string())),
+                ))
+                .expect("failed to send strings event");
+        });
     }
 }
 
@@ -74,8 +86,13 @@ mod tests {
     fn test_extract_strings() -> Result<()> {
         let test_bytes = get_test_bytes()?;
         let analyzer = Analyzer::new(test_bytes.as_slice())?;
-        let strings = analyzer.extract_strings(4)?;
-        assert!(strings.iter().map(|(s, _)| s).any(|v| v == ".debug_str"));
+        let (tx, rx) = mpsc::channel();
+        analyzer.extract_strings(4, tx);
+        if let Event::FileStrings(strings) = rx.recv()? {
+            assert!(strings?.iter().map(|(s, _)| s).any(|v| v == ".debug_str"));
+        } else {
+            panic!("strings did not succeed");
+        }
         Ok(())
     }
 }
