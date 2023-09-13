@@ -27,8 +27,9 @@ use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
 use std::io;
 use tui::event::{Event, EventHandler};
-use tui::handler::handle_key_events;
+use tui::handler;
 use tui::state::State;
+use tui::ui::Tab;
 use tui::Tui;
 
 /// Starts the terminal user interface.
@@ -53,11 +54,14 @@ pub fn start_tui(analyzer: Analyzer, args: &Args) -> Result<()> {
         // Handle events.
         match tui.events.next()? {
             Event::Tick => state.tick(),
-            Event::Key(key_event) => handle_key_events(key_event, &mut state)?,
+            Event::Key(key_event) => handler::handle_key_events(key_event, &mut state)?,
             Event::Mouse(_) => {}
             Event::Resize(_, _) => {}
             Event::FileStrings(strings) => {
                 state.analyzer.strings = Some(strings?);
+                if state.tab == Tab::Strings {
+                    handler::handle_tab(&mut state)?;
+                }
             }
         }
     }

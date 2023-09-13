@@ -51,7 +51,7 @@ pub fn handle_key_events(key_event: KeyEvent, state: &mut State) -> Result<()> {
 }
 
 /// Update the state based on selected tab.
-fn handle_tab(state: &mut State) -> Result<()> {
+pub fn handle_tab(state: &mut State) -> Result<()> {
     match state.tab {
         Tab::StaticAnalysis => {
             state.info_index = 0;

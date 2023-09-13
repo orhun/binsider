@@ -23,7 +23,7 @@ pub const ELF_INFO_TABS: &[Info] = &[
 ];
 
 /// Application tab.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Tab {
     /// Static analysis.
     StaticAnalysis = 0,
