@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::tui::state::State;
-use crate::tui::ui::{ELF_INFO_TABS, MAIN_TABS};
+use crate::tui::ui::{Tab, ELF_INFO_TABS, MAIN_TABS};
 use crate::tui::widgets::SelectableList;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
@@ -9,15 +9,17 @@ pub fn handle_key_events(key_event: KeyEvent, state: &mut State) -> Result<()> {
     match key_event.code {
         // Next tab.
         KeyCode::Right | KeyCode::Char('l') => {
-            state.tab_index = (state.tab_index + 1) % MAIN_TABS.len();
+            state.tab = ((state.tab as usize + 1) % MAIN_TABS.len()).into();
+            handle_tab(state)?;
         }
         // Previous tab.
         KeyCode::Left | KeyCode::Char('h') => {
-            if state.tab_index > 0 {
-                state.tab_index -= 1;
+            if state.tab as usize > 0 {
+                state.tab = (state.tab as usize - 1).into();
             } else {
-                state.tab_index = MAIN_TABS.len() - 1;
+                state.tab = (MAIN_TABS.len() - 1).into();
             }
+            handle_tab(state)?;
         }
         // Scroll down the list.
         KeyCode::Down | KeyCode::Char('j') => state.list.next(),
@@ -42,6 +44,34 @@ pub fn handle_key_events(key_event: KeyEvent, state: &mut State) -> Result<()> {
             if key_event.modifiers == KeyModifiers::CONTROL {
                 state.quit();
             }
+        }
+        _ => {}
+    }
+    Ok(())
+}
+
+/// Update the state based on selected tab.
+fn handle_tab(state: &mut State) -> Result<()> {
+    match state.tab {
+        Tab::StaticAnalysis => {
+            state.info_index = 0;
+            state.list = SelectableList::with_items(
+                state
+                    .analyzer
+                    .elf
+                    .info(&ELF_INFO_TABS[state.info_index])
+                    .items(),
+            );
+        }
+        Tab::Strings => {
+            state.list = SelectableList::with_items(
+                state
+                    .analyzer
+                    .extract_strings(10)?
+                    .iter()
+                    .map(|(v, i)| vec![v.to_string(), i.to_string()])
+                    .collect(),
+            )
         }
         _ => {}
     }

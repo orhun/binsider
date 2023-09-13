@@ -10,7 +10,7 @@ use ratatui::{
 use unicode_width::UnicodeWidthStr;
 
 /// Titles of the main tabs.
-pub const MAIN_TABS: &[&str] = &["Static", "Dynamic", "Strings", "Hexdump"];
+pub const MAIN_TABS: &[&str] = Tab::get_headers();
 
 /// Titles of the ELF info tabs.
 pub const ELF_INFO_TABS: &[Info] = &[
@@ -21,6 +21,44 @@ pub const ELF_INFO_TABS: &[Info] = &[
     Info::Dynamics,
     Info::Relocations,
 ];
+
+/// Application tab.
+#[derive(Clone, Copy, Debug)]
+pub enum Tab {
+    /// Static analysis.
+    StaticAnalysis = 0,
+    /// Dynamic analysis.
+    DynamicAnalysis = 1,
+    /// String.
+    Strings = 2,
+    /// Hexdump.
+    Hexdump = 3,
+}
+
+impl Default for Tab {
+    fn default() -> Self {
+        Self::StaticAnalysis
+    }
+}
+
+impl Tab {
+    /// Returns the available tabs.
+    const fn get_headers() -> &'static [&'static str] {
+        &["Static", "Dynamic", "Strings", "Hexdump"]
+    }
+}
+
+impl From<usize> for Tab {
+    fn from(v: usize) -> Self {
+        match v {
+            0 => Self::StaticAnalysis,
+            1 => Self::DynamicAnalysis,
+            2 => Self::Strings,
+            3 => Self::Hexdump,
+            _ => Self::default(),
+        }
+    }
+}
 
 /// Renders the user interface widgets.
 pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
@@ -48,7 +86,7 @@ pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
             .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
             .split(chunks[0]);
         let tabs = Tabs::new(MAIN_TABS.iter().map(|v| Line::from(*v)).collect())
-            .select(state.tab_index)
+            .select(state.tab as usize)
             .style(Style::default().fg(Color::Cyan))
             .highlight_style(
                 Style::default()
@@ -61,23 +99,21 @@ pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
             chunks[1],
         )
     }
-    match state.tab_index {
-        0 => {
+    match state.tab {
+        Tab::StaticAnalysis => {
             render_static_analysis(state, frame, chunks[1]);
         }
-        1 => {
+        Tab::DynamicAnalysis => {
             let block = Block::default().borders(Borders::ALL);
             frame.render_widget(block, chunks[1]);
         }
-        2 => {
+        Tab::Strings => {
+            render_strings(state, frame, chunks[1]);
+        }
+        Tab::Hexdump => {
             let block = Block::default().borders(Borders::ALL);
             frame.render_widget(block, chunks[1]);
         }
-        3 => {
-            let block = Block::default().borders(Borders::ALL);
-            frame.render_widget(block, chunks[1]);
-        }
-        _ => unreachable!(),
     }
 }
 
@@ -161,7 +197,7 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             .constraints([Constraint::Length(1), Constraint::Percentage(100)].as_ref())
             .split(area);
         let tabs = Tabs::new(MAIN_TABS.iter().map(|v| Line::from(*v)).collect())
-            .select(state.tab_index)
+            .select(state.tab as usize)
             .style(Style::default().fg(Color::Cyan))
             .highlight_style(
                 Style::default()
@@ -233,6 +269,34 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
             ),
         );
     }
+}
+
+/// Renders the strings tab.
+pub fn render_strings<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>, rect: Rect) {
+    frame.render_stateful_widget(
+        Table::new(
+            state
+                .list
+                .items
+                .iter()
+                .map(|items| Row::new(items.iter().map(|v| Cell::from(Span::raw(v))))),
+        )
+        .block(Block::default().borders(Borders::ALL))
+        .highlight_style(Style::default().fg(Color::Green))
+        .header(Row::new(vec!["String", "Location"]))
+        .widths(&[Constraint::Percentage(50)].repeat(2)),
+        rect,
+        &mut state.list.state,
+    );
+    render_item_index(
+        frame,
+        rect,
+        format!(
+            "{}/{}",
+            state.list.state.selected().map(|v| v + 1).unwrap_or(0),
+            state.list.items.len()
+        ),
+    );
 }
 
 /// Renders the text for displaying the selected index.

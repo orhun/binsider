@@ -1,5 +1,6 @@
 use crate::elf::Info;
 use crate::prelude::Analyzer;
+use crate::tui::ui::Tab;
 use crate::tui::widgets::SelectableList;
 
 /// Application state.
@@ -9,8 +10,8 @@ pub struct State<'a> {
     pub running: bool,
     /// Binary analyzer.
     pub analyzer: Analyzer<'a>,
-    /// Index of the selected tab.
-    pub tab_index: usize,
+    /// Selected tab.
+    pub tab: Tab,
     /// Elf info.
     pub info_index: usize,
     /// List items.
@@ -22,7 +23,7 @@ impl<'a> State<'a> {
     pub fn new(analyzer: Analyzer<'a>) -> Self {
         Self {
             running: true,
-            tab_index: 0,
+            tab: Tab::default(),
             info_index: 0,
             list: SelectableList::with_items(analyzer.elf.info(&Info::ProgramHeaders).items()),
             analyzer,
