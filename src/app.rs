@@ -21,6 +21,8 @@ pub struct Analyzer<'a> {
     pub elf: Elf,
     /// Strings.
     pub strings: Option<Vec<(String, u64)>>,
+    /// Min length of the strings.
+    pub strings_len: usize,
 }
 
 impl Debug for Analyzer<'_> {
@@ -33,7 +35,7 @@ impl Debug for Analyzer<'_> {
 
 impl<'a> Analyzer<'a> {
     /// Constructs a new instance.
-    pub fn new(bytes: &'a [u8]) -> Result<Self> {
+    pub fn new(bytes: &'a [u8], strings_len: usize) -> Result<Self> {
         let elf_bytes = ElfBytes::<AnyEndian>::minimal_parse(bytes)?;
         let elf = Elf::try_from(elf_bytes)?;
         Ok(Self {
@@ -41,6 +43,7 @@ impl<'a> Analyzer<'a> {
             bytes,
             elf,
             strings: None,
+            strings_len,
         })
     }
 
@@ -51,8 +54,8 @@ impl<'a> Analyzer<'a> {
     }
 
     /// Returns the sequences of printable characters.
-    pub fn extract_strings(&self, min_length: usize, sender: mpsc::Sender<Event>) {
-        let config = BytesConfig::new(self.bytes.to_vec()).with_min_length(min_length);
+    pub fn extract_strings(&self, sender: mpsc::Sender<Event>) {
+        let config = BytesConfig::new(self.bytes.to_vec()).with_min_length(self.strings_len);
         thread::spawn(move || {
             sender
                 .send(Event::FileStrings(
@@ -78,16 +81,16 @@ mod tests {
 
     #[test]
     fn test_init() -> Result<()> {
-        assert!(Analyzer::new(get_test_bytes()?.as_slice()).is_ok());
+        assert!(Analyzer::new(get_test_bytes()?.as_slice(), 4).is_ok());
         Ok(())
     }
 
     #[test]
     fn test_extract_strings() -> Result<()> {
         let test_bytes = get_test_bytes()?;
-        let analyzer = Analyzer::new(test_bytes.as_slice())?;
+        let analyzer = Analyzer::new(test_bytes.as_slice(), 4)?;
         let (tx, rx) = mpsc::channel();
-        analyzer.extract_strings(4, tx);
+        analyzer.extract_strings(tx);
         if let Event::FileStrings(strings) = rx.recv()? {
             assert!(strings?.iter().map(|(s, _)| s).any(|v| v == ".debug_str"));
         } else {

@@ -306,6 +306,37 @@ pub fn render_strings<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>, r
             state.list.items.len()
         ),
     );
+    let min_length_text = format!("Min length: {}", state.analyzer.strings_len);
+    let selection_text_width = u16::try_from(min_length_text.width()).unwrap_or_default();
+    if let Some(horizontal_area_width) = rect.width.checked_sub(selection_text_width + 3) {
+        let vertical_area = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints(
+                [
+                    Constraint::Min(1),
+                    Constraint::Min(1),
+                    Constraint::Min(rect.height),
+                ]
+                .as_ref(),
+            )
+            .split(rect);
+        let horizontal_area = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints(
+                [
+                    Constraint::Min(horizontal_area_width),
+                    Constraint::Min(selection_text_width),
+                    Constraint::Min(1),
+                    Constraint::Min(1),
+                ]
+                .as_ref(),
+            )
+            .split(vertical_area[1]);
+        frame.render_widget(Clear, horizontal_area[1]);
+        frame.render_widget(Paragraph::new(min_length_text), horizontal_area[1]);
+        frame.render_widget(Clear, horizontal_area[2]);
+        frame.render_widget(Paragraph::new(Text::default()), horizontal_area[2]);
+    }
 }
 
 /// Renders the text for displaying the selected index.

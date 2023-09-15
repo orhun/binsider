@@ -21,7 +21,6 @@ pub mod error;
 pub mod prelude;
 
 use app::Analyzer;
-use args::Args;
 use error::Result;
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
@@ -33,7 +32,7 @@ use tui::ui::Tab;
 use tui::Tui;
 
 /// Starts the terminal user interface.
-pub fn start_tui(analyzer: Analyzer, args: &Args) -> Result<()> {
+pub fn start_tui(analyzer: Analyzer) -> Result<()> {
     // Create an application.
     let mut state = State::new(analyzer);
 
@@ -41,9 +40,7 @@ pub fn start_tui(analyzer: Analyzer, args: &Args) -> Result<()> {
     let backend = CrosstermBackend::new(io::stderr());
     let terminal = Terminal::new(backend)?;
     let events = EventHandler::new(250);
-    state
-        .analyzer
-        .extract_strings(args.min_strings_len, events.sender.clone());
+    state.analyzer.extract_strings(events.sender.clone());
     let mut tui = Tui::new(terminal, events);
     tui.init()?;
 
