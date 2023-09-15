@@ -30,14 +30,16 @@ pub fn handle_key_events(key_event: KeyEvent, state: &mut State) -> Result<()> {
             state.quit();
         }
         KeyCode::Tab => {
-            state.info_index = (state.info_index + 1) % ELF_INFO_TABS.len();
-            state.list = SelectableList::with_items(
-                state
-                    .analyzer
-                    .elf
-                    .info(&ELF_INFO_TABS[state.info_index])
-                    .items(),
-            );
+            if state.tab == Tab::StaticAnalysis {
+                state.info_index = (state.info_index + 1) % ELF_INFO_TABS.len();
+                state.list = SelectableList::with_items(
+                    state
+                        .analyzer
+                        .elf
+                        .info(&ELF_INFO_TABS[state.info_index])
+                        .items(),
+                );
+            }
         }
         // Exit application on `Ctrl-C`
         KeyCode::Char('c') | KeyCode::Char('C') => {
