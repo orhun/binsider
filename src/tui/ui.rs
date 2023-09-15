@@ -273,18 +273,27 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
 
 /// Renders the strings tab.
 pub fn render_strings<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>, rect: Rect) {
+    let left_padding = state
+        .list
+        .items
+        .last()
+        .cloned()
+        .unwrap_or_default()
+        .get(1)
+        .map(|v| v.len())
+        .unwrap_or_default();
     frame.render_stateful_widget(
-        Table::new(
-            state
-                .list
-                .items
-                .iter()
-                .map(|items| Row::new(items.iter().map(|v| Cell::from(Span::raw(v))))),
-        )
+        Table::new(state.list.items.iter().map(|items| {
+            Row::new(vec![Cell::from(Span::raw(format!(
+                "{:>p$} {}",
+                items[1],
+                items[0],
+                p = left_padding
+            )))])
+        }))
         .block(Block::default().borders(Borders::ALL))
         .highlight_style(Style::default().fg(Color::Green))
-        .header(Row::new(vec!["String", "Location"]))
-        .widths(&[Constraint::Percentage(50)].repeat(2)),
+        .widths(&[Constraint::Percentage(100)]),
         rect,
         &mut state.list.state,
     );
