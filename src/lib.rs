@@ -51,7 +51,9 @@ pub fn start_tui(analyzer: Analyzer) -> Result<()> {
         // Handle events.
         match tui.events.next()? {
             Event::Tick => state.tick(),
-            Event::Key(key_event) => handler::handle_key_events(key_event, &mut state)?,
+            Event::Key(key_event) => {
+                handler::handle_key_events(key_event, &mut state, tui.events.sender.clone())?
+            }
             Event::Mouse(_) => {}
             Event::Resize(_, _) => {}
             Event::FileStrings(strings) => {

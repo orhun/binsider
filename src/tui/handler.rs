@@ -1,11 +1,17 @@
 use crate::error::Result;
+use crate::tui::event::Event;
 use crate::tui::state::State;
 use crate::tui::ui::{Tab, ELF_INFO_TABS, MAIN_TABS};
 use crate::tui::widgets::SelectableList;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+use std::sync::mpsc;
 
 /// Handles the key events and updates the state of [`App`].
-pub fn handle_key_events(key_event: KeyEvent, state: &mut State) -> Result<()> {
+pub fn handle_key_events(
+    key_event: KeyEvent,
+    state: &mut State,
+    event_sender: mpsc::Sender<Event>,
+) -> Result<()> {
     match key_event.code {
         // Next tab.
         KeyCode::Right | KeyCode::Char('l') => {
@@ -29,6 +35,7 @@ pub fn handle_key_events(key_event: KeyEvent, state: &mut State) -> Result<()> {
         KeyCode::Esc | KeyCode::Char('q') => {
             state.quit();
         }
+        // Switch to next info.
         KeyCode::Tab => {
             if state.tab == Tab::StaticAnalysis {
                 state.info_index = (state.info_index + 1) % ELF_INFO_TABS.len();
@@ -39,6 +46,28 @@ pub fn handle_key_events(key_event: KeyEvent, state: &mut State) -> Result<()> {
                         .info(&ELF_INFO_TABS[state.info_index])
                         .items(),
                 );
+            }
+        }
+        // increase string length.
+        KeyCode::Char('+') => {
+            if state.tab == Tab::Strings {
+                state.analyzer.strings_len = state
+                    .analyzer
+                    .strings_len
+                    .checked_add(1)
+                    .unwrap_or(state.analyzer.strings_len);
+                state.analyzer.extract_strings(event_sender.clone());
+            }
+        }
+        // Decrease string length.
+        KeyCode::Char('-') => {
+            if state.tab == Tab::Strings {
+                state.analyzer.strings_len = state
+                    .analyzer
+                    .strings_len
+                    .checked_sub(1)
+                    .unwrap_or_default();
+                state.analyzer.extract_strings(event_sender.clone());
             }
         }
         // Exit application on `Ctrl-C`

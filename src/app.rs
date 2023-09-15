@@ -54,10 +54,10 @@ impl<'a> Analyzer<'a> {
     }
 
     /// Returns the sequences of printable characters.
-    pub fn extract_strings(&self, sender: mpsc::Sender<Event>) {
+    pub fn extract_strings(&self, event_sender: mpsc::Sender<Event>) {
         let config = BytesConfig::new(self.bytes.to_vec()).with_min_length(self.strings_len);
         thread::spawn(move || {
-            sender
+            event_sender
                 .send(Event::FileStrings(
                     rust_strings::strings(&config).map_err(|e| Error::StringsError(e.to_string())),
                 ))
