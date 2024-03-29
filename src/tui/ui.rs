@@ -11,8 +11,8 @@ use unicode_width::UnicodeWidthStr;
 /// Titles of the main tabs.
 pub const MAIN_TABS: &[&str] = Tab::get_headers();
 
-/// Maximum number of elements to show in table.
-const TABLE_LIMIT: usize = 100;
+/// Maximum number of elements to show in table/list.
+const LIST_LIMIT: usize = 100;
 
 /// Titles of the ELF info tabs.
 pub const ELF_INFO_TABS: &[Info] = &[
@@ -209,18 +209,18 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
         frame.render_widget(tabs, chunks[0]);
         let selected_index = state.list.state.selected().unwrap_or_default();
         let items_len = state.list.items.len();
-        let page = selected_index / TABLE_LIMIT;
+        let page = selected_index / LIST_LIMIT;
         let headers = ELF_INFO_TABS[state.info_index].headers();
         let mut table_state = TableState::default();
-        table_state.select(Some(selected_index % TABLE_LIMIT));
+        table_state.select(Some(selected_index % LIST_LIMIT));
         frame.render_stateful_widget(
             Table::new(
                 state
                     .list
                     .items
                     .iter()
-                    .skip(page * TABLE_LIMIT)
-                    .take(TABLE_LIMIT)
+                    .skip(page * LIST_LIMIT)
+                    .take(LIST_LIMIT)
                     .map(|items| Row::new(items.iter().map(|v| Cell::from(Span::raw(v))))),
             )
             .block(Block::default().borders(Borders::ALL))
@@ -278,17 +278,27 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
 
 /// Renders the strings tab.
 pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
-    let left_padding = state
+    let selected_index = state.list.state.selected().unwrap_or_default();
+    let items_len = state.list.items.len();
+    let page = selected_index / LIST_LIMIT;
+    let items = state
         .list
         .items
+        .iter()
+        .skip(page * LIST_LIMIT)
+        .take(LIST_LIMIT);
+    let left_padding = items
+        .clone()
         .last()
         .cloned()
         .unwrap_or_default()
         .get(1)
         .map(|v| v.len())
         .unwrap_or_default();
+    let mut list_state = TableState::default();
+    list_state.select(Some(selected_index % LIST_LIMIT));
     frame.render_stateful_widget(
-        Table::new(state.list.items.iter().map(|items| {
+        Table::new(items.map(|items| {
             Row::new(vec![Cell::from(Span::raw(format!(
                 "{:>p$} {}",
                 items[1],
@@ -300,16 +310,12 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         .highlight_style(Style::default().fg(Color::Green))
         .widths(&[Constraint::Percentage(100)]),
         rect,
-        &mut state.list.state,
+        &mut list_state,
     );
     render_item_index(
         frame,
         rect,
-        format!(
-            "{}/{}",
-            state.list.state.selected().map(|v| v + 1).unwrap_or(0),
-            state.list.items.len()
-        ),
+        format!("{}/{}", selected_index.saturating_add(1), items_len),
     );
     let min_length_text = format!("Minimum length: {}", state.analyzer.strings_len);
     let selection_text_width = u16::try_from(min_length_text.width()).unwrap_or_default() + 2;
