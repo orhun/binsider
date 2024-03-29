@@ -13,30 +13,8 @@ pub fn handle_key_events(
     event_sender: mpsc::Sender<Event>,
 ) -> Result<()> {
     match key_event.code {
-        // Next tab.
+        // Next info.
         KeyCode::Right | KeyCode::Char('l') => {
-            state.tab = ((state.tab as usize + 1) % MAIN_TABS.len()).into();
-            handle_tab(state)?;
-        }
-        // Previous tab.
-        KeyCode::Left | KeyCode::Char('h') => {
-            if state.tab as usize > 0 {
-                state.tab = (state.tab as usize - 1).into();
-            } else {
-                state.tab = (MAIN_TABS.len() - 1).into();
-            }
-            handle_tab(state)?;
-        }
-        // Scroll down the list.
-        KeyCode::Down | KeyCode::Char('j') => state.list.next(),
-        // Scroll up the list.
-        KeyCode::Up | KeyCode::Char('k') => state.list.previous(),
-        // Exit application on `ESC` or `q`
-        KeyCode::Esc | KeyCode::Char('q') => {
-            state.quit();
-        }
-        // Switch to next info.
-        KeyCode::Tab => {
             if state.tab == Tab::StaticAnalysis {
                 state.info_index = (state.info_index + 1) % ELF_INFO_TABS.len();
                 state.list = SelectableList::with_items(
@@ -47,6 +25,35 @@ pub fn handle_key_events(
                         .items(),
                 );
             }
+        }
+        // Previous info.
+        KeyCode::Left | KeyCode::Char('h') => {
+            if state.tab == Tab::StaticAnalysis {
+                state.info_index = state
+                    .info_index
+                    .checked_sub(1)
+                    .unwrap_or(ELF_INFO_TABS.len() - 1);
+                state.list = SelectableList::with_items(
+                    state
+                        .analyzer
+                        .elf
+                        .info(&ELF_INFO_TABS[state.info_index])
+                        .items(),
+                );
+            }
+        }
+        // Scroll down the list.
+        KeyCode::Down | KeyCode::Char('j') => state.list.next(),
+        // Scroll up the list.
+        KeyCode::Up | KeyCode::Char('k') => state.list.previous(),
+        // Exit application on `ESC` or `q`
+        KeyCode::Esc | KeyCode::Char('q') => {
+            state.quit();
+        }
+        // Next tab..
+        KeyCode::Tab => {
+            state.tab = ((state.tab as usize + 1) % MAIN_TABS.len()).into();
+            handle_tab(state)?;
         }
         // Increase string length.
         KeyCode::Char('+') => {
