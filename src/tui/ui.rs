@@ -3,13 +3,16 @@ use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span, Text},
-    widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, Tabs},
+    widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, TableState, Tabs},
     Frame,
 };
 use unicode_width::UnicodeWidthStr;
 
 /// Titles of the main tabs.
 pub const MAIN_TABS: &[&str] = Tab::get_headers();
+
+/// Maximum number of elements to show in table.
+const TABLE_LIMIT: usize = 100;
 
 /// Titles of the ELF info tabs.
 pub const ELF_INFO_TABS: &[Info] = &[
@@ -204,13 +207,20 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                     .bg(Color::Black),
             );
         frame.render_widget(tabs, chunks[0]);
+        let selected_index = state.list.state.selected().unwrap_or_default();
+        let items_len = state.list.items.len();
+        let page = selected_index / TABLE_LIMIT;
         let headers = ELF_INFO_TABS[state.info_index].headers();
+        let mut table_state = TableState::default();
+        table_state.select(Some(selected_index % TABLE_LIMIT));
         frame.render_stateful_widget(
             Table::new(
                 state
                     .list
                     .items
                     .iter()
+                    .skip(page * TABLE_LIMIT)
+                    .take(TABLE_LIMIT)
                     .map(|items| Row::new(items.iter().map(|v| Cell::from(Span::raw(v))))),
             )
             .block(Block::default().borders(Borders::ALL))
@@ -223,7 +233,7 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                 .repeat(headers.len()),
             ),
             area,
-            &mut state.list.state,
+            &mut table_state,
         );
         let chunks = Layout::default()
             .direction(Direction::Horizontal)
@@ -261,11 +271,7 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
         render_item_index(
             frame,
             rect,
-            format!(
-                "{}/{}",
-                state.list.state.selected().map(|v| v + 1).unwrap_or(0),
-                state.list.items.len()
-            ),
+            format!("{}/{}", selected_index.saturating_add(1), items_len),
         );
     }
 }
