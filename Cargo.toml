@@ -6,7 +6,7 @@ authors = ["Orhun Parmaksız <orhunparmaksiz@gmail.com>"]
 edition = "2021"
 
 [dependencies]
-ratatui = "0.23.0"
+ratatui = "0.24.0"
 crossterm = "0.27.0"
 clap = { version = "4.4.2", features = ["derive", "env", "wrap_help", "cargo"] }
 thiserror = "1.0.48"

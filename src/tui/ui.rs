@@ -1,6 +1,5 @@
 use crate::{elf::Info, tui::state::State};
 use ratatui::{
-    backend::Backend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span, Text},
@@ -61,7 +60,7 @@ impl From<usize> for Tab {
 }
 
 /// Renders the user interface widgets.
-pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
+pub fn render(state: &mut State, frame: &mut Frame) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
         .margin(1)
@@ -128,7 +127,7 @@ pub fn render<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>) {
 /// - dynamics
 /// - relocations
 /// - notes
-pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>, rect: Rect) {
+pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) {
     let headers: Vec<Line> = state
         .analyzer
         .elf
@@ -272,7 +271,7 @@ pub fn render_static_analysis<B: Backend>(state: &mut State, frame: &mut Frame<'
 }
 
 /// Renders the strings tab.
-pub fn render_strings<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>, rect: Rect) {
+pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
     let left_padding = state
         .list
         .items
@@ -344,7 +343,7 @@ pub fn render_strings<B: Backend>(state: &mut State, frame: &mut Frame<'_, B>, r
 }
 
 /// Renders the text for displaying the selected index.
-fn render_item_index<B: Backend>(frame: &mut Frame<'_, B>, rect: Rect, selection_text: String) {
+fn render_item_index(frame: &mut Frame, rect: Rect, selection_text: String) {
     let selection_text_width = u16::try_from(selection_text.width()).unwrap_or_default();
     if let Some(horizontal_area_width) = rect.width.checked_sub(selection_text_width + 3) {
         let vertical_area = Layout::default()
