@@ -1,4 +1,5 @@
 use elf::{endian::AnyEndian, note::Note as ElfNote, ElfBytes, ParseError};
+use std::fmt::Write;
 use std::io::{Error as IoError, ErrorKind as IoErrorKind};
 
 /// Representation of an ELF note.
@@ -66,11 +67,13 @@ impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Notes {
                         }
                         ElfNote::GnuBuildId(build_id) => {
                             note.header.extend(vec![String::from("Build ID")]);
-                            note.text.extend(vec![build_id
-                                .0
-                                .iter()
-                                .map(|v| format!("{v:02x}"))
-                                .collect()]);
+                            note.text.extend(vec![build_id.0.iter().fold(
+                                String::new(),
+                                |mut output, b| {
+                                    let _ = write!(output, "{b:02X}");
+                                    output
+                                },
+                            )]);
                         }
                         ElfNote::Unknown(any) => {
                             note.header.extend(vec![
