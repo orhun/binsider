@@ -48,7 +48,7 @@ pub fn handle_key_events(
                 );
             }
         }
-        // increase string length.
+        // Increase string length.
         KeyCode::Char('+') => {
             if state.tab == Tab::Strings {
                 state.analyzer.strings_len = state
