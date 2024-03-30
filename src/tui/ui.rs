@@ -297,11 +297,13 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                 .fg(Color::White),
         );
         frame.render_widget(tabs, chunks[1]);
-        render_item_index(
-            frame,
-            rect,
-            format!("{}/{}", selected_index.saturating_add(1), items_len),
-        );
+        if items_len != 0 {
+            render_item_index(
+                frame,
+                rect,
+                format!("{}/{}", selected_index.saturating_add(1), items_len),
+            );
+        }
     }
 }
 
@@ -352,11 +354,22 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         }),
         &mut ScrollbarState::new(items_len).position(selected_index),
     );
+    if items_len == 0 {
+        frame.render_widget(
+            Paragraph::new("Loading...".italic()).alignment(Alignment::Center),
+            rect.inner(&Margin {
+                vertical: 1,
+                horizontal: 0,
+            }),
+        );
+        return;
+    }
     render_item_index(
         frame,
         rect,
         format!("{}/{}", selected_index.saturating_add(1), items_len),
     );
+
     let min_length_text = format!("Minimum length: {}", state.analyzer.strings_len);
     let selection_text_width = u16::try_from(min_length_text.width()).unwrap_or_default() + 2;
     if let Some(horizontal_area_width) = rect.width.checked_sub(selection_text_width + 2) {
