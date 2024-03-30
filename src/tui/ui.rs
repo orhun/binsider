@@ -1,7 +1,7 @@
 use crate::{elf::Info, tui::state::State};
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{Color, Modifier, Style},
+    style::{Color, Modifier, Style, Stylize},
     text::{Line, Span, Text},
     widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, TableState, Tabs},
     Frame,
@@ -73,11 +73,11 @@ pub fn render(state: &mut State, frame: &mut Frame) {
     {
         frame.render_widget(
             Block::default()
-                .title(format!(
-                    "{} {}",
-                    env!("CARGO_PKG_NAME"),
-                    env!("CARGO_PKG_VERSION")
-                ))
+                .title(vec![
+                    env!("CARGO_PKG_NAME").bold(),
+                    "-".fg(Color::Rgb(100, 100, 100)),
+                    env!("CARGO_PKG_VERSION").into(),
+                ])
                 .title_alignment(Alignment::Center)
                 .borders(Borders::ALL),
             chunks[0],
@@ -93,11 +93,11 @@ pub fn render(state: &mut State, frame: &mut Frame) {
             .highlight_style(
                 Style::default()
                     .add_modifier(Modifier::BOLD)
-                    .bg(Color::Black),
+                    .fg(Color::White),
             );
         frame.render_widget(tabs, chunks[0]);
         frame.render_widget(
-            Paragraph::new(state.analyzer.path).alignment(Alignment::Right),
+            Paragraph::new(state.analyzer.path.italic()).alignment(Alignment::Right),
             chunks[1],
         )
     }
@@ -145,19 +145,19 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             ])
         })
         .collect();
-    let mut lines = Vec::new();
+    let mut notes = Vec::new();
     for note in state.analyzer.elf.notes.inner.iter() {
-        lines.push(Line::from(vec![Span::styled(
+        notes.push(Line::from(vec![Span::styled(
             note.name.to_string(),
             Style::default().fg(Color::Cyan),
         )]));
-        lines.push(Line::from(
+        notes.push(Line::from(
             note.header
                 .iter()
                 .map(|v| Span::raw(format!("{v} ")))
                 .collect::<Vec<Span>>(),
         ));
-        lines.push(Line::from(
+        notes.push(Line::from(
             note.text
                 .iter()
                 .map(|v| Span::raw(format!("{v} ")))
@@ -178,16 +178,26 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
         frame.render_widget(
             Paragraph::new(headers).block(
                 Block::default()
+                    .title(vec![
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                        "File Headers".white().bold(),
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                    ])
                     .borders(Borders::ALL)
-                    .border_style(Style::default().fg(Color::Black)),
+                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
             ),
             chunks[0],
         );
         frame.render_widget(
-            Paragraph::new(lines).block(
+            Paragraph::new(notes).block(
                 Block::default()
+                    .title(vec![
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                        "Notes".white().bold(),
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                    ])
                     .borders(Borders::ALL)
-                    .border_style(Style::default().fg(Color::Black)),
+                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
             ),
             chunks[1],
         );
@@ -200,11 +210,10 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             .split(area);
         let tabs = Tabs::new(MAIN_TABS.iter().map(|v| Line::from(*v)).collect())
             .select(state.tab as usize)
-            .style(Style::default().fg(Color::Cyan))
             .highlight_style(
                 Style::default()
                     .add_modifier(Modifier::BOLD)
-                    .bg(Color::Black),
+                    .fg(Color::White),
             );
         frame.render_widget(tabs, chunks[0]);
         let selected_index = state.list.state.selected().unwrap_or_default();
@@ -223,9 +232,15 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                     .take(LIST_LIMIT)
                     .map(|items| Row::new(items.iter().map(|v| Cell::from(Span::raw(v))))),
             )
-            .block(Block::default().borders(Borders::ALL))
+            .header(Row::new(
+                headers.to_vec().iter().map(|v| Cell::from((*v).bold())),
+            ))
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
+            )
             .highlight_style(Style::default().fg(Color::Green))
-            .header(Row::new(headers.to_vec()))
             .widths(
                 &[Constraint::Percentage(
                     (100 / headers.len()).try_into().unwrap_or_default(),
@@ -265,7 +280,7 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
         .highlight_style(
             Style::default()
                 .add_modifier(Modifier::BOLD)
-                .bg(Color::Black),
+                .fg(Color::White),
         );
         frame.render_widget(tabs, chunks[1]);
         render_item_index(
@@ -347,7 +362,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
             Paragraph::new(min_length_text).block(
                 Block::default()
                     .borders(Borders::ALL)
-                    .border_style(Style::default().fg(Color::Black)),
+                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
             ),
             horizontal_area[1],
         );
