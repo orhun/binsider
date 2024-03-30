@@ -1,9 +1,12 @@
 use crate::{elf::Info, tui::state::State};
 use ratatui::{
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
+    layout::{Alignment, Constraint, Direction, Layout, Margin, Rect},
     style::{Color, Modifier, Style, Stylize},
     text::{Line, Span, Text},
-    widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, TableState, Tabs},
+    widgets::{
+        Block, Borders, Cell, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation,
+        ScrollbarState, Table, TableState, Tabs,
+    },
     Frame,
 };
 use unicode_width::UnicodeWidthStr;
@@ -250,6 +253,18 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             area,
             &mut table_state,
         );
+
+        frame.render_stateful_widget(
+            Scrollbar::new(ScrollbarOrientation::VerticalRight)
+                .begin_symbol(Some("↑"))
+                .end_symbol(Some("↓")),
+            area.inner(&Margin {
+                vertical: 1,
+                horizontal: 0,
+            }),
+            &mut ScrollbarState::new(items_len).position(selected_index),
+        );
+
         let chunks = Layout::default()
             .direction(Direction::Horizontal)
             .constraints(
@@ -326,6 +341,17 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         .widths(&[Constraint::Percentage(100)]),
         rect,
         &mut list_state,
+    );
+
+    frame.render_stateful_widget(
+        Scrollbar::new(ScrollbarOrientation::VerticalRight)
+            .begin_symbol(Some("↑"))
+            .end_symbol(Some("↓")),
+        rect.inner(&Margin {
+            vertical: 1,
+            horizontal: 0,
+        }),
+        &mut ScrollbarState::new(items_len).position(selected_index),
     );
     render_item_index(
         frame,
