@@ -4,9 +4,12 @@ use crate::{
     tui::event::Event,
 };
 use elf::{endian::AnyEndian, ElfBytes};
+use heh::app::Application as Heh;
+use heh::decoder::Encoding;
 use rust_strings::BytesConfig;
 use std::{
     fmt::{self, Debug, Formatter},
+    fs::{File, OpenOptions},
     sync::mpsc,
     thread,
 };
@@ -17,12 +20,16 @@ pub struct Analyzer<'a> {
     pub path: &'a str,
     /// Bytes of the file.
     bytes: &'a [u8],
+    /// Whether if the file is read only.
+    pub read_only: bool,
     /// Elf properties.
     pub elf: Elf,
     /// Strings.
     pub strings: Option<Vec<(String, u64)>>,
     /// Min length of the strings.
     pub strings_len: usize,
+    /// Heh application.
+    pub heh: Heh,
 }
 
 impl Debug for Analyzer<'_> {
@@ -35,22 +42,27 @@ impl Debug for Analyzer<'_> {
 
 impl<'a> Analyzer<'a> {
     /// Constructs a new instance.
-    pub fn new(bytes: &'a [u8], strings_len: usize) -> Result<Self> {
+    pub fn new(path: &'a str, bytes: &'a [u8], strings_len: usize) -> Result<Self> {
         let elf_bytes = ElfBytes::<AnyEndian>::minimal_parse(bytes)?;
         let elf = Elf::try_from(elf_bytes)?;
+        let mut read_only = false;
+        let file = match OpenOptions::new().write(true).read(true).open(path) {
+            Ok(v) => v,
+            Err(_) => {
+                read_only = true;
+                File::open(path)?
+            }
+        };
+        let heh = Heh::new(file, Encoding::Ascii, 0).map_err(|e| Error::HehError(e.to_string()))?;
         Ok(Self {
-            path: "",
+            path,
             bytes,
+            read_only,
             elf,
             strings: None,
             strings_len,
+            heh,
         })
-    }
-
-    /// Sets the path of the ELF file.
-    pub fn with_path(mut self, path: &'a str) -> Self {
-        self.path = path;
-        self
     }
 
     /// Returns the sequences of printable characters.
@@ -81,14 +93,14 @@ mod tests {
 
     #[test]
     fn test_init() -> Result<()> {
-        assert!(Analyzer::new(get_test_bytes()?.as_slice(), 4).is_ok());
+        assert!(Analyzer::new("", get_test_bytes()?.as_slice(), 4).is_ok());
         Ok(())
     }
 
     #[test]
     fn test_extract_strings() -> Result<()> {
         let test_bytes = get_test_bytes()?;
-        let analyzer = Analyzer::new(test_bytes.as_slice(), 4)?;
+        let analyzer = Analyzer::new("", test_bytes.as_slice(), 4)?;
         let (tx, rx) = mpsc::channel();
         analyzer.extract_strings(tx);
         if let Event::FileStrings(strings) = rx.recv()? {

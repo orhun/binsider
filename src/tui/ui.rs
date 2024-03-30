@@ -116,8 +116,7 @@ pub fn render(state: &mut State, frame: &mut Frame) {
             render_strings(state, frame, chunks[1]);
         }
         Tab::Hexdump => {
-            let block = Block::default().borders(Borders::ALL);
-            frame.render_widget(block, chunks[1]);
+            state.analyzer.heh.render_frame(frame, chunks[1]);
         }
     }
 }

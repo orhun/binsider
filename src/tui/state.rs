@@ -16,6 +16,8 @@ pub struct State<'a> {
     pub info_index: usize,
     /// List items.
     pub list: SelectableList<Vec<String>>,
+    /// Show heh.
+    pub show_heh: bool,
 }
 
 impl<'a> State<'a> {
@@ -26,6 +28,7 @@ impl<'a> State<'a> {
             tab: Tab::default(),
             info_index: 0,
             list: SelectableList::with_items(analyzer.elf.info(&Info::ProgramHeaders).items()),
+            show_heh: false,
             analyzer,
         }
     }

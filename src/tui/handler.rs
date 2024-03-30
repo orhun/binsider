@@ -1,9 +1,9 @@
-use crate::error::Result;
+use crate::error::{Error, Result};
 use crate::tui::event::Event;
 use crate::tui::state::State;
 use crate::tui::ui::{Tab, ELF_INFO_TABS, MAIN_TABS};
 use crate::tui::widgets::SelectableList;
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+use crossterm::event::{Event as CrosstermEvent, KeyCode, KeyEvent, KeyModifiers};
 use std::sync::mpsc;
 
 /// Handles the key events and updates the state of [`App`].
@@ -12,6 +12,26 @@ pub fn handle_key_events(
     state: &mut State,
     event_sender: mpsc::Sender<Event>,
 ) -> Result<()> {
+    if state.show_heh {
+        if key_event.code == KeyCode::Char('q') {
+            state.quit()
+        } else if key_event.code == KeyCode::Tab {
+            state.tab = ((state.tab as usize + 1) % MAIN_TABS.len()).into();
+            handle_tab(state)?;
+        } else if key_event.code == KeyCode::Char('s')
+            && key_event.modifiers == KeyModifiers::CONTROL
+            && state.analyzer.read_only
+        {
+            state.analyzer.heh.labels.notification = String::from("file is read-only");
+        } else {
+            state
+                .analyzer
+                .heh
+                .handle_input(CrosstermEvent::Key(key_event))
+                .map_err(|e| Error::HehError(e.to_string()))?;
+        }
+        return Ok(());
+    }
     match key_event.code {
         // Next info.
         KeyCode::Right | KeyCode::Char('l') => {
@@ -92,6 +112,7 @@ pub fn handle_key_events(
 pub fn handle_tab(state: &mut State) -> Result<()> {
     match state.tab {
         Tab::StaticAnalysis => {
+            state.show_heh = false;
             state.info_index = 0;
             state.list = SelectableList::with_items(
                 state
@@ -102,6 +123,7 @@ pub fn handle_tab(state: &mut State) -> Result<()> {
             );
         }
         Tab::Strings => {
+            state.show_heh = false;
             state.list = SelectableList::with_items(
                 state
                     .analyzer
@@ -112,6 +134,9 @@ pub fn handle_tab(state: &mut State) -> Result<()> {
                     .map(|(v, i)| vec![v.to_string(), i.to_string()])
                     .collect(),
             )
+        }
+        Tab::Hexdump => {
+            state.show_heh = true;
         }
         _ => {}
     }

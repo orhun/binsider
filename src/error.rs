@@ -15,6 +15,9 @@ pub enum Error {
     /// Error that may occur while extracting strings from binary data.
     #[error("String extraction error: `{0}`")]
     StringsError(String),
+    /// Error that may occur while running hexdump.
+    #[error("Hexdump (heh) error: `{0}`")]
+    HehError(String),
 }
 
 /// Type alias for the standard [`Result`] type.
