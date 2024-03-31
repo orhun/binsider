@@ -36,7 +36,7 @@ impl<T> SelectableList<T> {
     pub fn next(&mut self) {
         let i = match self.state.selected() {
             Some(i) => {
-                if i >= self.items.len() - 1 {
+                if i >= self.items.len().saturating_sub(1) {
                     0
                 } else {
                     i + 1
@@ -52,7 +52,7 @@ impl<T> SelectableList<T> {
         let i = match self.state.selected() {
             Some(i) => {
                 if i == 0 {
-                    self.items.len() - 1
+                    self.items.len().saturating_sub(1)
                 } else {
                     i - 1
                 }

@@ -2,14 +2,13 @@ use crate::{elf::Info, tui::state::State};
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Margin, Rect},
     style::{Color, Modifier, Style, Stylize},
-    text::{Line, Span, Text},
+    text::{Line, Span},
     widgets::{
-        Block, Borders, Cell, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation,
+        block::Position, Block, Cell, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation,
         ScrollbarState, Table, TableState, Tabs,
     },
     Frame,
 };
-use unicode_width::UnicodeWidthStr;
 
 /// Titles of the main tabs.
 pub const MAIN_TABS: &[&str] = Tab::get_headers();
@@ -75,14 +74,13 @@ pub fn render(state: &mut State, frame: &mut Frame) {
 
     {
         frame.render_widget(
-            Block::default()
+            Block::bordered()
                 .title(vec![
                     env!("CARGO_PKG_NAME").bold(),
                     "-".fg(Color::Rgb(100, 100, 100)),
                     env!("CARGO_PKG_VERSION").into(),
                 ])
-                .title_alignment(Alignment::Center)
-                .borders(Borders::ALL),
+                .title_alignment(Alignment::Center),
             chunks[0],
         );
         let chunks = Layout::default()
@@ -90,7 +88,7 @@ pub fn render(state: &mut State, frame: &mut Frame) {
             .margin(1)
             .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
             .split(chunks[0]);
-        let tabs = Tabs::new(MAIN_TABS.iter().map(|v| Line::from(*v)).collect())
+        let tabs = Tabs::new(MAIN_TABS.iter().map(|v| Line::from(*v)))
             .select(state.tab as usize)
             .style(Style::default().fg(Color::Cyan))
             .highlight_style(
@@ -109,8 +107,7 @@ pub fn render(state: &mut State, frame: &mut Frame) {
             render_static_analysis(state, frame, chunks[1]);
         }
         Tab::DynamicAnalysis => {
-            let block = Block::default().borders(Borders::ALL);
-            frame.render_widget(block, chunks[1]);
+            frame.render_widget(Block::bordered(), chunks[1]);
         }
         Tab::Strings => {
             render_strings(state, frame, chunks[1]);
@@ -166,7 +163,7 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                 .collect::<Vec<Span>>(),
         ));
     }
-    frame.render_widget(Block::default().borders(Borders::ALL), rect);
+    frame.render_widget(Block::bordered(), rect);
     let chunks = Layout::default()
         .direction(Direction::Vertical)
         .margin(1)
@@ -179,26 +176,24 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             .split(chunks[0]);
         frame.render_widget(
             Paragraph::new(headers).block(
-                Block::default()
+                Block::bordered()
                     .title(vec![
                         "|".fg(Color::Rgb(100, 100, 100)),
                         "File Headers".white().bold(),
                         "|".fg(Color::Rgb(100, 100, 100)),
                     ])
-                    .borders(Borders::ALL)
                     .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
             ),
             chunks[0],
         );
         frame.render_widget(
             Paragraph::new(notes).block(
-                Block::default()
+                Block::bordered()
                     .title(vec![
                         "|".fg(Color::Rgb(100, 100, 100)),
                         "Notes".white().bold(),
                         "|".fg(Color::Rgb(100, 100, 100)),
                     ])
-                    .borders(Borders::ALL)
                     .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
             ),
             chunks[1],
@@ -210,7 +205,7 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             .direction(Direction::Vertical)
             .constraints([Constraint::Length(1), Constraint::Percentage(100)].as_ref())
             .split(area);
-        let tabs = Tabs::new(MAIN_TABS.iter().map(|v| Line::from(*v)).collect())
+        let tabs = Tabs::new(MAIN_TABS.iter().map(|v| Line::from(*v)))
             .select(state.tab as usize)
             .highlight_style(
                 Style::default()
@@ -233,22 +228,28 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                     .skip(page * LIST_LIMIT)
                     .take(LIST_LIMIT)
                     .map(|items| Row::new(items.iter().map(|v| Cell::from(Span::raw(v))))),
+                &[Constraint::Percentage(
+                    (100 / headers.len()).try_into().unwrap_or_default(),
+                )]
+                .repeat(headers.len()),
             )
             .header(Row::new(
                 headers.to_vec().iter().map(|v| Cell::from((*v).bold())),
             ))
             .block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
+                Block::bordered()
+                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100)))
+                    .title(vec![
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                        format!("{}/{}", selected_index.saturating_add(1), items_len)
+                            .white()
+                            .bold(),
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                    ])
+                    .title_position(Position::Bottom)
+                    .title_alignment(Alignment::Right),
             )
-            .highlight_style(Style::default().fg(Color::Green))
-            .widths(
-                &[Constraint::Percentage(
-                    (100 / headers.len()).try_into().unwrap_or_default(),
-                )]
-                .repeat(headers.len()),
-            ),
+            .highlight_style(Style::default().fg(Color::Green)),
             area,
             &mut table_state,
         );
@@ -283,27 +284,15 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             )
             .split(chunks[0]);
         frame.render_widget(Clear, chunks[1]);
-        let tabs = Tabs::new(
-            ELF_INFO_TABS
-                .iter()
-                .map(|v| Line::from(v.title()))
-                .collect(),
-        )
-        .select(state.info_index)
-        .style(Style::default().fg(Color::Cyan))
-        .highlight_style(
-            Style::default()
-                .add_modifier(Modifier::BOLD)
-                .fg(Color::White),
-        );
-        frame.render_widget(tabs, chunks[1]);
-        if items_len != 0 {
-            render_item_index(
-                frame,
-                rect,
-                format!("{}/{}", selected_index.saturating_add(1), items_len),
+        let tabs = Tabs::new(ELF_INFO_TABS.iter().map(|v| Line::from(v.title())))
+            .select(state.info_index)
+            .style(Style::default().fg(Color::Cyan))
+            .highlight_style(
+                Style::default()
+                    .add_modifier(Modifier::BOLD)
+                    .fg(Color::White),
             );
-        }
+        frame.render_widget(tabs, chunks[1]);
     }
 }
 
@@ -326,24 +315,57 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         .get(1)
         .map(|v| v.len())
         .unwrap_or_default();
+    if items_len == 0 {
+        frame.render_widget(Block::bordered(), rect);
+        frame.render_widget(
+            Paragraph::new("Loading...".italic()).alignment(Alignment::Center),
+            rect.inner(&Margin {
+                vertical: 1,
+                horizontal: 0,
+            }),
+        );
+        return;
+    }
     let mut list_state = TableState::default();
     list_state.select(Some(selected_index % LIST_LIMIT));
     frame.render_stateful_widget(
-        Table::new(items.map(|items| {
-            Row::new(vec![Cell::from(Span::raw(format!(
-                "{:>p$} {}",
-                items[1],
-                items[0],
-                p = left_padding
-            )))])
-        }))
-        .block(Block::default().borders(Borders::ALL))
-        .highlight_style(Style::default().fg(Color::Green))
-        .widths(&[Constraint::Percentage(100)]),
+        Table::new(
+            items.map(|items| {
+                Row::new(vec![Cell::from(Line::from(vec![
+                    format!("{:>p$}", items[1], p = left_padding).cyan(),
+                    " ".into(),
+                    items[0].to_string().into(),
+                ]))])
+            }),
+            &[Constraint::Percentage(100)],
+        )
+        .block(
+            Block::bordered()
+                .title_top(
+                    Line::from(vec![
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                        format!("Min length: {}", state.analyzer.strings_len)
+                            .white()
+                            .bold(),
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                    ])
+                    .right_aligned(),
+                )
+                .title_bottom(
+                    Line::from(vec![
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                        format!("{}/{}", selected_index.saturating_add(1), items_len)
+                            .white()
+                            .bold(),
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                    ])
+                    .right_aligned(),
+                ),
+        )
+        .highlight_style(Style::default().add_modifier(Modifier::BOLD)),
         rect,
         &mut list_state,
     );
-
     frame.render_stateful_widget(
         Scrollbar::new(ScrollbarOrientation::VerticalRight)
             .begin_symbol(Some("↑"))
@@ -354,89 +376,4 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         }),
         &mut ScrollbarState::new(items_len).position(selected_index),
     );
-    if items_len == 0 {
-        frame.render_widget(
-            Paragraph::new("Loading...".italic()).alignment(Alignment::Center),
-            rect.inner(&Margin {
-                vertical: 1,
-                horizontal: 0,
-            }),
-        );
-        return;
-    }
-    render_item_index(
-        frame,
-        rect,
-        format!("{}/{}", selected_index.saturating_add(1), items_len),
-    );
-
-    let min_length_text = format!("Minimum length: {}", state.analyzer.strings_len);
-    let selection_text_width = u16::try_from(min_length_text.width()).unwrap_or_default() + 2;
-    if let Some(horizontal_area_width) = rect.width.checked_sub(selection_text_width + 2) {
-        let vertical_area = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints(
-                [
-                    Constraint::Min(1),
-                    Constraint::Min(3),
-                    Constraint::Min(rect.height),
-                ]
-                .as_ref(),
-            )
-            .split(rect);
-        let horizontal_area = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints(
-                [
-                    Constraint::Min(horizontal_area_width),
-                    Constraint::Min(selection_text_width),
-                    Constraint::Min(1),
-                ]
-                .as_ref(),
-            )
-            .split(vertical_area[1]);
-        frame.render_widget(Clear, horizontal_area[1]);
-        frame.render_widget(
-            Paragraph::new(min_length_text).block(
-                Block::default()
-                    .borders(Borders::ALL)
-                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
-            ),
-            horizontal_area[1],
-        );
-    }
-}
-
-/// Renders the text for displaying the selected index.
-fn render_item_index(frame: &mut Frame, rect: Rect, selection_text: String) {
-    let selection_text_width = u16::try_from(selection_text.width()).unwrap_or_default();
-    if let Some(horizontal_area_width) = rect.width.checked_sub(selection_text_width + 3) {
-        let vertical_area = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints(
-                [
-                    Constraint::Min(rect.height.checked_sub(3).unwrap_or(rect.height)),
-                    Constraint::Min(1),
-                    Constraint::Min(1),
-                ]
-                .as_ref(),
-            )
-            .split(rect);
-        let horizontal_area = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints(
-                [
-                    Constraint::Min(horizontal_area_width),
-                    Constraint::Min(selection_text_width),
-                    Constraint::Min(1),
-                    Constraint::Min(1),
-                ]
-                .as_ref(),
-            )
-            .split(vertical_area[1]);
-        frame.render_widget(Clear, horizontal_area[1]);
-        frame.render_widget(Paragraph::new(selection_text), horizontal_area[1]);
-        frame.render_widget(Clear, horizontal_area[2]);
-        frame.render_widget(Paragraph::new(Text::default()), horizontal_area[2]);
-    }
 }
