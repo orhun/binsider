@@ -12,7 +12,7 @@ clap = { version = "4.4.2", features = ["derive", "env", "wrap_help", "cargo"] }
 thiserror = "1.0.48"
 elf = "0.7.1"
 rust-strings = "0.4.0"
-heh = { git = "https://github.com/orhun/heh", branch = "feat/binsider" }
+heh = { git = "https://github.com/orhun/heh", branch = "feat/support_as_widget" }
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
