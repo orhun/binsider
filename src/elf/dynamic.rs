@@ -3,7 +3,7 @@ use elf::{dynamic::Dyn, endian::AnyEndian, parse::ParsingTable, ParseError};
 use std::io::{Error as IoError, ErrorKind as IoErrorKind};
 
 /// ELF dynamic section wrapper.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Dynamic {
     /// Dynamics.
     dynamics: Vec<Dyn>,

@@ -108,15 +108,17 @@ impl<'a> TryFrom<ElfBytes<'a, AnyEndian>> for Elf {
                 Some(segments) => segments.iter().collect(),
                 None => vec![],
             }),
-            section_headers: SectionHeaders::try_from(elf_bytes.section_headers_with_strtab()?)?,
-            symbols: Symbols::try_from(elf_bytes.symbol_table()?)?,
+            section_headers: SectionHeaders::try_from(elf_bytes.section_headers_with_strtab()?)
+                .unwrap_or_default(),
+            symbols: Symbols::try_from(elf_bytes.symbol_table()?).unwrap_or_default(),
             dynamic_symbols: DynamicSymbols::try_from((
                 elf_bytes.dynamic_symbol_table()?,
                 elf_bytes.symbol_version_table()?,
-            ))?,
-            dynamic: Dynamic::try_from(elf_bytes.dynamic()?)?,
-            relocations: Relocations::try_from(&elf_bytes)?,
-            notes: Notes::try_from(&elf_bytes)?,
+            ))
+            .unwrap_or_default(),
+            dynamic: Dynamic::try_from(elf_bytes.dynamic()?).unwrap_or_default(),
+            relocations: Relocations::try_from(&elf_bytes).unwrap_or_default(),
+            notes: Notes::try_from(&elf_bytes).unwrap_or_default(),
         })
     }
 }

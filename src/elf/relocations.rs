@@ -7,7 +7,7 @@ use elf::{
 use std::io::{Error as IoError, ErrorKind as IoErrorKind};
 
 /// ELF relocations wrapper.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Relocations {
     /// Relocations.
     rels: Vec<Rel>,

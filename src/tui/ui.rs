@@ -241,13 +241,17 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                 Block::bordered()
                     .border_style(Style::default().fg(Color::Rgb(100, 100, 100)))
                     .title_bottom(
-                        Line::from(vec![
-                            "|".fg(Color::Rgb(100, 100, 100)),
-                            format!("{}/{}", selected_index.saturating_add(1), items_len)
-                                .white()
-                                .bold(),
-                            "|".fg(Color::Rgb(100, 100, 100)),
-                        ])
+                        if items_len != 0 {
+                            Line::from(vec![
+                                "|".fg(Color::Rgb(100, 100, 100)),
+                                format!("{}/{}", selected_index.saturating_add(1), items_len)
+                                    .white()
+                                    .bold(),
+                                "|".fg(Color::Rgb(100, 100, 100)),
+                            ])
+                        } else {
+                            Line::default()
+                        }
                         .right_aligned(),
                     )
                     .title_bottom(get_input_line(state)),
@@ -356,13 +360,17 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
                     .right_aligned(),
                 )
                 .title_bottom(
-                    Line::from(vec![
-                        "|".fg(Color::Rgb(100, 100, 100)),
-                        format!("{}/{}", selected_index.saturating_add(1), items_len)
-                            .white()
-                            .bold(),
-                        "|".fg(Color::Rgb(100, 100, 100)),
-                    ])
+                    if items_len != 0 {
+                        Line::from(vec![
+                            "|".fg(Color::Rgb(100, 100, 100)),
+                            format!("{}/{}", selected_index.saturating_add(1), items_len)
+                                .white()
+                                .bold(),
+                            "|".fg(Color::Rgb(100, 100, 100)),
+                        ])
+                    } else {
+                        Line::default()
+                    }
                     .right_aligned(),
                 )
                 .title_bottom(get_input_line(state)),

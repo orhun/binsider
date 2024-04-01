@@ -14,7 +14,7 @@ pub struct Note {
 }
 
 /// ELF notes wrapper.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Notes {
     /// Notes text.
     pub inner: Vec<Note>,

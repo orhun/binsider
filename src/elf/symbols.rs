@@ -6,7 +6,7 @@ use elf::{
 use std::io::{Error as IoError, ErrorKind as IoErrorKind};
 
 /// ELF symbols wrapper.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Symbols {
     /// Symbols.
     symbols: Vec<Symbol>,
@@ -72,7 +72,7 @@ impl<'a> Property<'a> for Symbols {
 }
 
 /// ELF dynamic symbols wrapper.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct DynamicSymbols {
     /// Symbols.
     symbols: Vec<Symbol>,

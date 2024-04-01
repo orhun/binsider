@@ -142,7 +142,7 @@ impl<'a> Property<'a> for ProgramHeaders {
 }
 
 /// ELF file section header wrapper.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct SectionHeaders {
     /// Inner type.
     inner: Vec<SectionHeader>,
