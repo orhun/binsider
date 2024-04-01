@@ -4,11 +4,12 @@ use ratatui::{
     style::{Color, Modifier, Style, Stylize},
     text::{Line, Span},
     widgets::{
-        block::Position, Block, Cell, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation,
-        ScrollbarState, Table, TableState, Tabs,
+        Block, Cell, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation, ScrollbarState, Table,
+        TableState, Tabs,
     },
     Frame,
 };
+use tui_input::Input;
 
 /// Titles of the main tabs.
 pub const MAIN_TABS: &[&str] = Tab::get_headers();
@@ -239,20 +240,23 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             .block(
                 Block::bordered()
                     .border_style(Style::default().fg(Color::Rgb(100, 100, 100)))
-                    .title(vec![
-                        "|".fg(Color::Rgb(100, 100, 100)),
-                        format!("{}/{}", selected_index.saturating_add(1), items_len)
-                            .white()
-                            .bold(),
-                        "|".fg(Color::Rgb(100, 100, 100)),
-                    ])
-                    .title_position(Position::Bottom)
-                    .title_alignment(Alignment::Right),
+                    .title_bottom(
+                        Line::from(vec![
+                            "|".fg(Color::Rgb(100, 100, 100)),
+                            format!("{}/{}", selected_index.saturating_add(1), items_len)
+                                .white()
+                                .bold(),
+                            "|".fg(Color::Rgb(100, 100, 100)),
+                        ])
+                        .right_aligned(),
+                    )
+                    .title_bottom(get_input_line(state)),
             )
             .highlight_style(Style::default().fg(Color::Green)),
             area,
             &mut table_state,
         );
+        render_cursor(state, area, frame);
 
         frame.render_stateful_widget(
             Scrollbar::new(ScrollbarOrientation::VerticalRight)
@@ -315,7 +319,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         .get(1)
         .map(|v| v.len())
         .unwrap_or_default();
-    if items_len == 0 {
+    if items_len == 0 && state.input.value().is_empty() {
         frame.render_widget(Block::bordered(), rect);
         frame.render_widget(
             Paragraph::new("Loading...".italic()).alignment(Alignment::Center),
@@ -360,12 +364,14 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
                         "|".fg(Color::Rgb(100, 100, 100)),
                     ])
                     .right_aligned(),
-                ),
+                )
+                .title_bottom(get_input_line(state)),
         )
         .highlight_style(Style::default().add_modifier(Modifier::BOLD)),
         rect,
         &mut list_state,
     );
+    render_cursor(state, rect, frame);
     frame.render_stateful_widget(
         Scrollbar::new(ScrollbarOrientation::VerticalRight)
             .begin_symbol(Some("↑"))
@@ -376,4 +382,43 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         }),
         &mut ScrollbarState::new(items_len).position(selected_index),
     );
+}
+
+/// Renders the cursor.
+fn render_cursor(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
+    if state.input_mode {
+        let (x, y) = (
+            area.x
+                + Input::default()
+                    .with_value(format!("search: {}", state.input.value()))
+                    .visual_cursor() as u16
+                + 2,
+            area.bottom().saturating_sub(1),
+        );
+        frame.render_widget(
+            Clear,
+            Rect {
+                x,
+                y,
+                width: 1,
+                height: 1,
+            },
+        );
+        frame.set_cursor(x, y);
+    }
+}
+
+/// Returns the input line.
+fn get_input_line<'a>(state: &'a State) -> Line<'a> {
+    if !state.input.value().is_empty() || state.input_mode {
+        Line::from(vec![
+            "|".fg(Color::Rgb(100, 100, 100)),
+            "search: ".green(),
+            state.input.value().white(),
+            if state.input_mode { " " } else { "" }.into(),
+            "|".fg(Color::Rgb(100, 100, 100)),
+        ])
+    } else {
+        Line::default()
+    }
 }

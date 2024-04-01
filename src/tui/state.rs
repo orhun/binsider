@@ -2,6 +2,7 @@ use crate::elf::Info;
 use crate::prelude::Analyzer;
 use crate::tui::ui::Tab;
 use crate::tui::widgets::SelectableList;
+use tui_input::Input;
 
 /// Application state.
 #[derive(Debug)]
@@ -18,6 +19,10 @@ pub struct State<'a> {
     pub list: SelectableList<Vec<String>>,
     /// Show heh.
     pub show_heh: bool,
+    /// Input.
+    pub input: Input,
+    /// Enable input.
+    pub input_mode: bool,
 }
 
 impl<'a> State<'a> {
@@ -28,8 +33,10 @@ impl<'a> State<'a> {
             tab: Tab::default(),
             info_index: 0,
             list: SelectableList::with_items(analyzer.elf.info(&Info::ProgramHeaders).items()),
-            show_heh: false,
             analyzer,
+            show_heh: false,
+            input: Input::default(),
+            input_mode: false,
         }
     }
 

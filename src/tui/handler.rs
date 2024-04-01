@@ -5,6 +5,8 @@ use crate::tui::ui::{Tab, ELF_INFO_TABS, MAIN_TABS};
 use crate::tui::widgets::SelectableList;
 use crossterm::event::{Event as CrosstermEvent, KeyCode, KeyEvent, KeyModifiers};
 use std::sync::mpsc;
+use tui_input::backend::crossterm::EventHandler;
+use tui_input::Input;
 
 /// Handles the key events and updates the state of [`App`].
 pub fn handle_key_events(
@@ -12,6 +14,21 @@ pub fn handle_key_events(
     state: &mut State,
     event_sender: mpsc::Sender<Event>,
 ) -> Result<()> {
+    if state.input_mode {
+        if key_event.code == KeyCode::Char('q')
+            || key_event.code == KeyCode::Esc
+            || (key_event.code == KeyCode::Backspace && state.input.value().is_empty())
+        {
+            state.input = Input::default();
+            state.input_mode = false;
+        } else if key_event.code == KeyCode::Enter {
+            state.input_mode = false;
+        } else {
+            state.input.handle_event(&CrosstermEvent::Key(key_event));
+        }
+        handle_tab(state)?;
+        return Ok(());
+    }
     if state.show_heh {
         if key_event.code == KeyCode::Char('q') {
             state.quit()
@@ -33,49 +50,30 @@ pub fn handle_key_events(
         return Ok(());
     }
     match key_event.code {
-        // Next info.
         KeyCode::Right | KeyCode::Char('l') => {
             if state.tab == Tab::StaticAnalysis {
                 state.info_index = (state.info_index + 1) % ELF_INFO_TABS.len();
-                state.list = SelectableList::with_items(
-                    state
-                        .analyzer
-                        .elf
-                        .info(&ELF_INFO_TABS[state.info_index])
-                        .items(),
-                );
+                handle_tab(state)?;
             }
         }
-        // Previous info.
         KeyCode::Left | KeyCode::Char('h') => {
             if state.tab == Tab::StaticAnalysis {
                 state.info_index = state
                     .info_index
                     .checked_sub(1)
                     .unwrap_or(ELF_INFO_TABS.len() - 1);
-                state.list = SelectableList::with_items(
-                    state
-                        .analyzer
-                        .elf
-                        .info(&ELF_INFO_TABS[state.info_index])
-                        .items(),
-                );
+                handle_tab(state)?;
             }
         }
-        // Scroll down the list.
         KeyCode::Down | KeyCode::Char('j') => state.list.next(),
-        // Scroll up the list.
         KeyCode::Up | KeyCode::Char('k') => state.list.previous(),
-        // Exit application on `ESC` or `q`
         KeyCode::Esc | KeyCode::Char('q') => {
             state.quit();
         }
-        // Next tab..
         KeyCode::Tab => {
             state.tab = ((state.tab as usize + 1) % MAIN_TABS.len()).into();
             handle_tab(state)?;
         }
-        // Increase string length.
         KeyCode::Char('+') => {
             if state.tab == Tab::Strings {
                 state.analyzer.strings_len = state
@@ -86,7 +84,6 @@ pub fn handle_key_events(
                 state.analyzer.extract_strings(event_sender.clone());
             }
         }
-        // Decrease string length.
         KeyCode::Char('-') => {
             if state.tab == Tab::Strings {
                 state.analyzer.strings_len = state
@@ -97,10 +94,18 @@ pub fn handle_key_events(
                 state.analyzer.extract_strings(event_sender.clone());
             }
         }
-        // Exit application on `Ctrl-C`
         KeyCode::Char('c') | KeyCode::Char('C') => {
             if key_event.modifiers == KeyModifiers::CONTROL {
                 state.quit();
+            }
+        }
+        KeyCode::Char('/') => {
+            state.input_mode = true;
+        }
+        KeyCode::Backspace => {
+            if !state.input.value().is_empty() {
+                state.input_mode = true;
+                state.input.handle_event(&CrosstermEvent::Key(key_event));
             }
         }
         _ => {}
@@ -113,13 +118,21 @@ pub fn handle_tab(state: &mut State) -> Result<()> {
     match state.tab {
         Tab::StaticAnalysis => {
             state.show_heh = false;
-            state.info_index = 0;
             state.list = SelectableList::with_items(
                 state
                     .analyzer
                     .elf
                     .info(&ELF_INFO_TABS[state.info_index])
-                    .items(),
+                    .items()
+                    .into_iter()
+                    .filter(|items| {
+                        state.input.value().is_empty()
+                            || items.iter().any(|item| {
+                                item.to_lowercase()
+                                    .contains(&state.input.value().to_lowercase())
+                            })
+                    })
+                    .collect(),
             );
         }
         Tab::Strings => {
@@ -132,6 +145,13 @@ pub fn handle_tab(state: &mut State) -> Result<()> {
                     .unwrap_or_default()
                     .iter()
                     .map(|(v, i)| vec![v.to_string(), i.to_string()])
+                    .filter(|items| {
+                        state.input.value().is_empty()
+                            || items.iter().any(|item| {
+                                item.to_lowercase()
+                                    .contains(&state.input.value().to_lowercase())
+                            })
+                    })
                     .collect(),
             )
         }
