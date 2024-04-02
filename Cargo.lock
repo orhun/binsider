@@ -103,6 +103,7 @@ dependencies = [
  "rust-strings",
  "thiserror",
  "tui-input",
+ "unicode-width",
 ]
 
 [[package]]

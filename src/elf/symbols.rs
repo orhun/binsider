@@ -60,11 +60,7 @@ impl<'a> Property<'a> for Symbols {
                         .trim_start_matches("STV_")
                         .to_string(),
                     symbol.st_shndx.to_string(),
-                    format!(
-                        "{}{}",
-                        name.chars().take(15).collect::<String>(),
-                        if name.is_empty() { "" } else { "[...]" }
-                    ),
+                    name,
                 ]
             })
             .collect()

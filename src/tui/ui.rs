@@ -10,6 +10,7 @@ use ratatui::{
     Frame,
 };
 use tui_input::Input;
+use unicode_width::UnicodeWidthStr;
 
 /// Titles of the main tabs.
 pub const MAIN_TABS: &[&str] = Tab::get_headers();
@@ -224,15 +225,30 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
         let headers = ELF_INFO_TABS[state.info_index].headers();
         let mut table_state = TableState::default();
         table_state.select(Some(selected_index % LIST_LIMIT));
+        let max_row_width = (area.width as usize / headers.len()).saturating_sub(2);
+        let items = state
+            .list
+            .items
+            .iter()
+            .skip(page * LIST_LIMIT)
+            .take(LIST_LIMIT)
+            .map(|items| {
+                Row::new(items.iter().enumerate().map(|(i, value)| {
+                    Cell::from(Line::from(
+                        if value.width() > max_row_width && i == items.len() - 1 {
+                            vec![
+                                value.chars().take(max_row_width).collect::<String>().into(),
+                                "…".fg(Color::Rgb(100, 100, 100)),
+                            ]
+                        } else {
+                            vec![value.to_string().into()]
+                        },
+                    ))
+                }))
+            });
         frame.render_stateful_widget(
             Table::new(
-                state
-                    .list
-                    .items
-                    .iter()
-                    .skip(page * LIST_LIMIT)
-                    .take(LIST_LIMIT)
-                    .map(|items| Row::new(items.iter().map(|v| Cell::from(Span::raw(v))))),
+                items,
                 &[Constraint::Percentage(
                     (100 / headers.len()).try_into().unwrap_or_default(),
                 )]
@@ -340,14 +356,28 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
     }
     let mut list_state = TableState::default();
     list_state.select(Some(selected_index % LIST_LIMIT));
+    let max_row_width = rect.width.saturating_sub(4) as usize;
     frame.render_stateful_widget(
         Table::new(
             items.map(|items| {
-                Row::new(vec![Cell::from(Line::from(vec![
-                    format!("{:>p$}", items[1], p = left_padding).cyan(),
-                    " ".into(),
-                    items[0].to_string().into(),
-                ]))])
+                Row::new(vec![Cell::from(Line::from({
+                    let index = format!("{:>p$}", items[1], p = left_padding);
+                    let value = items[0].to_string();
+                    let mut line = vec![index.clone().cyan(), " ".into()];
+                    if index.width() + value.width() > max_row_width {
+                        line.push(
+                            value
+                                .chars()
+                                .take(max_row_width.saturating_sub(index.width()))
+                                .collect::<String>()
+                                .into(),
+                        );
+                        line.push("…".fg(Color::Rgb(100, 100, 100)));
+                    } else {
+                        line.push(value.into());
+                    }
+                    line
+                }))])
             }),
             &[Constraint::Percentage(100)],
         )
