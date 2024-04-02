@@ -5,7 +5,7 @@ use ratatui::{
     text::{Line, Span},
     widgets::{
         Block, Cell, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation, ScrollbarState, Table,
-        TableState, Tabs,
+        TableState, Tabs, Wrap,
     },
     Frame,
 };
@@ -176,27 +176,31 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
             .split(chunks[0]);
         frame.render_widget(
-            Paragraph::new(headers).block(
-                Block::bordered()
-                    .title(vec![
-                        "|".fg(Color::Rgb(100, 100, 100)),
-                        "File Headers".white().bold(),
-                        "|".fg(Color::Rgb(100, 100, 100)),
-                    ])
-                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
-            ),
+            Paragraph::new(headers)
+                .block(
+                    Block::bordered()
+                        .title(vec![
+                            "|".fg(Color::Rgb(100, 100, 100)),
+                            "File Headers".white().bold(),
+                            "|".fg(Color::Rgb(100, 100, 100)),
+                        ])
+                        .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
+                )
+                .wrap(Wrap { trim: true }),
             chunks[0],
         );
         frame.render_widget(
-            Paragraph::new(notes).block(
-                Block::bordered()
-                    .title(vec![
-                        "|".fg(Color::Rgb(100, 100, 100)),
-                        "Notes".white().bold(),
-                        "|".fg(Color::Rgb(100, 100, 100)),
-                    ])
-                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
-            ),
+            Paragraph::new(notes)
+                .block(
+                    Block::bordered()
+                        .title(vec![
+                            "|".fg(Color::Rgb(100, 100, 100)),
+                            "Notes".white().bold(),
+                            "|".fg(Color::Rgb(100, 100, 100)),
+                        ])
+                        .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
+                )
+                .wrap(Wrap { trim: true }),
             chunks[1],
         );
     }
