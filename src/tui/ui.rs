@@ -342,7 +342,8 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         .unwrap_or_default()
         .get(1)
         .map(|v| v.len())
-        .unwrap_or_default();
+        .unwrap_or_default()
+        + 1;
     if items_len == 0 && state.input.value().is_empty() {
         frame.render_widget(Block::bordered(), rect);
         frame.render_widget(
@@ -381,6 +382,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
             }),
             &[Constraint::Percentage(100)],
         )
+        .header(Row::new(vec!["Location String".bold()]))
         .block(
             Block::bordered()
                 .title_top(
