@@ -14,7 +14,9 @@ elf = "0.7.1"
 rust-strings = "0.4.0"
 heh = { git = "https://github.com/orhun/heh", branch = "feat/support_as_widget" }
 tui-input = "0.8.0"
+tui-popup = "0.2.4"
 unicode-width = "0.1.11"
+textwrap = "0.16.1"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"

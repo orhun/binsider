@@ -25,7 +25,7 @@ pub struct Analyzer<'a> {
     /// Elf properties.
     pub elf: Elf,
     /// Strings.
-    pub strings: Option<Vec<(String, u64)>>,
+    pub strings: Option<Vec<(u64, String)>>,
     /// Min length of the strings.
     pub strings_len: usize,
     /// Heh application.

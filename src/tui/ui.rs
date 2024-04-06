@@ -10,10 +10,14 @@ use ratatui::{
     Frame,
 };
 use tui_input::Input;
+use tui_popup::Popup;
 use unicode_width::UnicodeWidthStr;
 
 /// Titles of the main tabs.
 pub const MAIN_TABS: &[&str] = Tab::get_headers();
+
+/// Header for the strings table.
+const STRINGS_HEADERS: &[&str] = &["Location", "String"];
 
 /// Maximum number of elements to show in table/list.
 const LIST_LIMIT: usize = 100;
@@ -281,7 +285,6 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             &mut table_state,
         );
         render_cursor(state, area, frame);
-
         frame.render_stateful_widget(
             Scrollbar::new(ScrollbarOrientation::VerticalRight)
                 .begin_symbol(Some("↑"))
@@ -321,6 +324,7 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                     .fg(Color::White),
             );
         frame.render_widget(tabs, chunks[1]);
+        render_details(state, rect, frame);
     }
 }
 
@@ -340,7 +344,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         .last()
         .cloned()
         .unwrap_or_default()
-        .get(1)
+        .first()
         .map(|v| v.len())
         .unwrap_or_default()
         + 1;
@@ -362,8 +366,8 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         Table::new(
             items.map(|items| {
                 Row::new(vec![Cell::from(Line::from({
-                    let index = format!("{:>p$}", items[1], p = left_padding);
-                    let value = items[0].to_string();
+                    let index = format!("{:>p$}", items[0], p = left_padding);
+                    let value = items[1].to_string();
                     let mut line = vec![index.clone().cyan(), " ".into()];
                     if index.width() + value.width() > max_row_width {
                         line.push(
@@ -382,7 +386,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
             }),
             &[Constraint::Percentage(100)],
         )
-        .header(Row::new(vec!["Location String".bold()]))
+        .header(Row::new(vec![STRINGS_HEADERS.join(" ").bold()]))
         .block(
             Block::bordered()
                 .title_top(
@@ -416,6 +420,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         &mut list_state,
     );
     render_cursor(state, rect, frame);
+    render_details(state, rect, frame);
     frame.render_stateful_widget(
         Scrollbar::new(ScrollbarOrientation::VerticalRight)
             .begin_symbol(Some("↑"))
@@ -449,6 +454,69 @@ fn render_cursor(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
             },
         );
         frame.set_cursor(x, y);
+    }
+}
+
+fn render_details(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
+    if state.show_details {
+        let headers;
+        match state.tab {
+            Tab::StaticAnalysis => {
+                headers = ELF_INFO_TABS[state.info_index].headers();
+            }
+            Tab::Strings => {
+                headers = STRINGS_HEADERS;
+            }
+            _ => {
+                unimplemented!()
+            }
+        }
+        let max_row_width = (area.width - 2) / 2;
+        let items = state.list.selected().cloned().unwrap_or_default();
+        let lines: Vec<Line> = items
+            .iter()
+            .enumerate()
+            .flat_map(|(i, v)| {
+                let mut lines = Vec::new();
+                if v.width() as u16 > max_row_width {
+                    lines.extend(
+                        textwrap::wrap(v, textwrap::Options::new(max_row_width as usize))
+                            .into_iter()
+                            .enumerate()
+                            .map(|(x, v)| {
+                                if x == 0 {
+                                    Line::from(vec![
+                                        Span::styled(
+                                            headers[i].to_string(),
+                                            Style::default().fg(Color::Cyan),
+                                        ),
+                                        Span::raw(": "),
+                                        v.to_string().into(),
+                                    ])
+                                } else {
+                                    Line::from(v.to_string())
+                                }
+                            }),
+                    )
+                } else {
+                    lines.push(Line::from(vec![
+                        Span::styled(headers[i].to_string(), Style::default().fg(Color::Cyan)),
+                        Span::raw(": "),
+                        Span::styled(v, Style::default().fg(Color::White)),
+                    ]));
+                }
+                lines
+            })
+            .collect();
+        let popup = Popup::new(
+            vec![
+                "|".fg(Color::Rgb(100, 100, 100)),
+                "Details".white().bold(),
+                "|".fg(Color::Rgb(100, 100, 100)),
+            ],
+            lines,
+        );
+        frame.render_widget(popup.to_widget(), area);
     }
 }
 

@@ -19,6 +19,8 @@ pub struct State<'a> {
     pub list: SelectableList<Vec<String>>,
     /// Show heh.
     pub show_heh: bool,
+    /// Show details.
+    pub show_details: bool,
     /// Input.
     pub input: Input,
     /// Enable input.
@@ -35,6 +37,7 @@ impl<'a> State<'a> {
             list: SelectableList::with_items(analyzer.elf.info(&Info::ProgramHeaders).items()),
             analyzer,
             show_heh: false,
+            show_details: false,
             input: Input::default(),
             input_mode: false,
         }

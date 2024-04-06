@@ -68,7 +68,11 @@ pub fn handle_key_events(
         KeyCode::Down | KeyCode::Char('j') => state.list.next(),
         KeyCode::Up | KeyCode::Char('k') => state.list.previous(),
         KeyCode::Esc | KeyCode::Char('q') => {
-            state.quit();
+            if state.show_details {
+                state.show_details = false;
+            } else {
+                state.quit();
+            }
         }
         KeyCode::Tab => {
             state.tab = ((state.tab as usize + 1) % MAIN_TABS.len()).into();
@@ -108,16 +112,18 @@ pub fn handle_key_events(
                 state.input.handle_event(&CrosstermEvent::Key(key_event));
             }
         }
+        KeyCode::Enter => state.show_details = !state.show_details,
         _ => {}
     }
+    state.show_details = key_event == KeyCode::Enter.into();
     Ok(())
 }
 
 /// Update the state based on selected tab.
 pub fn handle_tab(state: &mut State) -> Result<()> {
+    state.show_heh = false;
     match state.tab {
         Tab::StaticAnalysis => {
-            state.show_heh = false;
             state.list = SelectableList::with_items(
                 state
                     .analyzer
@@ -136,7 +142,6 @@ pub fn handle_tab(state: &mut State) -> Result<()> {
             );
         }
         Tab::Strings => {
-            state.show_heh = false;
             state.list = SelectableList::with_items(
                 state
                     .analyzer

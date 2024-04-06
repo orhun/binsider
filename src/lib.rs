@@ -57,7 +57,7 @@ pub fn start_tui(analyzer: Analyzer) -> Result<()> {
             Event::Mouse(_) => {}
             Event::Resize(_, _) => {}
             Event::FileStrings(strings) => {
-                state.analyzer.strings = Some(strings?);
+                state.analyzer.strings = Some(strings?.into_iter().map(|(v, l)| (l, v)).collect());
                 if state.tab == Tab::Strings {
                     handler::handle_tab(&mut state)?;
                 }
