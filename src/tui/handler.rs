@@ -44,7 +44,7 @@ pub fn handle_key_events(
             state
                 .analyzer
                 .heh
-                .handle_input(CrosstermEvent::Key(key_event))
+                .handle_input(&CrosstermEvent::Key(key_event))
                 .map_err(|e| Error::HehError(e.to_string()))?;
         }
         return Ok(());

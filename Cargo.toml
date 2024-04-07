@@ -12,7 +12,7 @@ clap = { version = "4.4.2", features = ["derive", "env", "wrap_help", "cargo"] }
 thiserror = "1.0.48"
 elf = "0.7.1"
 rust-strings = "0.4.0"
-heh = { git = "https://github.com/orhun/heh", branch = "feat/support_as_widget" }
+heh = { git = "https://github.com/orhun/heh", rev = "91e8db53d7f27f04cfe500d4b994fe8206cffb07" }
 tui-input = "0.8.0"
 tui-popup = "0.2.4"
 unicode-width = "0.1.11"

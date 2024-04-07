@@ -430,7 +430,7 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 [[package]]
 name = "heh"
 version = "0.4.1"
-source = "git+https://github.com/orhun/heh?branch=feat/support_as_widget#f919803e9a80b7c25b4b153362acd0686953cd0f"
+source = "git+https://github.com/orhun/heh?rev=91e8db53d7f27f04cfe500d4b994fe8206cffb07#91e8db53d7f27f04cfe500d4b994fe8206cffb07"
 dependencies = [
  "arboard",
  "clap",
