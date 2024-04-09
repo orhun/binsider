@@ -145,7 +145,7 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
         .map(|items| {
             Line::from(vec![
                 Span::styled(items[0].to_string(), Style::default().fg(Color::Cyan)),
-                Span::raw(": "),
+                Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
                 Span::styled(items[1].to_string(), Style::default().fg(Color::White)),
             ])
         })
@@ -490,7 +490,7 @@ fn render_details(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
                                             headers[i].to_string(),
                                             Style::default().fg(Color::Cyan),
                                         ),
-                                        Span::raw(": "),
+                                        Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
                                         v.to_string().into(),
                                     ])
                                 } else {
@@ -501,7 +501,7 @@ fn render_details(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
                 } else {
                     lines.push(Line::from(vec![
                         Span::styled(headers[i].to_string(), Style::default().fg(Color::Cyan)),
-                        Span::raw(": "),
+                        Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
                         Span::styled(v, Style::default().fg(Color::White)),
                     ]));
                 }
