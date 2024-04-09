@@ -152,10 +152,10 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
         .collect();
     let mut notes = Vec::new();
     for note in state.analyzer.elf.notes.inner.iter() {
-        notes.push(Line::from(vec![Span::styled(
-            note.name.to_string(),
-            Style::default().fg(Color::Cyan),
-        )]));
+        notes.push(Line::from(vec![
+            "Notes in ".cyan(),
+            note.name.to_string().cyan().italic(),
+        ]));
         notes.push(Line::from(
             note.header
                 .iter()
