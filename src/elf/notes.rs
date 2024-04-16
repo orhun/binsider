@@ -50,7 +50,7 @@ impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Notes {
                     .section_data_as_notes(&section_header)
                     .expect("Failed to read notes section");
                 let mut note = Note {
-                    name: format!("{name}"),
+                    name: name.to_string(),
                     ..Default::default()
                 };
                 for elf_note in elf_notes {
