@@ -1,23 +1,11 @@
-use binsider::app::Analyzer;
 use binsider::args::Args;
 use binsider::error::Result;
 use clap::Parser;
-use std::{env, fs, process};
+use std::process;
 
 fn main() -> Result<()> {
     let args = Args::parse();
-    let mut file = args.file.clone().unwrap_or(env::current_exe()?);
-    if !file.exists() {
-        file = which::which(file.to_string_lossy().to_string())?;
-    }
-    let file_data = fs::read(&file)?;
-    let bytes = file_data.as_slice();
-    let analyzer = Analyzer::new(
-        file.to_str().unwrap_or_default(),
-        bytes,
-        args.min_strings_len,
-    )?;
-    match binsider::start_tui(analyzer) {
+    match binsider::run(args) {
         Ok(_) => process::exit(0),
         Err(e) => {
             eprintln!("{e}");

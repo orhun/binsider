@@ -24,15 +24,32 @@ pub mod tracer;
 pub mod prelude;
 
 use app::Analyzer;
+use args::Args;
 use error::Result;
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
-use std::io;
+use std::{env, fs, io};
 use tui::event::{Event, EventHandler};
 use tui::handler;
 use tui::state::State;
 use tui::ui::Tab;
 use tui::Tui;
+
+/// Runs binsider.
+pub fn run(args: Args) -> Result<()> {
+    let mut file = args.file.clone().unwrap_or(env::current_exe()?);
+    if !file.exists() {
+        file = which::which(file.to_string_lossy().to_string())?;
+    }
+    let file_data = fs::read(&file)?;
+    let bytes = file_data.as_slice();
+    let analyzer = Analyzer::new(
+        file.to_str().unwrap_or_default(),
+        bytes,
+        args.min_strings_len,
+    )?;
+    start_tui(analyzer)
+}
 
 /// Starts the terminal user interface.
 pub fn start_tui(analyzer: Analyzer) -> Result<()> {

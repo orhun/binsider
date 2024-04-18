@@ -10,10 +10,10 @@ pub enum Error {
     #[error("Unable to locate binary: `{0}`")]
     WhichError(#[from] which::Error),
     /// Error that may occur while receiving messages from the channel.
-    #[error("channel receive error: `{0}`")]
+    #[error("Channel receive error: `{0}`")]
     ChannelReceiveError(#[from] std::sync::mpsc::RecvError),
     /// Error that may occur while sending messages to the channel.
-    #[error("channel send error: `{0}`")]
+    #[error("Channel send error: `{0}`")]
     ChannelSendError(String),
     /// Error that may occur while parsing ELF files.
     #[error("ELF parse error: `{0}`")]
