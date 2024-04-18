@@ -6,7 +6,10 @@ use std::{env, fs, process};
 
 fn main() -> Result<()> {
     let args = Args::parse();
-    let file = args.file.clone().unwrap_or(env::current_exe()?);
+    let mut file = args.file.clone().unwrap_or(env::current_exe()?);
+    if !file.exists() {
+        file = which::which(file.to_string_lossy().to_string())?;
+    }
     let file_data = fs::read(&file)?;
     let bytes = file_data.as_slice();
     let analyzer = Analyzer::new(

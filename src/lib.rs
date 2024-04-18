@@ -17,6 +17,9 @@ pub mod args;
 /// Error handler implementation.
 pub mod error;
 
+/// System call tracer.
+pub mod tracer;
+
 /// Common types that can be glob-imported for convenience.
 pub mod prelude;
 
@@ -61,6 +64,17 @@ pub fn start_tui(analyzer: Analyzer) -> Result<()> {
                 if state.tab == Tab::Strings {
                     handler::handle_tab(&mut state)?;
                 }
+            }
+            Event::Trace => {
+                tui.toggle_pause()?;
+                tracer::trace_syscalls(state.analyzer.path, tui.events.sender.clone());
+            }
+            Event::TraceResult(syscalls) => {
+                state.analyzer.syscalls = match syscalls {
+                    Ok(v) => v,
+                    Err(e) => console::style(e).red().to_string().as_bytes().to_vec(),
+                };
+                tui.toggle_pause()?;
             }
         }
     }

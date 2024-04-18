@@ -30,6 +30,8 @@ pub struct Analyzer<'a> {
     pub strings_len: usize,
     /// Heh application.
     pub heh: Heh,
+    /// System calls.
+    pub syscalls: Vec<u8>,
 }
 
 impl Debug for Analyzer<'_> {
@@ -53,7 +55,8 @@ impl<'a> Analyzer<'a> {
                 File::open(path)?
             }
         };
-        let heh = Heh::new(file, Encoding::Ascii, 0).map_err(|e| Error::HehError(e.to_string()))?;
+        let heh =
+            Heh::new(file, Encoding::Ascii, 0).map_err(|e| Error::HexdumpError(e.to_string()))?;
         Ok(Self {
             path,
             bytes,
@@ -62,6 +65,7 @@ impl<'a> Analyzer<'a> {
             strings: None,
             strings_len,
             heh,
+            syscalls: Vec::new(),
         })
     }
 

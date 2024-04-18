@@ -45,7 +45,7 @@ pub fn handle_key_events(
                 .analyzer
                 .heh
                 .handle_input(&CrosstermEvent::Key(key_event))
-                .map_err(|e| Error::HehError(e.to_string()))?;
+                .map_err(|e| Error::HexdumpError(e.to_string()))?;
         }
         return Ok(());
     }
@@ -112,7 +112,16 @@ pub fn handle_key_events(
                 state.input.handle_event(&CrosstermEvent::Key(key_event));
             }
         }
-        KeyCode::Enter => state.show_details = !state.show_details,
+        KeyCode::Enter => {
+            if state.tab == Tab::DynamicAnalysis && state.analyzer.syscalls.is_empty() {
+                event_sender
+                    .send(Event::Trace)
+                    .expect("failed to send trace event");
+                return Ok(());
+            } else {
+                state.show_details = !state.show_details;
+            }
+        }
         _ => {}
     }
     state.show_details = key_event == KeyCode::Enter.into();

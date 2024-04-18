@@ -6,9 +6,15 @@ pub enum Error {
     /// Error that may occur during I/O operations.
     #[error("IO error: `{0}`")]
     IoError(#[from] std::io::Error),
+    /// Error that may occur during locating binaries.
+    #[error("Unable to locate binary: `{0}`")]
+    WhichError(#[from] which::Error),
     /// Error that may occur while receiving messages from the channel.
     #[error("channel receive error: `{0}`")]
     ChannelReceiveError(#[from] std::sync::mpsc::RecvError),
+    /// Error that may occur while sending messages to the channel.
+    #[error("channel send error: `{0}`")]
+    ChannelSendError(String),
     /// Error that may occur while parsing ELF files.
     #[error("ELF parse error: `{0}`")]
     ElfError(#[from] elf::parse::ParseError),
@@ -17,7 +23,10 @@ pub enum Error {
     StringsError(String),
     /// Error that may occur while running hexdump.
     #[error("Hexdump (heh) error: `{0}`")]
-    HehError(String),
+    HexdumpError(String),
+    /// Error that may occur while tracing system calls.
+    #[error("Tracing system call error: `{0}`")]
+    TraceError(String),
 }
 
 /// Type alias for the standard [`Result`] type.

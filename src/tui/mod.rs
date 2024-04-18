@@ -17,10 +17,11 @@ use crate::error::Result;
 use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
 use crossterm::terminal::{self, EnterAlternateScreen, LeaveAlternateScreen};
 use event::EventHandler;
-use ratatui::backend::Backend;
+use ratatui::backend::{Backend, CrosstermBackend};
 use ratatui::Terminal;
 use state::State;
-use std::io;
+use std::sync::atomic::Ordering;
+use std::{io, panic};
 
 /// Representation of a terminal user interface.
 ///
@@ -32,12 +33,18 @@ pub struct Tui<B: Backend> {
     terminal: Terminal<B>,
     /// Terminal event handler.
     pub events: EventHandler,
+    /// Is the interface paused?
+    pub paused: bool,
 }
 
 impl<B: Backend> Tui<B> {
     /// Constructs a new instance of [`Tui`].
     pub fn new(terminal: Terminal<B>, events: EventHandler) -> Self {
-        Self { terminal, events }
+        Self {
+            terminal,
+            events,
+            paused: false,
+        }
     }
 
     /// Initializes the terminal interface.
@@ -46,6 +53,14 @@ impl<B: Backend> Tui<B> {
     pub fn init(&mut self) -> Result<()> {
         terminal::enable_raw_mode()?;
         crossterm::execute!(io::stderr(), EnterAlternateScreen, EnableMouseCapture)?;
+        panic::set_hook(Box::new(move |panic| {
+            Self::reset().expect("failed to reset the terminal");
+            better_panic::Settings::auto()
+                .most_recent_first(false)
+                .lineno_suffix(true)
+                .create_panic_handler()(panic);
+            std::process::exit(1);
+        }));
         self.terminal.hide_cursor()?;
         self.terminal.clear()?;
         Ok(())
@@ -57,6 +72,35 @@ impl<B: Backend> Tui<B> {
     /// [`rendering`]: crate::ui:render
     pub fn draw(&mut self, app: &mut State) -> Result<()> {
         self.terminal.draw(|frame| ui::render(app, frame))?;
+        Ok(())
+    }
+
+    /// Toggles the [`paused`] state of interface.
+    ///
+    /// It disables the key input and exits the
+    /// terminal interface on pause (and vice-versa).
+    ///
+    /// [`paused`]: Tui::paused
+    pub fn toggle_pause(&mut self) -> Result<()> {
+        self.paused = !self.paused;
+        if self.paused {
+            Self::reset()?;
+        } else {
+            self.init()?;
+        }
+        self.events
+            .key_input_disabled
+            .store(self.paused, Ordering::Relaxed);
+        Ok(())
+    }
+
+    /// Reset the terminal interface.
+    ///
+    /// It disables the raw mode and reverts back the terminal properties.
+    pub fn reset() -> Result<()> {
+        terminal::disable_raw_mode()?;
+        crossterm::execute!(io::stderr(), LeaveAlternateScreen, DisableMouseCapture)?;
+        Terminal::new(CrosstermBackend::new(io::stderr()))?.show_cursor()?;
         Ok(())
     }
 

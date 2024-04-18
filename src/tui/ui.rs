@@ -1,8 +1,9 @@
 use crate::{elf::Info, tui::state::State};
+use ansi_to_tui::IntoText;
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Margin, Rect},
     style::{Color, Modifier, Style, Stylize},
-    text::{Line, Span},
+    text::{Line, Span, Text},
     widgets::{
         Block, Cell, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation, ScrollbarState, Table,
         TableState, Tabs, Wrap,
@@ -113,7 +114,7 @@ pub fn render(state: &mut State, frame: &mut Frame) {
             render_static_analysis(state, frame, chunks[1]);
         }
         Tab::DynamicAnalysis => {
-            frame.render_widget(Block::bordered(), chunks[1]);
+            render_dynamic_analysis(state, frame, chunks[1]);
         }
         Tab::Strings => {
             render_strings(state, frame, chunks[1]);
@@ -457,6 +458,7 @@ fn render_cursor(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
     }
 }
 
+/// Renders details popup.
 fn render_details(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
     if state.show_details {
         let headers;
@@ -517,6 +519,45 @@ fn render_details(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
             lines,
         );
         frame.render_widget(popup.to_widget(), area);
+    }
+}
+
+/// Renders the dynamic analysis tab.
+pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect) {
+    if state.analyzer.syscalls.is_empty() {
+        frame.render_widget(
+            Paragraph::new(vec![
+                Line::from(vec![
+                    "Press ".into(),
+                    "Enter".cyan(),
+                    " to run the executable.".into(),
+                ]),
+                Line::from(vec![
+                    "(".fg(Color::Rgb(100, 100, 100)),
+                    state.analyzer.path.italic(),
+                    ")".fg(Color::Rgb(100, 100, 100)),
+                ]),
+            ])
+            .block(Block::bordered())
+            .alignment(Alignment::Center),
+            rect,
+        );
+    } else {
+        frame.render_widget(
+            Paragraph::new(
+                state
+                    .analyzer
+                    .syscalls
+                    .into_text()
+                    .unwrap_or_else(|_| Text::from("ANSI error occurred")),
+            )
+            .block(Block::bordered().title(vec![
+                "|".fg(Color::Rgb(100, 100, 100)),
+                "System Calls".white().bold(),
+                "|".fg(Color::Rgb(100, 100, 100)),
+            ])),
+            rect,
+        );
     }
 }
 

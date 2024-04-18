@@ -17,6 +17,12 @@ tui-input = "0.8.0"
 tui-popup = "0.2.4"
 unicode-width = "0.1.11"
 textwrap = "0.16.1"
+lurk-cli = { path = "../lurk" }
+nix = { version = "0.27.1", features = ["ptrace", "signal"] }
+ansi-to-tui = "4.0.1"
+console = "0.15.8"
+which = "6.0.1"
+better-panic = "0.3.0"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
