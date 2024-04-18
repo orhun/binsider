@@ -45,10 +45,10 @@ impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Notes {
             .for_each(|section_header| {
                 let name = string_table
                     .get(section_header.sh_name as usize)
-                    .expect("section name should parse");
+                    .expect("failed to parse section name");
                 let elf_notes = elf
                     .section_data_as_notes(&section_header)
-                    .expect("Failed to read notes section");
+                    .expect("failed to read notes section");
                 let mut note = Note {
                     name: name.to_string(),
                     ..Default::default()

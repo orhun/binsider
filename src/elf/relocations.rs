@@ -30,7 +30,7 @@ impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Relocations {
                 .filter(|shdr| shdr.sh_type == elf::abi::SHT_REL)
                 .flat_map(|v| {
                     elf.section_data_as_rels(&v)
-                        .expect("Failed to read rels section")
+                        .expect("failed to read rels section")
                         .collect::<Vec<Rel>>()
                 })
                 .collect(),
@@ -39,7 +39,7 @@ impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Relocations {
                 .filter(|shdr| shdr.sh_type == elf::abi::SHT_RELA)
                 .flat_map(|v| {
                     elf.section_data_as_relas(&v)
-                        .expect("Failed to read relas section")
+                        .expect("failed to read relas section")
                         .collect::<Vec<Rela>>()
                 })
                 .collect(),
