@@ -682,6 +682,7 @@ dependencies = [
 [[package]]
 name = "lurk-cli"
 version = "0.3.4"
+source = "git+https://github.com/orhun/lurk?rev=4d3dbd08cbc0a99271012252d0d248b90b5bb087#4d3dbd08cbc0a99271012252d0d248b90b5bb087"
 dependencies = [
  "anyhow",
  "atty",
