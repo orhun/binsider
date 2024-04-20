@@ -65,8 +65,20 @@ pub fn handle_key_events(
                 handle_tab(state)?;
             }
         }
-        KeyCode::Down | KeyCode::Char('j') => state.list.next(),
-        KeyCode::Up | KeyCode::Char('k') => state.list.previous(),
+        KeyCode::Down | KeyCode::Char('j') => {
+            if state.tab == Tab::DynamicAnalysis {
+                state.scroll_index = state.scroll_index.saturating_add(1);
+            } else {
+                state.list.next()
+            }
+        }
+        KeyCode::Up | KeyCode::Char('k') => {
+            if state.tab == Tab::DynamicAnalysis {
+                state.scroll_index = state.scroll_index.saturating_sub(1);
+            } else {
+                state.list.previous()
+            }
+        }
         KeyCode::Esc | KeyCode::Char('q') => {
             if state.show_details {
                 state.show_details = false;

@@ -15,6 +15,8 @@ pub struct State<'a> {
     pub tab: Tab,
     /// Elf info.
     pub info_index: usize,
+    /// Scroll index.
+    pub scroll_index: usize,
     /// List items.
     pub list: SelectableList<Vec<String>>,
     /// Show heh.
@@ -34,6 +36,7 @@ impl<'a> State<'a> {
             running: true,
             tab: Tab::default(),
             info_index: 0,
+            scroll_index: 0,
             list: SelectableList::with_items(analyzer.elf.info(&Info::ProgramHeaders).items()),
             analyzer,
             show_heh: false,

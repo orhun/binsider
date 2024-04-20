@@ -543,20 +543,41 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
             rect,
         );
     } else {
+        let text = state
+            .analyzer
+            .syscalls
+            .into_text()
+            .unwrap_or_else(|_| Text::from("ANSI error occurred"));
+        let max_height = text.height().saturating_sub(rect.height as usize) + 2;
+        if max_height < state.scroll_index {
+            state.scroll_index = max_height;
+        }
+
         frame.render_widget(
-            Paragraph::new(
-                state
-                    .analyzer
-                    .syscalls
-                    .into_text()
-                    .unwrap_or_else(|_| Text::from("ANSI error occurred")),
-            )
-            .block(Block::bordered().title(vec![
-                "|".fg(Color::Rgb(100, 100, 100)),
-                "System Calls".white().bold(),
-                "|".fg(Color::Rgb(100, 100, 100)),
-            ])),
+            Paragraph::new(text.clone())
+                .block(Block::bordered().title(vec![
+                    "|".fg(Color::Rgb(100, 100, 100)),
+                    format!(
+                        "height: {}, text_h: {}, scroll: {}",
+                        rect.height,text.height(),
+                        state.scroll_index
+                    ).into(),
+                    "System Calls".white().bold(),
+                    "|".fg(Color::Rgb(100, 100, 100)),
+                ]))
+                .scroll((state.scroll_index as u16, 0)),
             rect,
+        );
+
+        frame.render_stateful_widget(
+            Scrollbar::new(ScrollbarOrientation::VerticalRight)
+                .begin_symbol(Some("↑"))
+                .end_symbol(Some("↓")),
+            rect.inner(&Margin {
+                vertical: 1,
+                horizontal: 0,
+            }),
+            &mut ScrollbarState::new(max_height).position(state.scroll_index),
         );
     }
 }
