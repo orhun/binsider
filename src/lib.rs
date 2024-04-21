@@ -96,6 +96,7 @@ pub fn start_tui(analyzer: Analyzer) -> Result<()> {
                     },
                 };
                 tui.toggle_pause()?;
+                handler::handle_tab(&mut state)?;
             }
         }
     }

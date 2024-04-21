@@ -3,7 +3,9 @@ use crate::tui::event::Event;
 use crate::tui::state::State;
 use crate::tui::ui::{Tab, ELF_INFO_TABS, MAIN_TABS};
 use crate::tui::widgets::SelectableList;
+use ansi_to_tui::IntoText;
 use crossterm::event::{Event as CrosstermEvent, KeyCode, KeyEvent, KeyModifiers};
+use ratatui::text::Text;
 use std::sync::mpsc;
 use tui_input::backend::crossterm::EventHandler;
 use tui_input::Input;
@@ -162,6 +164,26 @@ pub fn handle_tab(state: &mut State) -> Result<()> {
                     .collect(),
             );
         }
+        Tab::DynamicAnalysis => {
+            state.system_calls = state
+                .analyzer
+                .tracer
+                .syscalls
+                .into_text()
+                .unwrap_or_else(|_| Text::from("ANSI error occurred"))
+                .lines
+                .into_iter()
+                .filter(|line| {
+                    state.input.value().is_empty()
+                        || line
+                            .clone()
+                            .reset_style()
+                            .to_string()
+                            .to_lowercase()
+                            .contains(&state.input.value().to_lowercase())
+                })
+                .collect();
+        }
         Tab::Strings => {
             state.list = SelectableList::with_items(
                 state
@@ -184,7 +206,6 @@ pub fn handle_tab(state: &mut State) -> Result<()> {
         Tab::Hexdump => {
             state.show_heh = true;
         }
-        _ => {}
     }
     Ok(())
 }

@@ -2,6 +2,7 @@ use crate::elf::Info;
 use crate::prelude::Analyzer;
 use crate::tui::ui::Tab;
 use crate::tui::widgets::SelectableList;
+use ratatui::text::Line;
 use tui_input::Input;
 
 /// Application state.
@@ -27,6 +28,8 @@ pub struct State<'a> {
     pub input: Input,
     /// Enable input.
     pub input_mode: bool,
+    /// System calls.
+    pub system_calls: Vec<Line<'a>>,
 }
 
 impl<'a> State<'a> {
@@ -43,6 +46,7 @@ impl<'a> State<'a> {
             show_details: false,
             input: Input::default(),
             input_mode: false,
+            system_calls: Vec::new(),
         }
     }
 

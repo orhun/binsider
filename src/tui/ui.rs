@@ -543,19 +543,17 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
             rect,
         );
     } else {
-        let text = state
-            .analyzer
-            .tracer
-            .syscalls
-            .into_text()
-            .unwrap_or_else(|_| Text::from("ANSI error occurred"));
-        let max_height = text.height().saturating_sub(rect.height as usize) + 2;
+        let max_height = state
+            .system_calls
+            .len()
+            .saturating_sub(rect.height as usize)
+            + 2;
         if max_height < state.scroll_index {
             state.scroll_index = max_height;
         }
 
         frame.render_widget(
-            Paragraph::new(text.clone())
+            Paragraph::new(state.system_calls.clone())
                 .block(
                     Block::bordered()
                         .title(vec![
@@ -566,16 +564,18 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
                         .title_bottom(
                             Line::from(vec![
                                 "|".fg(Color::Rgb(100, 100, 100)),
-                                format!("{}", text.height()).white().bold(),
+                                format!("{}", state.system_calls.len()).white().bold(),
                                 "|".fg(Color::Rgb(100, 100, 100)),
                             ])
                             .right_aligned(),
-                        ),
+                        )
+                        .title_bottom(get_input_line(state)),
                 )
                 .scroll((state.scroll_index as u16, 0)),
             rect,
         );
 
+        render_cursor(state, rect, frame);
         frame.render_stateful_widget(
             Scrollbar::new(ScrollbarOrientation::VerticalRight)
                 .begin_symbol(Some("↑"))
