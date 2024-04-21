@@ -556,11 +556,22 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
 
         frame.render_widget(
             Paragraph::new(text.clone())
-                .block(Block::bordered().title(vec![
-                    "|".fg(Color::Rgb(100, 100, 100)),
-                    "System Calls".white().bold(),
-                    "|".fg(Color::Rgb(100, 100, 100)),
-                ]))
+                .block(
+                    Block::bordered()
+                        .title(vec![
+                            "|".fg(Color::Rgb(100, 100, 100)),
+                            "System Calls".white().bold(),
+                            "|".fg(Color::Rgb(100, 100, 100)),
+                        ])
+                        .title_bottom(
+                            Line::from(vec![
+                                "|".fg(Color::Rgb(100, 100, 100)),
+                                format!("{}", text.height()).white().bold(),
+                                "|".fg(Color::Rgb(100, 100, 100)),
+                            ])
+                            .right_aligned(),
+                        ),
+                )
                 .scroll((state.scroll_index as u16, 0)),
             rect,
         );
