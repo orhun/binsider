@@ -105,7 +105,8 @@ pub fn render(state: &mut State, frame: &mut Frame) {
             );
         frame.render_widget(tabs, chunks[0]);
         frame.render_widget(
-            Paragraph::new(state.analyzer.path.italic()).alignment(Alignment::Right),
+            Paragraph::new(format!("{} ", state.analyzer.path).italic())
+                .alignment(Alignment::Right),
             chunks[1],
         )
     }
@@ -526,18 +527,11 @@ fn render_details(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
 pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect) {
     if state.analyzer.tracer.syscalls.is_empty() {
         frame.render_widget(
-            Paragraph::new(vec![
-                Line::from(vec![
-                    "Press ".into(),
-                    "Enter".cyan(),
-                    " to run the executable.".into(),
-                ]),
-                Line::from(vec![
-                    "(".fg(Color::Rgb(100, 100, 100)),
-                    state.analyzer.path.italic(),
-                    ")".fg(Color::Rgb(100, 100, 100)),
-                ]),
-            ])
+            Paragraph::new(vec![Line::from(vec![
+                "Press ".into(),
+                "Enter".cyan(),
+                " to run the executable.".into(),
+            ])])
             .block(Block::bordered())
             .alignment(Alignment::Center),
             rect,
