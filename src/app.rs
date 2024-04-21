@@ -1,6 +1,7 @@
 use crate::{
     elf::Elf,
     error::{Error, Result},
+    tracer::TraceData,
     tui::event::Event,
 };
 use elf::{endian::AnyEndian, ElfBytes};
@@ -30,8 +31,8 @@ pub struct Analyzer<'a> {
     pub strings_len: usize,
     /// Heh application.
     pub heh: Heh,
-    /// System calls.
-    pub syscalls: Vec<u8>,
+    /// Tracer data.
+    pub tracer: TraceData,
 }
 
 impl Debug for Analyzer<'_> {
@@ -65,7 +66,7 @@ impl<'a> Analyzer<'a> {
             strings: None,
             strings_len,
             heh,
-            syscalls: Vec::new(),
+            tracer: TraceData::default(),
         })
     }
 

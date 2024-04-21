@@ -29,6 +29,7 @@ use error::Result;
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
 use std::{env, fs, io};
+use tracer::TraceData;
 use tui::event::{Event, EventHandler};
 use tui::handler;
 use tui::state::State;
@@ -87,9 +88,12 @@ pub fn start_tui(analyzer: Analyzer) -> Result<()> {
                 tracer::trace_syscalls(state.analyzer.path, tui.events.sender.clone());
             }
             Event::TraceResult(syscalls) => {
-                state.analyzer.syscalls = match syscalls {
+                state.analyzer.tracer = match syscalls {
                     Ok(v) => v,
-                    Err(e) => console::style(e).red().to_string().as_bytes().to_vec(),
+                    Err(e) => TraceData {
+                        syscalls: console::style(e).red().to_string().as_bytes().to_vec(),
+                        ..Default::default()
+                    },
                 };
                 tui.toggle_pause()?;
             }

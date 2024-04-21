@@ -125,7 +125,7 @@ pub fn handle_key_events(
             }
         }
         KeyCode::Enter => {
-            if state.tab == Tab::DynamicAnalysis && state.analyzer.syscalls.is_empty() {
+            if state.tab == Tab::DynamicAnalysis && state.analyzer.tracer.syscalls.is_empty() {
                 event_sender
                     .send(Event::Trace)
                     .expect("failed to send trace event");

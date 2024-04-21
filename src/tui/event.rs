@@ -1,4 +1,4 @@
-use crate::error::Result;
+use crate::{error::Result, tracer::TraceData};
 use crossterm::event::{self, Event as CrosstermEvent, KeyEvent, MouseEvent};
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -23,7 +23,7 @@ pub enum Event {
     /// Trace system calls.
     Trace,
     /// Results of tracer.
-    TraceResult(Result<Vec<u8>>),
+    TraceResult(Result<TraceData>),
 }
 
 /// Terminal event handler.

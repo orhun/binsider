@@ -13,6 +13,15 @@ use crate::tui::event::Event;
 
 use nix::unistd::{fork, ForkResult};
 
+/// Tracer data.
+#[derive(Debug, Default)]
+pub struct TraceData {
+    /// System calls.
+    pub syscalls: Vec<u8>,
+    /// Summary.
+    pub summary: Vec<u8>,
+}
+
 /// Trace system calls and signals.
 pub fn trace_syscalls(command: &str, event_sender: mpsc::Sender<Event>) {
     let event_sender = event_sender.clone();
@@ -27,11 +36,11 @@ pub fn trace_syscalls(command: &str, event_sender: mpsc::Sender<Event>) {
                 Ok(ForkResult::Parent { child }) => child,
                 Err(err) => return Err(Error::TraceError(format!("fork() failed: {err}"))),
             };
-            let mut output = Vec::new();
-            Tracer::new(
+            let mut syscalls = Vec::new();
+            let mut tracer = Tracer::new(
                 pid,
                 Args::default(),
-                Box::new(Cursor::new(&mut output)),
+                Box::new(Cursor::new(&mut syscalls)),
                 StyleConfig {
                     pid: Style::new().cyan(),
                     syscall: Style::new().white().bold(),
@@ -41,12 +50,20 @@ pub fn trace_syscalls(command: &str, event_sender: mpsc::Sender<Event>) {
                     use_colors: true,
                 },
             )
-            .map_err(|e| Error::TraceError(e.to_string()))?
-            .run_tracer()
             .map_err(|e| Error::TraceError(e.to_string()))?;
+            tracer
+                .run_tracer()
+                .map_err(|e| Error::TraceError(e.to_string()))?;
+
+            let mut summary = Vec::new();
+            tracer.set_output(Box::new(Cursor::new(&mut summary)));
+            tracer
+                .report_summary()
+                .map_err(|e| Error::TraceError(e.to_string()))?;
+
             let _ = waitpid(pid, Some(WaitPidFlag::WNOHANG));
             event_sender
-                .send(Event::TraceResult(Ok(output)))
+                .send(Event::TraceResult(Ok(TraceData { syscalls, summary })))
                 .map_err(|e| Error::ChannelSendError(e.to_string()))?;
             Ok(())
         };

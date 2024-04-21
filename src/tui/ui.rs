@@ -524,7 +524,7 @@ fn render_details(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
 
 /// Renders the dynamic analysis tab.
 pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect) {
-    if state.analyzer.syscalls.is_empty() {
+    if state.analyzer.tracer.syscalls.is_empty() {
         frame.render_widget(
             Paragraph::new(vec![
                 Line::from(vec![
@@ -545,6 +545,7 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
     } else {
         let text = state
             .analyzer
+            .tracer
             .syscalls
             .into_text()
             .unwrap_or_else(|_| Text::from("ANSI error occurred"));
@@ -557,11 +558,6 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
             Paragraph::new(text.clone())
                 .block(Block::bordered().title(vec![
                     "|".fg(Color::Rgb(100, 100, 100)),
-                    format!(
-                        "height: {}, text_h: {}, scroll: {}",
-                        rect.height,text.height(),
-                        state.scroll_index
-                    ).into(),
                     "System Calls".white().bold(),
                     "|".fg(Color::Rgb(100, 100, 100)),
                 ]))
@@ -579,6 +575,27 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
             }),
             &mut ScrollbarState::new(max_height).position(state.scroll_index),
         );
+
+        if state.show_details && !state.analyzer.tracer.summary.is_empty() {
+            let summary = state
+                .analyzer
+                .tracer
+                .summary
+                .into_text()
+                .unwrap_or_else(|_| Text::from("ANSI error occurred"))
+                .into_iter()
+                .filter(|v| v.width() != 0)
+                .collect::<Vec<Line>>();
+            let popup = Popup::new(
+                vec![
+                    "|".fg(Color::Rgb(100, 100, 100)),
+                    "Details".white().bold(),
+                    "|".fg(Color::Rgb(100, 100, 100)),
+                ],
+                summary,
+            );
+            frame.render_widget(popup.to_widget(), rect);
+        }
     }
 }
 
