@@ -388,7 +388,9 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
             }),
             &[Constraint::Percentage(100)],
         )
-        .header(Row::new(vec![STRINGS_HEADERS.join(" ").bold()]))
+        .header(Row::new(vec![
+            format!(" {}", STRINGS_HEADERS.join(" ")).bold()
+        ]))
         .block(
             Block::bordered()
                 .title_top(
