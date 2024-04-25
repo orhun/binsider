@@ -29,6 +29,8 @@ pub struct Analyzer<'a> {
     pub strings: Option<Vec<(u64, String)>>,
     /// Min length of the strings.
     pub strings_len: usize,
+    /// Strings call completed.
+    pub strings_loaded: bool,
     /// Heh application.
     pub heh: Heh,
     /// Tracer data.
@@ -64,6 +66,7 @@ impl<'a> Analyzer<'a> {
             is_read_only: read_only,
             elf,
             strings: None,
+            strings_loaded: false,
             strings_len,
             heh,
             tracer: TraceData::default(),
@@ -71,7 +74,8 @@ impl<'a> Analyzer<'a> {
     }
 
     /// Returns the sequences of printable characters.
-    pub fn extract_strings(&self, event_sender: mpsc::Sender<Event>) {
+    pub fn extract_strings(&mut self, event_sender: mpsc::Sender<Event>) {
+        self.strings_loaded = false;
         let config = BytesConfig::new(self.bytes.to_vec()).with_min_length(self.strings_len);
         thread::spawn(move || {
             event_sender
@@ -105,7 +109,7 @@ mod tests {
     #[test]
     fn test_extract_strings() -> Result<()> {
         let test_bytes = get_test_bytes()?;
-        let analyzer = Analyzer::new("", test_bytes.as_slice(), 4)?;
+        let mut analyzer = Analyzer::new("", test_bytes.as_slice(), 4)?;
         let (tx, rx) = mpsc::channel();
         analyzer.extract_strings(tx);
         if let Event::FileStrings(strings) = rx.recv()? {

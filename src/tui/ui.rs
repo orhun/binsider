@@ -350,7 +350,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         .map(|v| v.len())
         .unwrap_or_default()
         + 1;
-    if items_len == 0 && state.input.value().is_empty() {
+    if !state.analyzer.strings_loaded {
         frame.render_widget(Block::bordered(), rect);
         frame.render_widget(
             Paragraph::new("Loading...".italic()).alignment(Alignment::Center),
