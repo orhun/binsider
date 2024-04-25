@@ -32,6 +32,16 @@ impl<T> SelectableList<T> {
         self.items.get(self.state.selected()?)
     }
 
+    /// Selects the first item.
+    pub fn first(&mut self) {
+        self.state.select(Some(0));
+    }
+
+    /// Selects the last item.
+    pub fn last(&mut self) {
+        self.state.select(Some(self.items.len().saturating_sub(1)));
+    }
+
     /// Selects the next item.
     pub fn next(&mut self, amount: usize) {
         let i = match self.state.selected() {

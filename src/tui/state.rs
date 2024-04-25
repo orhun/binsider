@@ -159,6 +159,27 @@ impl<'a> State<'a> {
                     }
                 }
             },
+            Command::Top => {
+                if self.tab == Tab::DynamicAnalysis {
+                    self.scroll_index = 0;
+                } else {
+                    self.list.first();
+                }
+            }
+            Command::Bottom => {
+                if self.tab == Tab::DynamicAnalysis {
+                    self.scroll_index = self
+                        .analyzer
+                        .tracer
+                        .syscalls
+                        .into_text()
+                        .unwrap_or_default()
+                        .lines
+                        .len();
+                } else {
+                    self.list.last();
+                }
+            }
             Command::Increment => {
                 if self.tab == Tab::Strings {
                     self.analyzer.strings_len = self

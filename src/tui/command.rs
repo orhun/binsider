@@ -21,6 +21,10 @@ pub enum Command {
     Next(ScrollType, usize),
     /// Previous.
     Previous(ScrollType, usize),
+    /// Go to top.
+    Top,
+    /// Go to bottom.
+    Bottom,
     /// Increment value.
     Increment,
     /// Decrement value.
@@ -46,6 +50,8 @@ impl From<KeyEvent> for Command {
             KeyCode::PageUp => Self::Previous(ScrollType::List, 5),
             KeyCode::Esc | KeyCode::Char('q') => Self::Exit,
             KeyCode::Tab => Self::Next(ScrollType::Tab, 1),
+            KeyCode::Char('t') => Self::Top,
+            KeyCode::Char('b') => Self::Bottom,
             KeyCode::Char('+') => Self::Increment,
             KeyCode::Char('-') => Self::Decrement,
             KeyCode::Char('c') | KeyCode::Char('C') => {
