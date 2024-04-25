@@ -1,4 +1,4 @@
-use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
+use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent, MouseEventKind};
 use tui_input::Input;
 
 /// Possible scroll areas.
@@ -58,6 +58,16 @@ impl From<KeyEvent> for Command {
             KeyCode::Char('/') => Self::Input(InputCommand::Enter),
             KeyCode::Backspace => Self::Input(InputCommand::Resume(Event::Key(key_event))),
             KeyCode::Enter => Self::ShowDetails,
+            _ => Self::Nothing,
+        }
+    }
+}
+
+impl From<MouseEvent> for Command {
+    fn from(mouse_event: MouseEvent) -> Self {
+        match mouse_event.kind {
+            MouseEventKind::ScrollDown => Self::Next(ScrollType::List, 1),
+            MouseEventKind::ScrollUp => Self::Previous(ScrollType::List, 1),
             _ => Self::Nothing,
         }
     }

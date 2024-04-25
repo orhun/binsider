@@ -80,7 +80,9 @@ pub fn start_tui(analyzer: Analyzer) -> Result<()> {
                 };
                 state.run_command(command, tui.events.sender.clone())?;
             }
-            Event::Mouse(_) => {}
+            Event::Mouse(mouse_event) => {
+                state.run_command(Command::from(mouse_event), tui.events.sender.clone())?;
+            }
             Event::Resize(_, _) => {}
             Event::FileStrings(strings) => {
                 state.analyzer.strings_loaded = true;
