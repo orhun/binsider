@@ -1,18 +1,16 @@
 use std::sync::mpsc;
 
 use crate::elf::Info;
+use crate::error::{Error, Result};
 use crate::prelude::Analyzer;
-use crate::tui::ui::Tab;
+use crate::tui::command::*;
+use crate::tui::event::Event;
+use crate::tui::ui::{Tab, ELF_INFO_TABS, MAIN_TABS};
 use crate::tui::widgets::SelectableList;
 use ansi_to_tui::IntoText;
 use ratatui::text::Line;
 use tui_input::backend::crossterm::EventHandler;
 use tui_input::Input;
-
-use super::command::{Command, HexdumpCommand, InputCommand, ScrollType};
-use super::event::Event;
-use super::ui::{ELF_INFO_TABS, MAIN_TABS};
-use crate::error::{Error, Result};
 
 /// Application state.
 #[derive(Debug)]

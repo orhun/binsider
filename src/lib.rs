@@ -23,18 +23,13 @@ pub mod tracer;
 /// Common types that can be glob-imported for convenience.
 pub mod prelude;
 
-use app::Analyzer;
 use args::Args;
-use error::Result;
+use prelude::*;
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
 use std::{env, fs, io};
 use tracer::TraceData;
-use tui::command::{Command, HexdumpCommand, InputCommand};
-use tui::event::{Event, EventHandler};
-use tui::state::State;
-use tui::ui::Tab;
-use tui::Tui;
+use tui::{state::State, ui::Tab, Tui};
 
 /// Runs binsider.
 pub fn run(args: Args) -> Result<()> {
