@@ -18,9 +18,9 @@ pub enum Command {
     /// Show details.
     ShowDetails,
     /// Next.
-    Next(ScrollType),
+    Next(ScrollType, usize),
     /// Previous.
-    Previous(ScrollType),
+    Previous(ScrollType, usize),
     /// Increment value.
     Increment,
     /// Decrement value.
@@ -38,12 +38,14 @@ pub enum Command {
 impl From<KeyEvent> for Command {
     fn from(key_event: KeyEvent) -> Self {
         match key_event.code {
-            KeyCode::Right | KeyCode::Char('l') => Self::Next(ScrollType::Table),
-            KeyCode::Left | KeyCode::Char('h') => Self::Previous(ScrollType::Table),
-            KeyCode::Down | KeyCode::Char('j') => Self::Next(ScrollType::List),
-            KeyCode::Up | KeyCode::Char('k') => Self::Previous(ScrollType::List),
+            KeyCode::Right | KeyCode::Char('l') => Self::Next(ScrollType::Table, 1),
+            KeyCode::Left | KeyCode::Char('h') => Self::Previous(ScrollType::Table, 1),
+            KeyCode::Down | KeyCode::Char('j') => Self::Next(ScrollType::List, 1),
+            KeyCode::Up | KeyCode::Char('k') => Self::Previous(ScrollType::List, 1),
+            KeyCode::PageDown => Self::Next(ScrollType::List, 5),
+            KeyCode::PageUp => Self::Previous(ScrollType::List, 5),
             KeyCode::Esc | KeyCode::Char('q') => Self::Exit,
-            KeyCode::Tab => Self::Next(ScrollType::Tab),
+            KeyCode::Tab => Self::Next(ScrollType::Tab, 1),
             KeyCode::Char('+') => Self::Increment,
             KeyCode::Char('-') => Self::Decrement,
             KeyCode::Char('c') | KeyCode::Char('C') => {

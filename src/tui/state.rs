@@ -116,26 +116,29 @@ impl<'a> State<'a> {
                     self.show_details = !self.show_details;
                 }
             }
-            Command::Next(scroll_type) => match scroll_type {
+            Command::Next(scroll_type, amount) => match scroll_type {
                 ScrollType::Tab => {
-                    self.tab = ((self.tab as usize + 1) % MAIN_TABS.len()).into();
+                    self.tab = (((self.tab as usize).checked_add(amount).unwrap_or_default())
+                        % MAIN_TABS.len())
+                    .into();
                     self.handle_tab()?;
                 }
                 ScrollType::Table => {
                     if self.tab == Tab::StaticAnalysis {
-                        self.info_index = (self.info_index + 1) % ELF_INFO_TABS.len();
+                        self.info_index = (self.info_index.checked_add(amount).unwrap_or_default())
+                            % ELF_INFO_TABS.len();
                         self.handle_tab()?;
                     }
                 }
                 ScrollType::List => {
                     if self.tab == Tab::DynamicAnalysis {
-                        self.scroll_index = self.scroll_index.saturating_add(1);
+                        self.scroll_index = self.scroll_index.saturating_add(amount);
                     } else {
-                        self.list.next()
+                        self.list.next(amount)
                     }
                 }
             },
-            Command::Previous(scroll_type) => match scroll_type {
+            Command::Previous(scroll_type, amount) => match scroll_type {
                 ScrollType::Tab => {
                     unimplemented!()
                 }
@@ -143,16 +146,16 @@ impl<'a> State<'a> {
                     if self.tab == Tab::StaticAnalysis {
                         self.info_index = self
                             .info_index
-                            .checked_sub(1)
+                            .checked_sub(amount)
                             .unwrap_or(ELF_INFO_TABS.len() - 1);
                         self.handle_tab()?;
                     }
                 }
                 ScrollType::List => {
                     if self.tab == Tab::DynamicAnalysis {
-                        self.scroll_index = self.scroll_index.saturating_sub(1);
+                        self.scroll_index = self.scroll_index.saturating_sub(amount);
                     } else {
-                        self.list.previous()
+                        self.list.previous(amount)
                     }
                 }
             },

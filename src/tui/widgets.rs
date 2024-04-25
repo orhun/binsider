@@ -33,13 +33,13 @@ impl<T> SelectableList<T> {
     }
 
     /// Selects the next item.
-    pub fn next(&mut self) {
+    pub fn next(&mut self, amount: usize) {
         let i = match self.state.selected() {
             Some(i) => {
-                if i >= self.items.len().saturating_sub(1) {
+                if i.saturating_add(amount) >= self.items.len() {
                     0
                 } else {
-                    i + 1
+                    i.saturating_add(amount)
                 }
             }
             None => 0,
@@ -48,13 +48,13 @@ impl<T> SelectableList<T> {
     }
 
     /// Selects the previous item.
-    pub fn previous(&mut self) {
+    pub fn previous(&mut self, amount: usize) {
         let i = match self.state.selected() {
             Some(i) => {
                 if i == 0 {
                     self.items.len().saturating_sub(1)
                 } else {
-                    i - 1
+                    i.saturating_sub(amount)
                 }
             }
             None => 0,
@@ -72,16 +72,16 @@ mod tests {
         let mut list = SelectableList::with_items(vec!["data1", "data2", "data3"]);
         list.state.select(Some(1));
         assert_eq!(Some(&"data2"), list.selected());
-        list.next();
+        list.next(1);
         assert_eq!(Some(2), list.state.selected());
-        list.previous();
+        list.previous(1);
         assert_eq!(Some(1), list.state.selected());
 
         let mut list = SelectableList::<()>::default();
         list.state.select(None);
-        list.next();
+        list.next(1);
         list.state.select(None);
-        list.previous();
+        list.previous(1);
         assert_eq!(Some(0), list.state.selected());
     }
 }
