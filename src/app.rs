@@ -22,7 +22,7 @@ pub struct Analyzer<'a> {
     /// Bytes of the file.
     bytes: &'a [u8],
     /// Whether if the file is read only.
-    pub read_only: bool,
+    pub is_read_only: bool,
     /// Elf properties.
     pub elf: Elf,
     /// Strings.
@@ -61,7 +61,7 @@ impl<'a> Analyzer<'a> {
         Ok(Self {
             path,
             bytes,
-            read_only,
+            is_read_only: read_only,
             elf,
             strings: None,
             strings_len,

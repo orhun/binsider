@@ -1,4 +1,4 @@
-/// Application state.
+/// Application state handler.
 pub mod state;
 
 /// Terminal events handler.
@@ -7,11 +7,11 @@ pub mod event;
 /// Widget renderer.
 pub mod ui;
 
-/// Event handler.
-pub mod handler;
-
 /// Custom widgets.
 pub mod widgets;
+
+/// Possible commands.
+pub mod command;
 
 use crate::error::Result;
 use crossterm::event::{DisableMouseCapture, EnableMouseCapture};

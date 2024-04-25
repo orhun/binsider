@@ -30,8 +30,8 @@ use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
 use std::{env, fs, io};
 use tracer::TraceData;
+use tui::command::{Command, HexdumpCommand, InputCommand};
 use tui::event::{Event, EventHandler};
-use tui::handler;
 use tui::state::State;
 use tui::ui::Tab;
 use tui::Tui;
@@ -73,14 +73,24 @@ pub fn start_tui(analyzer: Analyzer) -> Result<()> {
         match tui.events.next()? {
             Event::Tick => state.tick(),
             Event::Key(key_event) => {
-                handler::handle_key_events(key_event, &mut state, tui.events.sender.clone())?
+                let command = if state.input_mode {
+                    Command::Input(InputCommand::parse(key_event, &state.input))
+                } else if state.show_heh {
+                    Command::Hexdump(HexdumpCommand::parse(
+                        key_event,
+                        state.analyzer.is_read_only,
+                    ))
+                } else {
+                    Command::from(key_event)
+                };
+                state.run_command(command, tui.events.sender.clone())?;
             }
             Event::Mouse(_) => {}
             Event::Resize(_, _) => {}
             Event::FileStrings(strings) => {
                 state.analyzer.strings = Some(strings?.into_iter().map(|(v, l)| (l, v)).collect());
                 if state.tab == Tab::Strings {
-                    handler::handle_tab(&mut state)?;
+                    state.handle_tab()?;
                 }
             }
             Event::Trace => {
@@ -96,7 +106,7 @@ pub fn start_tui(analyzer: Analyzer) -> Result<()> {
                     },
                 };
                 tui.toggle_pause()?;
-                handler::handle_tab(&mut state)?;
+                state.handle_tab()?;
             }
         }
     }
