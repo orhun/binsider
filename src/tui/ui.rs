@@ -5,14 +5,23 @@ use ratatui::{
     style::{Color, Modifier, Style, Stylize},
     text::{Line, Span, Text},
     widgets::{
-        Block, Cell, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation, ScrollbarState, Table,
-        TableState, Tabs, Wrap,
+        Block, Borders, Cell, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation,
+        ScrollbarState, Table, TableState, Tabs, Wrap,
     },
     Frame,
 };
 use tui_input::Input;
 use tui_popup::Popup;
 use unicode_width::UnicodeWidthStr;
+
+/// Key bindings.
+const KEY_BINDINGS: &[(&str, &str)] = &[
+    ("Enter", "Details"),
+    ("/", "Search"),
+    ("h/j/k/l", "Next/Prev"),
+    ("Tab", "Next Tab"),
+    ("q", "Quit"),
+];
 
 /// Titles of the main tabs.
 pub const MAIN_TABS: &[&str] = Tab::get_headers();
@@ -121,9 +130,39 @@ pub fn render(state: &mut State, frame: &mut Frame) {
             render_strings(state, frame, chunks[1]);
         }
         Tab::Hexdump => {
-            state.analyzer.heh.render_frame(frame, chunks[1]);
+            {
+                let chunks = Layout::vertical([Constraint::Percentage(100), Constraint::Min(1)])
+                    .split(chunks[1]);
+                state.analyzer.heh.render_frame(frame, chunks[0]);
+            }
+            frame.render_widget(Block::new().borders(Borders::BOTTOM), chunks[1])
         }
     }
+    let chunks =
+        Layout::vertical([Constraint::Percentage(100), Constraint::Min(1)]).split(chunks[1]);
+    let key_bindings = KEY_BINDINGS;
+    frame.render_widget(
+        Paragraph::new(
+            Line::from(
+                key_bindings
+                    .iter()
+                    .enumerate()
+                    .flat_map(|(i, (keys, desc))| {
+                        vec![
+                            "[".fg(Color::Rgb(100, 100, 100)),
+                            keys.cyan(),
+                            "→ ".fg(Color::Rgb(100, 100, 100)),
+                            Span::from(*desc),
+                            "]".fg(Color::Rgb(100, 100, 100)),
+                            if i != key_bindings.len() - 1 { " " } else { "" }.into(),
+                        ]
+                    })
+                    .collect::<Vec<Span>>(),
+            )
+            .alignment(Alignment::Center),
+        ),
+        chunks[1],
+    );
 }
 
 /// Renders the static analysis tab.
