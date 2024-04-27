@@ -92,9 +92,11 @@ pub fn render(state: &mut State, frame: &mut Frame) {
         frame.render_widget(
             Block::bordered()
                 .title(vec![
+                    "|".fg(Color::Rgb(100, 100, 100)),
                     env!("CARGO_PKG_NAME").bold(),
                     "-".fg(Color::Rgb(100, 100, 100)),
                     env!("CARGO_PKG_VERSION").into(),
+                    "|".fg(Color::Rgb(100, 100, 100)),
                 ])
                 .title_alignment(Alignment::Center),
             chunks[0],
