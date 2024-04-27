@@ -599,7 +599,8 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
                         .title_bottom(
                             Line::from(vec![
                                 "|".fg(Color::Rgb(100, 100, 100)),
-                                format!("{}", state.system_calls.len()).white().bold(),
+                                "Total: ".into(),
+                                state.system_calls.len().to_string().white().bold(),
                                 "|".fg(Color::Rgb(100, 100, 100)),
                             ])
                             .right_aligned(),
