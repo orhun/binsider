@@ -8,7 +8,6 @@ use crate::tui::event::Event;
 use crate::tui::ui::{Tab, ELF_INFO_TABS, MAIN_TABS};
 use crate::tui::widgets::SelectableList;
 use ansi_to_tui::IntoText;
-use ratatui::text::Line;
 use tui_input::backend::crossterm::EventHandler;
 use tui_input::Input;
 
@@ -35,8 +34,10 @@ pub struct State<'a> {
     pub input: Input,
     /// Enable input.
     pub input_mode: bool,
-    /// System calls.
-    pub system_calls: Vec<Line<'a>>,
+    /// Strings call completed.
+    pub strings_loaded: bool,
+    /// System calls completed.
+    pub system_calls_loaded: bool,
 }
 
 impl<'a> State<'a> {
@@ -53,7 +54,8 @@ impl<'a> State<'a> {
             show_details: false,
             input: Input::default(),
             input_mode: false,
-            system_calls: Vec::new(),
+            strings_loaded: false,
+            system_calls_loaded: false,
         }
     }
 
@@ -107,7 +109,7 @@ impl<'a> State<'a> {
                 }
             },
             Command::ShowDetails => {
-                if self.tab == Tab::DynamicAnalysis && self.analyzer.tracer.syscalls.is_empty() {
+                if self.tab == Tab::DynamicAnalysis && !self.system_calls_loaded {
                     event_sender
                         .send(Event::Trace)
                         .expect("failed to send trace event");
@@ -115,6 +117,11 @@ impl<'a> State<'a> {
                 } else {
                     self.show_details = !self.show_details;
                 }
+            }
+            Command::TraceCalls => {
+                event_sender
+                    .send(Event::Trace)
+                    .expect("failed to send trace event");
             }
             Command::Next(scroll_type, amount) => match scroll_type {
                 ScrollType::Tab => {
@@ -187,6 +194,7 @@ impl<'a> State<'a> {
                         .strings_len
                         .checked_add(1)
                         .unwrap_or(self.analyzer.strings_len);
+                    self.strings_loaded = false;
                     self.analyzer.extract_strings(event_sender.clone());
                 }
             }
@@ -194,6 +202,7 @@ impl<'a> State<'a> {
                 if self.tab == Tab::Strings {
                     self.analyzer.strings_len =
                         self.analyzer.strings_len.checked_sub(1).unwrap_or_default();
+                    self.strings_loaded = false;
                     self.analyzer.extract_strings(event_sender.clone());
                 }
             }
@@ -231,7 +240,7 @@ impl<'a> State<'a> {
                 );
             }
             Tab::DynamicAnalysis => {
-                self.system_calls = self
+                self.analyzer.system_calls = self
                     .analyzer
                     .tracer
                     .syscalls
@@ -275,6 +284,54 @@ impl<'a> State<'a> {
         Ok(())
     }
 
-    /// Handles the tick event of the terminal.
-    pub fn tick(&self) {}
+    /// Returns the key bindings.
+    pub fn get_key_bindings(&self) -> Vec<(&'a str, &'a str)> {
+        match self.tab {
+            Tab::StaticAnalysis => vec![
+                ("Enter", "Details"),
+                ("/", "Search"),
+                ("h/j/k/l", "Scroll"),
+                ("Tab", "Next"),
+                ("q", "Quit"),
+            ],
+            Tab::DynamicAnalysis => {
+                if self.system_calls_loaded {
+                    vec![
+                        ("Enter", "Details"),
+                        ("r", "Re-run"),
+                        ("/", "Search"),
+                        ("h/j/k/l", "Scroll"),
+                        ("Tab", "Next"),
+                        ("q", "Quit"),
+                    ]
+                } else {
+                    vec![
+                        ("Enter", "Run"),
+                        ("/", "Search"),
+                        ("h/j/k/l", "Scroll"),
+                        ("Tab", "Next"),
+                        ("q", "Quit"),
+                    ]
+                }
+            }
+            Tab::Strings => vec![
+                ("Enter", "Details"),
+                ("+", "Increment"),
+                ("-", "Decrement"),
+                ("/", "Search"),
+                ("h/j/k/l", "Scroll"),
+                ("Tab", "Next"),
+                ("q", "Quit"),
+            ],
+            Tab::Hexdump => vec![
+                ("s", "Save"),
+                ("g", "Jump"),
+                ("/", "Search"),
+                ("n", "Endianness"),
+                ("h/j/k/l", "Scroll"),
+                ("Tab", "Next"),
+                ("q", "Quit"),
+            ],
+        }
+    }
 }

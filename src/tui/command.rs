@@ -33,6 +33,8 @@ pub enum Command {
     Input(InputCommand),
     /// Hexdump command.
     Hexdump(HexdumpCommand),
+    /// Trace system calls.
+    TraceCalls,
     /// Exit application.
     Exit,
     /// Do nothing.
@@ -48,6 +50,20 @@ impl From<KeyEvent> for Command {
             KeyCode::Up | KeyCode::Char('k') => Self::Previous(ScrollType::List, 1),
             KeyCode::PageDown => Self::Next(ScrollType::List, 5),
             KeyCode::PageUp => Self::Previous(ScrollType::List, 5),
+            KeyCode::Char('d') => {
+                if key_event.modifiers == KeyModifiers::CONTROL {
+                    Self::Next(ScrollType::List, 5)
+                } else {
+                    Self::Nothing
+                }
+            }
+            KeyCode::Char('u') => {
+                if key_event.modifiers == KeyModifiers::CONTROL {
+                    Self::Previous(ScrollType::List, 5)
+                } else {
+                    Self::Nothing
+                }
+            }
             KeyCode::Esc | KeyCode::Char('q') => Self::Exit,
             KeyCode::Tab => Self::Next(ScrollType::Tab, 1),
             KeyCode::Char('t') => Self::Top,
@@ -62,8 +78,16 @@ impl From<KeyEvent> for Command {
                 }
             }
             KeyCode::Char('/') => Self::Input(InputCommand::Enter),
+            KeyCode::Char('f') => {
+                if key_event.modifiers == KeyModifiers::CONTROL {
+                    Self::Input(InputCommand::Enter)
+                } else {
+                    Self::Nothing
+                }
+            }
             KeyCode::Backspace => Self::Input(InputCommand::Resume(Event::Key(key_event))),
             KeyCode::Enter => Self::ShowDetails,
+            KeyCode::Char('r') => Self::TraceCalls,
             _ => Self::Nothing,
         }
     }
@@ -130,11 +154,25 @@ impl HexdumpCommand {
             Self::Exit
         } else if key_event.code == KeyCode::Tab {
             Self::Cancel
-        } else if key_event.code == KeyCode::Char('s')
-            && key_event.modifiers == KeyModifiers::CONTROL
-            && is_read_only
-        {
-            Self::Warn(String::from("file is read-only"))
+        } else if key_event.code == KeyCode::Char('s') {
+            if is_read_only {
+                Self::Warn(String::from("file is read-only"))
+            } else {
+                Self::Handle(Event::Key(KeyEvent::new(
+                    KeyCode::Char('s'),
+                    KeyModifiers::CONTROL,
+                )))
+            }
+        } else if key_event.code == KeyCode::Char('g') {
+            Self::Handle(Event::Key(KeyEvent::new(
+                KeyCode::Char('j'),
+                KeyModifiers::CONTROL,
+            )))
+        } else if key_event.code == KeyCode::Char('n') {
+            Self::Handle(Event::Key(KeyEvent::new(
+                KeyCode::Char('e'),
+                KeyModifiers::CONTROL,
+            )))
         } else {
             Self::Handle(Event::Key(key_event))
         }

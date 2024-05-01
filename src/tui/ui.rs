@@ -14,15 +14,6 @@ use tui_input::Input;
 use tui_popup::Popup;
 use unicode_width::UnicodeWidthStr;
 
-/// Key bindings.
-const KEY_BINDINGS: &[(&str, &str)] = &[
-    ("Enter", "Details"),
-    ("/", "Search"),
-    ("h/j/k/l", "Next/Prev"),
-    ("Tab", "Next Tab"),
-    ("q", "Quit"),
-];
-
 /// Titles of the main tabs.
 pub const MAIN_TABS: &[&str] = Tab::get_headers();
 
@@ -142,7 +133,7 @@ pub fn render(state: &mut State, frame: &mut Frame) {
     }
     let chunks =
         Layout::vertical([Constraint::Percentage(100), Constraint::Min(1)]).split(chunks[1]);
-    let key_bindings = KEY_BINDINGS;
+    let key_bindings = state.get_key_bindings();
     frame.render_widget(
         Paragraph::new(
             Line::from(
@@ -391,7 +382,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         .map(|v| v.len())
         .unwrap_or_default()
         + 1;
-    if !state.analyzer.strings_loaded {
+    if !state.strings_loaded {
         frame.render_widget(Block::bordered(), rect);
         frame.render_widget(
             Paragraph::new("Loading...".italic()).alignment(Alignment::Center),
@@ -568,7 +559,7 @@ fn render_details(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
 
 /// Renders the dynamic analysis tab.
 pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect) {
-    if state.analyzer.tracer.syscalls.is_empty() {
+    if !state.system_calls_loaded {
         frame.render_widget(
             Paragraph::new(vec![Line::from(vec![
                 "Press ".into(),
@@ -581,6 +572,7 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
         );
     } else {
         let max_height = state
+            .analyzer
             .system_calls
             .len()
             .saturating_sub(rect.height as usize)
@@ -590,7 +582,7 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
         }
 
         frame.render_widget(
-            Paragraph::new(state.system_calls.clone())
+            Paragraph::new(state.analyzer.system_calls.clone())
                 .block(
                     Block::bordered()
                         .title(vec![
@@ -602,7 +594,7 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
                             Line::from(vec![
                                 "|".fg(Color::Rgb(100, 100, 100)),
                                 "Total: ".into(),
-                                state.system_calls.len().to_string().white().bold(),
+                                state.analyzer.system_calls.len().to_string().white().bold(),
                                 "|".fg(Color::Rgb(100, 100, 100)),
                             ])
                             .right_aligned(),

@@ -66,7 +66,7 @@ pub fn start_tui(analyzer: Analyzer) -> Result<()> {
         tui.draw(&mut state)?;
         // Handle events.
         match tui.events.next()? {
-            Event::Tick => state.tick(),
+            Event::Tick => {}
             Event::Key(key_event) => {
                 let command = if state.input_mode {
                     Command::Input(InputCommand::parse(key_event, &state.input))
@@ -85,13 +85,14 @@ pub fn start_tui(analyzer: Analyzer) -> Result<()> {
             }
             Event::Resize(_, _) => {}
             Event::FileStrings(strings) => {
-                state.analyzer.strings_loaded = true;
+                state.strings_loaded = true;
                 state.analyzer.strings = Some(strings?.into_iter().map(|(v, l)| (l, v)).collect());
                 if state.tab == Tab::Strings {
                     state.handle_tab()?;
                 }
             }
             Event::Trace => {
+                state.system_calls_loaded = false;
                 tui.toggle_pause()?;
                 tracer::trace_syscalls(state.analyzer.path, tui.events.sender.clone());
             }
@@ -103,6 +104,8 @@ pub fn start_tui(analyzer: Analyzer) -> Result<()> {
                         ..Default::default()
                     },
                 };
+                state.system_calls_loaded = true;
+                state.scroll_index = 0;
                 tui.toggle_pause()?;
                 state.handle_tab()?;
             }

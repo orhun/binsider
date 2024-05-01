@@ -7,6 +7,7 @@ use crate::{
 use elf::{endian::AnyEndian, ElfBytes};
 use heh::app::Application as Heh;
 use heh::decoder::Encoding;
+use ratatui::text::Line;
 use rust_strings::BytesConfig;
 use std::{
     fmt::{self, Debug, Formatter},
@@ -29,12 +30,12 @@ pub struct Analyzer<'a> {
     pub strings: Option<Vec<(u64, String)>>,
     /// Min length of the strings.
     pub strings_len: usize,
-    /// Strings call completed.
-    pub strings_loaded: bool,
     /// Heh application.
     pub heh: Heh,
     /// Tracer data.
     pub tracer: TraceData,
+    /// System calls.
+    pub system_calls: Vec<Line<'a>>,
 }
 
 impl Debug for Analyzer<'_> {
@@ -66,16 +67,15 @@ impl<'a> Analyzer<'a> {
             is_read_only: read_only,
             elf,
             strings: None,
-            strings_loaded: false,
             strings_len,
             heh,
             tracer: TraceData::default(),
+            system_calls: Vec::new(),
         })
     }
 
     /// Returns the sequences of printable characters.
     pub fn extract_strings(&mut self, event_sender: mpsc::Sender<Event>) {
-        self.strings_loaded = false;
         let config = BytesConfig::new(self.bytes.to_vec()).with_min_length(self.strings_len);
         thread::spawn(move || {
             event_sender
