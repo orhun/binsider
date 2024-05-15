@@ -222,6 +222,7 @@ impl<'a> State<'a> {
     pub fn handle_tab(&mut self) -> Result<()> {
         self.show_heh = false;
         match self.tab {
+            Tab::General => {}
             Tab::StaticAnalysis => {
                 self.list = SelectableList::with_items(
                     self.analyzer
@@ -287,6 +288,9 @@ impl<'a> State<'a> {
     /// Returns the key bindings.
     pub fn get_key_bindings(&self) -> Vec<(&'a str, &'a str)> {
         match self.tab {
+            Tab::General => {
+                vec![("Tab", "Next"), ("q", "Quit")]
+            }
             Tab::StaticAnalysis => vec![
                 ("Enter", "Details"),
                 ("/", "Search"),

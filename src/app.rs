@@ -1,6 +1,7 @@
 use crate::{
     elf::Elf,
     error::{Error, Result},
+    file::FileInfo,
     tracer::TraceData,
     tui::event::Event,
 };
@@ -11,19 +12,14 @@ use ratatui::text::Line;
 use rust_strings::BytesConfig;
 use std::{
     fmt::{self, Debug, Formatter},
-    fs::{File, OpenOptions},
     sync::mpsc,
     thread,
 };
 
 /// Binary analyzer.
 pub struct Analyzer<'a> {
-    /// Path of the ELF file.
-    pub path: &'a str,
-    /// Bytes of the file.
-    bytes: &'a [u8],
-    /// Whether if the file is read only.
-    pub is_read_only: bool,
+    /// File infomration.
+    pub file: FileInfo<'a>,
     /// Elf properties.
     pub elf: Elf,
     /// Strings.
@@ -41,30 +37,20 @@ pub struct Analyzer<'a> {
 impl Debug for Analyzer<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         f.debug_struct("Analyzer")
-            .field("bytes", &self.bytes)
+            .field("bytes", &self.file.bytes)
             .finish()
     }
 }
 
 impl<'a> Analyzer<'a> {
     /// Constructs a new instance.
-    pub fn new(path: &'a str, bytes: &'a [u8], strings_len: usize) -> Result<Self> {
-        let elf_bytes = ElfBytes::<AnyEndian>::minimal_parse(bytes)?;
+    pub fn new(mut file_info: FileInfo<'a>, strings_len: usize) -> Result<Self> {
+        let elf_bytes = ElfBytes::<AnyEndian>::minimal_parse(file_info.bytes)?;
         let elf = Elf::try_from(elf_bytes)?;
-        let mut read_only = false;
-        let file = match OpenOptions::new().write(true).read(true).open(path) {
-            Ok(v) => v,
-            Err(_) => {
-                read_only = true;
-                File::open(path)?
-            }
-        };
-        let heh =
-            Heh::new(file, Encoding::Ascii, 0).map_err(|e| Error::HexdumpError(e.to_string()))?;
+        let heh = Heh::new(file_info.open_file()?, Encoding::Ascii, 0)
+            .map_err(|e| Error::HexdumpError(e.to_string()))?;
         Ok(Self {
-            path,
-            bytes,
-            is_read_only: read_only,
+            file: file_info,
             elf,
             strings: None,
             strings_len,
@@ -76,7 +62,7 @@ impl<'a> Analyzer<'a> {
 
     /// Returns the sequences of printable characters.
     pub fn extract_strings(&mut self, event_sender: mpsc::Sender<Event>) {
-        let config = BytesConfig::new(self.bytes.to_vec()).with_min_length(self.strings_len);
+        let config = BytesConfig::new(self.file.bytes.to_vec()).with_min_length(self.strings_len);
         thread::spawn(move || {
             event_sender
                 .send(Event::FileStrings(
@@ -102,14 +88,18 @@ mod tests {
 
     #[test]
     fn test_init() -> Result<()> {
-        assert!(Analyzer::new("", get_test_bytes()?.as_slice(), 4).is_ok());
+        assert!(Analyzer::new(
+            FileInfo::new("Cargo.toml", get_test_bytes()?.as_slice())?,
+            4
+        )
+        .is_ok());
         Ok(())
     }
 
     #[test]
     fn test_extract_strings() -> Result<()> {
         let test_bytes = get_test_bytes()?;
-        let mut analyzer = Analyzer::new("", test_bytes.as_slice(), 4)?;
+        let mut analyzer = Analyzer::new(FileInfo::new("Cargo.toml", test_bytes.as_slice())?, 4)?;
         let (tx, rx) = mpsc::channel();
         analyzer.extract_strings(tx);
         if let Event::FileStrings(strings) = rx.recv()? {

@@ -10,6 +10,7 @@ use ratatui::{
     },
     Frame,
 };
+use tui_big_text::{BigTextBuilder, PixelSize};
 use tui_input::Input;
 use tui_popup::Popup;
 use unicode_width::UnicodeWidthStr;
@@ -36,36 +37,39 @@ pub const ELF_INFO_TABS: &[Info] = &[
 /// Application tab.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Tab {
+    /// General information.
+    General = 0,
     /// Static analysis.
-    StaticAnalysis = 0,
+    StaticAnalysis = 1,
     /// Dynamic analysis.
-    DynamicAnalysis = 1,
+    DynamicAnalysis = 2,
     /// String.
-    Strings = 2,
+    Strings = 3,
     /// Hexdump.
-    Hexdump = 3,
+    Hexdump = 4,
 }
 
 impl Default for Tab {
     fn default() -> Self {
-        Self::StaticAnalysis
+        Self::General
     }
 }
 
 impl Tab {
     /// Returns the available tabs.
     const fn get_headers() -> &'static [&'static str] {
-        &["Static", "Dynamic", "Strings", "Hexdump"]
+        &["General", "Static", "Dynamic", "Strings", "Hexdump"]
     }
 }
 
 impl From<usize> for Tab {
     fn from(v: usize) -> Self {
         match v {
-            0 => Self::StaticAnalysis,
-            1 => Self::DynamicAnalysis,
-            2 => Self::Strings,
-            3 => Self::Hexdump,
+            0 => Self::General,
+            1 => Self::StaticAnalysis,
+            2 => Self::DynamicAnalysis,
+            3 => Self::Strings,
+            4 => Self::Hexdump,
             _ => Self::default(),
         }
     }
@@ -73,11 +77,13 @@ impl From<usize> for Tab {
 
 /// Renders the user interface widgets.
 pub fn render(state: &mut State, frame: &mut Frame) {
-    let chunks = Layout::default()
-        .direction(Direction::Vertical)
-        .margin(1)
-        .constraints([Constraint::Length(3), Constraint::Min(0)].as_ref())
-        .split(frame.size());
+    let chunks = Layout::new(
+        Direction::Vertical,
+        [Constraint::Length(3), Constraint::Min(0)],
+    )
+    .direction(Direction::Vertical)
+    .margin(1)
+    .split(frame.size());
 
     {
         frame.render_widget(
@@ -92,11 +98,12 @@ pub fn render(state: &mut State, frame: &mut Frame) {
                 .title_alignment(Alignment::Center),
             chunks[0],
         );
-        let chunks = Layout::default()
-            .direction(Direction::Horizontal)
-            .margin(1)
-            .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
-            .split(chunks[0]);
+        let chunks = Layout::new(
+            Direction::Horizontal,
+            [Constraint::Percentage(50), Constraint::Percentage(50)],
+        )
+        .margin(1)
+        .split(chunks[0]);
         let tabs = Tabs::new(MAIN_TABS.iter().map(|v| Line::from(*v)))
             .select(state.tab as usize)
             .style(Style::default().fg(Color::Cyan))
@@ -107,12 +114,15 @@ pub fn render(state: &mut State, frame: &mut Frame) {
             );
         frame.render_widget(tabs, chunks[0]);
         frame.render_widget(
-            Paragraph::new(format!("{} ", state.analyzer.path).italic())
+            Paragraph::new(format!("{} ", state.analyzer.file.path).italic())
                 .alignment(Alignment::Right),
             chunks[1],
         )
     }
     match state.tab {
+        Tab::General => {
+            render_general_info(state, frame, chunks[1]);
+        }
         Tab::StaticAnalysis => {
             render_static_analysis(state, frame, chunks[1]);
         }
@@ -155,6 +165,98 @@ pub fn render(state: &mut State, frame: &mut Frame) {
             .alignment(Alignment::Center),
         ),
         chunks[1],
+    );
+}
+
+/// Renders the general info tab.
+pub fn render_general_info(_state: &mut State, frame: &mut Frame, rect: Rect) {
+    frame.render_widget(Block::bordered(), rect);
+    let area = Layout::new(
+        Direction::Vertical,
+        [
+            Constraint::Percentage(10),
+            Constraint::Length(4),
+            Constraint::Percentage(100),
+        ],
+    )
+    .margin(1)
+    .split(rect);
+
+    if let Ok(banner) = BigTextBuilder::default()
+        .pixel_size(PixelSize::Sextant)
+        .lines([format!("{}.", env!("CARGO_PKG_NAME")).into()])
+        .build()
+    {
+        let banner_width = 34;
+        let banner_area = Layout::new(
+            Direction::Horizontal,
+            [
+                Constraint::Length(
+                    (area[1].width.checked_sub(banner_width)).unwrap_or_default() / 2,
+                ),
+                Constraint::Min(banner_width),
+                Constraint::Length(
+                    (area[1].width.checked_sub(banner_width)).unwrap_or_default() / 2,
+                ),
+            ],
+        )
+        .split(area[1]);
+
+        frame.render_widget(banner, banner_area[1]);
+        frame.render_widget(
+            Paragraph::new(Text::from(vec![
+                Line::default(),
+                Line::default(),
+                Line::default(),
+                Line::from(vec![
+                    "Analyze ELF binaries ".white(),
+                    "like a boss.".cyan().italic(),
+                ]),
+            ]))
+            .centered(),
+            banner_area[1],
+        );
+    }
+
+    let area = Layout::new(
+        Direction::Horizontal,
+        [
+            Constraint::Percentage(50),
+            Constraint::Min(3),
+            Constraint::Percentage(50),
+        ],
+    )
+    .margin(3)
+    .split(area[2]);
+
+    frame.render_widget(
+        Paragraph::new("")
+            .block(
+                Block::bordered()
+                    .title(vec![
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                        "File Information".white().bold(),
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                    ])
+                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
+            )
+            .wrap(Wrap { trim: true }),
+        area[0],
+    );
+
+    frame.render_widget(
+        Paragraph::new("")
+            .block(
+                Block::bordered()
+                    .title(vec![
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                        "Metadata".white().bold(),
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                    ])
+                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
+            )
+            .wrap(Wrap { trim: true }),
+        area[2],
     );
 }
 
@@ -204,16 +306,18 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
         ));
     }
     frame.render_widget(Block::bordered(), rect);
-    let chunks = Layout::default()
-        .direction(Direction::Vertical)
-        .margin(1)
-        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
-        .split(rect);
+    let chunks = Layout::new(
+        Direction::Vertical,
+        [Constraint::Percentage(50), Constraint::Percentage(50)],
+    )
+    .margin(1)
+    .split(rect);
     {
-        let chunks = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
-            .split(chunks[0]);
+        let chunks = Layout::new(
+            Direction::Horizontal,
+            [Constraint::Percentage(50), Constraint::Percentage(50)],
+        )
+        .split(chunks[0]);
         frame.render_widget(
             Paragraph::new(headers)
                 .block(
@@ -245,10 +349,11 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
     }
     {
         let area = chunks[1];
-        let chunks = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints([Constraint::Length(1), Constraint::Percentage(100)].as_ref())
-            .split(area);
+        let chunks = Layout::new(
+            Direction::Vertical,
+            [Constraint::Length(1), Constraint::Percentage(100)],
+        )
+        .split(area);
         let tabs = Tabs::new(MAIN_TABS.iter().map(|v| Line::from(*v)))
             .select(state.tab as usize)
             .highlight_style(
@@ -330,24 +435,22 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             &mut ScrollbarState::new(items_len).position(selected_index),
         );
 
-        let chunks = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints(
-                [
-                    Constraint::Length(1),
-                    Constraint::Length(
-                        ELF_INFO_TABS
-                            .iter()
-                            .map(|v| v.title().len() as u16)
-                            .sum::<u16>()
-                            + ((ELF_INFO_TABS.len() as u16 - 1) * 3)
-                            + 2,
-                    ),
-                    Constraint::Percentage(100),
-                ]
-                .as_ref(),
-            )
-            .split(chunks[0]);
+        let chunks = Layout::new(
+            Direction::Horizontal,
+            [
+                Constraint::Length(1),
+                Constraint::Length(
+                    ELF_INFO_TABS
+                        .iter()
+                        .map(|v| v.title().len() as u16)
+                        .sum::<u16>()
+                        + ((ELF_INFO_TABS.len() as u16 - 1) * 3)
+                        + 2,
+                ),
+                Constraint::Percentage(100),
+            ],
+        )
+        .split(chunks[0]);
         frame.render_widget(Clear, chunks[1]);
         let tabs = Tabs::new(ELF_INFO_TABS.iter().map(|v| Line::from(v.title())))
             .select(state.info_index)

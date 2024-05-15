@@ -20,10 +20,14 @@ pub mod error;
 /// System call tracer.
 pub mod tracer;
 
+/// File information.
+pub mod file;
+
 /// Common types that can be glob-imported for convenience.
 pub mod prelude;
 
 use args::Args;
+use file::FileInfo;
 use prelude::*;
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
@@ -33,17 +37,14 @@ use tui::{state::State, ui::Tab, Tui};
 
 /// Runs binsider.
 pub fn run(args: Args) -> Result<()> {
-    let mut file = args.file.clone().unwrap_or(env::current_exe()?);
-    if !file.exists() {
-        file = which::which(file.to_string_lossy().to_string())?;
+    let mut path = args.file.clone().unwrap_or(env::current_exe()?);
+    if !path.exists() {
+        path = which::which(path.to_string_lossy().to_string())?;
     }
-    let file_data = fs::read(&file)?;
+    let file_data = fs::read(&path)?;
     let bytes = file_data.as_slice();
-    let analyzer = Analyzer::new(
-        file.to_str().unwrap_or_default(),
-        bytes,
-        args.min_strings_len,
-    )?;
+    let file_info = FileInfo::new(path.to_str().unwrap_or_default(), bytes)?;
+    let analyzer = Analyzer::new(file_info, args.min_strings_len)?;
     start_tui(analyzer)
 }
 
@@ -73,7 +74,7 @@ pub fn start_tui(analyzer: Analyzer) -> Result<()> {
                 } else if state.show_heh {
                     Command::Hexdump(HexdumpCommand::parse(
                         key_event,
-                        state.analyzer.is_read_only,
+                        state.analyzer.file.is_read_only,
                     ))
                 } else {
                     Command::from(key_event)
@@ -94,7 +95,7 @@ pub fn start_tui(analyzer: Analyzer) -> Result<()> {
             Event::Trace => {
                 state.system_calls_loaded = false;
                 tui.toggle_pause()?;
-                tracer::trace_syscalls(state.analyzer.path, tui.events.sender.clone());
+                tracer::trace_syscalls(state.analyzer.file.path, tui.events.sender.clone());
             }
             Event::TraceResult(syscalls) => {
                 state.analyzer.tracer = match syscalls {

@@ -23,6 +23,7 @@ ansi-to-tui = "4.0.1"
 console = "0.15.8"
 which = "6.0.1"
 better-panic = "0.3.0"
+tui-big-text = "0.4.2"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
