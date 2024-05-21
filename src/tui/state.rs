@@ -114,6 +114,8 @@ impl<'a> State<'a> {
                         .send(Event::Trace)
                         .expect("failed to send trace event");
                     return Ok(());
+                } else if self.tab == Tab::General {
+                    webbrowser::open(env!("CARGO_PKG_REPOSITORY"))?;
                 } else {
                     self.show_details = !self.show_details;
                 }
@@ -289,7 +291,11 @@ impl<'a> State<'a> {
     pub fn get_key_bindings(&self) -> Vec<(&'a str, &'a str)> {
         match self.tab {
             Tab::General => {
-                vec![("Tab", "Next"), ("q", "Quit")]
+                vec![
+                    ("Tab", "Next"),
+                    ("Enter", "Visit Repository"),
+                    ("q", "Quit"),
+                ]
             }
             Tab::StaticAnalysis => vec![
                 ("Enter", "Details"),

@@ -28,6 +28,7 @@ tui-big-text = "0.4.2"
 chrono = "0.4.38"
 bytesize = "1.3.0"
 sysinfo = { version = "0.30.12", default-features = false }
+webbrowser = "1.0.1"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
