@@ -175,7 +175,7 @@ pub fn render_general_info(_state: &mut State, frame: &mut Frame, rect: Rect) {
         Direction::Vertical,
         [
             Constraint::Percentage(10),
-            Constraint::Length(4),
+            Constraint::Length(7),
             Constraint::Percentage(100),
         ],
     )
@@ -201,7 +201,6 @@ pub fn render_general_info(_state: &mut State, frame: &mut Frame, rect: Rect) {
             ],
         )
         .split(area[1]);
-
         frame.render_widget(banner, banner_area[1]);
         frame.render_widget(
             Paragraph::new(Text::from(vec![
@@ -211,6 +210,18 @@ pub fn render_general_info(_state: &mut State, frame: &mut Frame, rect: Rect) {
                 Line::from(vec![
                     "Analyze ELF binaries ".white(),
                     "like a boss.".cyan().italic(),
+                ]),
+                Line::from(
+                    ratatui::symbols::line::HORIZONTAL
+                        .repeat(33)
+                        .fg(Color::Rgb(100, 100, 100)),
+                ),
+                Line::from(env!("CARGO_PKG_REPOSITORY").italic()),
+                Line::from(vec![
+                    "[".fg(Color::Rgb(100, 100, 100)),
+                    "with ♥ by ".into(),
+                    "@orhun".cyan(),
+                    "]".fg(Color::Rgb(100, 100, 100)),
                 ]),
             ]))
             .centered(),
