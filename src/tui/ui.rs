@@ -169,7 +169,7 @@ pub fn render(state: &mut State, frame: &mut Frame) {
 }
 
 /// Renders the general info tab.
-pub fn render_general_info(_state: &mut State, frame: &mut Frame, rect: Rect) {
+pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
     frame.render_widget(Block::bordered(), rect);
     let area = Layout::new(
         Direction::Vertical,
@@ -229,45 +229,116 @@ pub fn render_general_info(_state: &mut State, frame: &mut Frame, rect: Rect) {
         );
     }
 
-    let area = Layout::new(
+    let lines = vec![
+        Line::from(vec![
+            "File".cyan(),
+            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+            state.analyzer.file.name.to_string().white(),
+        ]),
+        Line::from(vec![
+            "Size".cyan(),
+            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+            state.analyzer.file.size.to_string().white(),
+        ]),
+        Line::from(vec![
+            " ".into(),
+            "Blocks".cyan(),
+            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+            state.analyzer.file.blocks.to_string().white(),
+            " ".into(),
+        ]),
+        Line::from(vec![
+            "Block Size".cyan(),
+            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+            state.analyzer.file.block_size.to_string().white(),
+        ]),
+        Line::from(vec![
+            "Device".cyan(),
+            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+            state.analyzer.file.links.to_string().white(),
+        ]),
+        Line::from(vec![
+            "Inode".cyan(),
+            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+            state.analyzer.file.inode.to_string().white(),
+        ]),
+        Line::from(vec![
+            "Links".cyan(),
+            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+            state.analyzer.file.links.to_string().white(),
+        ]),
+        Line::from(vec![
+            "Access".cyan(),
+            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+            state.analyzer.file.access.mode.to_string().white(),
+        ]),
+        Line::from(vec![
+            "Uid".cyan(),
+            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+            state.analyzer.file.access.uid.to_string().white(),
+        ]),
+        Line::from(vec![
+            "Gid".cyan(),
+            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+            state.analyzer.file.access.gid.to_string().white(),
+        ]),
+        Line::from(vec![
+            "Access".cyan(),
+            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+            state.analyzer.file.date.access.to_string().white(),
+        ]),
+        Line::from(vec![
+            "Modify".cyan(),
+            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+            state.analyzer.file.date.modify.to_string().white(),
+        ]),
+        Line::from(vec![
+            "Change".cyan(),
+            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+            state.analyzer.file.date.change.to_string().white(),
+        ]),
+        Line::from(vec![
+            "Birth".cyan(),
+            Span::raw(":  ").fg(Color::Rgb(100, 100, 100)),
+            state.analyzer.file.date.birth.to_string().white(),
+        ]),
+    ];
+
+    let info_width = lines.iter().map(|v| v.width()).max().unwrap_or_default() as u16 + 2;
+
+    let area = area[2].inner(&Margin {
+        horizontal: 3,
+        vertical: 1,
+    });
+
+    let info_area = Layout::new(
         Direction::Horizontal,
         [
-            Constraint::Percentage(50),
-            Constraint::Min(3),
-            Constraint::Percentage(50),
+            Constraint::Length((area.width.checked_sub(info_width)).unwrap_or_default() / 2),
+            Constraint::Min(info_width),
+            Constraint::Length((area.width.checked_sub(info_width)).unwrap_or_default() / 2),
         ],
     )
-    .margin(3)
-    .split(area[2]);
+    .split(area)[1];
+
+    let info_area = Layout::new(
+        Direction::Vertical,
+        [
+            Constraint::Min(lines.len() as u16 + 2),
+            Constraint::Percentage(100),
+        ],
+    )
+    .split(info_area)[0];
 
     frame.render_widget(
-        Paragraph::new("")
+        Paragraph::new(lines)
             .block(
                 Block::bordered()
-                    .title(vec![
-                        "|".fg(Color::Rgb(100, 100, 100)),
-                        "File Information".white().bold(),
-                        "|".fg(Color::Rgb(100, 100, 100)),
-                    ])
+                    .title_alignment(Alignment::Center)
                     .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
             )
             .wrap(Wrap { trim: true }),
-        area[0],
-    );
-
-    frame.render_widget(
-        Paragraph::new("")
-            .block(
-                Block::bordered()
-                    .title(vec![
-                        "|".fg(Color::Rgb(100, 100, 100)),
-                        "Metadata".white().bold(),
-                        "|".fg(Color::Rgb(100, 100, 100)),
-                    ])
-                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
-            )
-            .wrap(Wrap { trim: true }),
-        area[2],
+        info_area,
     );
 }
 

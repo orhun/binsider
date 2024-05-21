@@ -27,6 +27,9 @@ pub enum Error {
     /// Error that may occur while tracing system calls.
     #[error("Tracing system call error: `{0}`")]
     TraceError(String),
+    /// Error that may occur while parsing integers.
+    #[error("Failed to parse integer: `{0}`")]
+    IntParseError(#[from] std::num::TryFromIntError),
 }
 
 /// Type alias for the standard [`Result`] type.
