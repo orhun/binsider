@@ -18,8 +18,8 @@ tui-input = "0.8.0"
 tui-popup = "0.2.4"
 unicode-width = "0.1.11"
 textwrap = "0.16.1"
-lurk-cli = { git = "https://github.com/orhun/lurk", branch = "feat/improve_lurk_cli" }
-nix = { version = "0.27.1", features = ["ptrace", "signal"] }
+lurk-cli = { version = "0.3.5" }
+nix = { version = "0.29.0", features = ["ptrace", "signal"] }
 ansi-to-tui = "4.0.1"
 console = "0.15.8"
 which = "6.0.1"
