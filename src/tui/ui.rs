@@ -305,21 +305,24 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
     ];
 
     let info_width = lines.iter().map(|v| v.width()).max().unwrap_or_default() as u16 + 2;
-
-    let area = area[2].inner(&Margin {
+    let area = Layout::new(
+        Direction::Vertical,
+        [Constraint::Percentage(50), Constraint::Percentage(50)],
+    )
+    .split(area[2].inner(&Margin {
         horizontal: 3,
         vertical: 1,
-    });
+    }));
 
     let info_area = Layout::new(
         Direction::Horizontal,
         [
-            Constraint::Length((area.width.checked_sub(info_width)).unwrap_or_default() / 2),
+            Constraint::Length((area[0].width.checked_sub(info_width)).unwrap_or_default() / 2),
             Constraint::Min(info_width),
-            Constraint::Length((area.width.checked_sub(info_width)).unwrap_or_default() / 2),
+            Constraint::Length((area[0].width.checked_sub(info_width)).unwrap_or_default() / 2),
         ],
     )
-    .split(area)[1];
+    .split(area[0])[1];
 
     let info_area = Layout::new(
         Direction::Vertical,
@@ -339,6 +342,42 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
             )
             .wrap(Wrap { trim: true }),
         info_area,
+    );
+    let items = state
+        .analyzer
+        .dependencies
+        .libraries
+        .clone()
+        .into_iter()
+        .map(|(name, lib)| {
+            Row::new(vec![
+                name.to_string(),
+                lib.realpath
+                    .unwrap_or(lib.path)
+                    .to_string_lossy()
+                    .to_string(),
+            ])
+        })
+        .collect::<Vec<Row>>();
+    frame.render_stateful_widget(
+        Table::new(
+            items,
+            &[Constraint::Percentage(50), Constraint::Percentage(50)],
+        )
+        .header(Row::new(vec!["Library".bold(), "Path".bold()]))
+        .block(
+            Block::bordered()
+                .title(vec![
+                    "|".fg(Color::Rgb(100, 100, 100)),
+                    "Dependencies".white().bold(),
+                    "|".fg(Color::Rgb(100, 100, 100)),
+                ])
+                .title_alignment(Alignment::Center)
+                .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
+        )
+        .highlight_style(Style::default().fg(Color::Green)),
+        area[1],
+        &mut TableState::default(),
     );
 }
 

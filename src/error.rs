@@ -30,6 +30,9 @@ pub enum Error {
     /// Error that may occur while parsing integers.
     #[error("Failed to parse integer: `{0}`")]
     IntParseError(#[from] std::num::TryFromIntError),
+    /// Error that may occur while analyzing library dependencies.
+    #[error("Dependency analysis error: `{0}`")]
+    LddError(#[from] lddtree::Error),
 }
 
 /// Type alias for the standard [`Result`] type.

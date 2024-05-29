@@ -8,6 +8,7 @@ use crate::{
 use elf::{endian::AnyEndian, ElfBytes};
 use heh::app::Application as Heh;
 use heh::decoder::Encoding;
+use lddtree::{DependencyAnalyzer, DependencyTree};
 use ratatui::text::Line;
 use rust_strings::BytesConfig;
 use std::{
@@ -32,6 +33,8 @@ pub struct Analyzer<'a> {
     pub tracer: TraceData,
     /// System calls.
     pub system_calls: Vec<Line<'a>>,
+    /// Library dependencies.
+    pub dependencies: DependencyTree,
 }
 
 impl Debug for Analyzer<'_> {
@@ -49,6 +52,7 @@ impl<'a> Analyzer<'a> {
         let elf = Elf::try_from(elf_bytes)?;
         let heh = Heh::new(file_info.open_file()?, Encoding::Ascii, 0)
             .map_err(|e| Error::HexdumpError(e.to_string()))?;
+        let dependencies = DependencyAnalyzer::default().analyze(file_info.path)?;
         Ok(Self {
             file: file_info,
             elf,
@@ -57,6 +61,7 @@ impl<'a> Analyzer<'a> {
             heh,
             tracer: TraceData::default(),
             system_calls: Vec::new(),
+            dependencies,
         })
     }
 
