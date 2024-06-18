@@ -1,6 +1,5 @@
 use std::sync::mpsc;
 
-use crate::elf::Info;
 use crate::error::{Error, Result};
 use crate::prelude::Analyzer;
 use crate::tui::command::*;
@@ -42,13 +41,13 @@ pub struct State<'a> {
 
 impl<'a> State<'a> {
     /// Constructs a new instance of [`State`].
-    pub fn new(analyzer: Analyzer<'a>) -> Self {
-        Self {
+    pub fn new(analyzer: Analyzer<'a>) -> Result<Self> {
+        let mut state = Self {
             running: true,
             tab: Tab::default(),
             info_index: 0,
             scroll_index: 0,
-            list: SelectableList::with_items(analyzer.elf.info(&Info::ProgramHeaders).items()),
+            list: SelectableList::default(),
             analyzer,
             show_heh: false,
             show_details: false,
@@ -56,7 +55,9 @@ impl<'a> State<'a> {
             input_mode: false,
             strings_loaded: false,
             system_calls_loaded: false,
-        }
+        };
+        state.handle_tab()?;
+        Ok(state)
     }
 
     /// Runs a command and updates the state.
@@ -224,7 +225,25 @@ impl<'a> State<'a> {
     pub fn handle_tab(&mut self) -> Result<()> {
         self.show_heh = false;
         match self.tab {
-            Tab::General => {}
+            Tab::General => {
+                self.list = SelectableList::with_items(
+                    self.analyzer
+                        .dependencies
+                        .libraries
+                        .clone()
+                        .into_iter()
+                        .map(|(name, lib)| {
+                            vec![
+                                name.to_string(),
+                                lib.realpath
+                                    .unwrap_or(lib.path)
+                                    .to_string_lossy()
+                                    .to_string(),
+                            ]
+                        })
+                        .collect(),
+                );
+            }
             Tab::StaticAnalysis => {
                 self.list = SelectableList::with_items(
                     self.analyzer

@@ -51,7 +51,7 @@ pub fn run(args: Args) -> Result<()> {
 /// Starts the terminal user interface.
 pub fn start_tui(analyzer: Analyzer) -> Result<()> {
     // Create an application.
-    let mut state = State::new(analyzer);
+    let mut state = State::new(analyzer)?;
 
     // Initialize the terminal user interface.
     let backend = CrosstermBackend::new(io::stderr());

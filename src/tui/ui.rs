@@ -310,7 +310,7 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
         [Constraint::Percentage(50), Constraint::Percentage(50)],
     )
     .split(area[2].inner(&Margin {
-        horizontal: 3,
+        horizontal: 0,
         vertical: 1,
     }));
 
@@ -343,25 +343,44 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
             .wrap(Wrap { trim: true }),
         info_area,
     );
-    let items = state
-        .analyzer
-        .dependencies
-        .libraries
-        .clone()
-        .into_iter()
-        .map(|(name, lib)| {
-            Row::new(vec![
-                name.to_string(),
-                lib.realpath
-                    .unwrap_or(lib.path)
-                    .to_string_lossy()
-                    .to_string(),
-            ])
-        })
-        .collect::<Vec<Row>>();
+
+    let max_row_width = state
+        .list
+        .items
+        .iter()
+        .map(|v| v.join(" ").len())
+        .max()
+        .unwrap_or_default() as u16
+        + 6;
+
+    let table_area = Layout::new(
+        Direction::Horizontal,
+        [
+            Constraint::Length((area[1].width.checked_sub(max_row_width)).unwrap_or_default() / 2),
+            Constraint::Min(max_row_width),
+            Constraint::Length((area[1].width.checked_sub(max_row_width)).unwrap_or_default() / 2),
+        ],
+    )
+    .split(area[1]);
+
+    let table_area = Layout::new(
+        Direction::Vertical,
+        [
+            Constraint::Min(state.list.items.len() as u16 + 3),
+            Constraint::Percentage(100),
+        ],
+    )
+    .split(table_area[1])[0];
+
     frame.render_stateful_widget(
         Table::new(
-            items,
+            state
+                .list
+                .items
+                .clone()
+                .into_iter()
+                .map(Row::new)
+                .collect::<Vec<Row>>(),
             &[Constraint::Percentage(50), Constraint::Percentage(50)],
         )
         .header(Row::new(vec!["Library".bold(), "Path".bold()]))
@@ -376,8 +395,8 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
                 .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
         )
         .highlight_style(Style::default().fg(Color::Green)),
-        area[1],
-        &mut TableState::default(),
+        table_area,
+        &mut state.list.state,
     );
 }
 
