@@ -1,5 +1,6 @@
 use crate::{error::Result, tracer::TraceData};
 use crossterm::event::{self, Event as CrosstermEvent, KeyEvent, MouseEvent};
+use std::path::PathBuf;
 use std::sync::{
     atomic::{AtomicBool, Ordering},
     mpsc, Arc,
@@ -24,6 +25,8 @@ pub enum Event {
     Trace,
     /// Results of tracer.
     TraceResult(Result<TraceData>),
+    /// Restart TUI with a new path.
+    Restart(Option<PathBuf>),
 }
 
 /// Terminal event handler.
@@ -38,6 +41,8 @@ pub struct EventHandler {
     handler: thread::JoinHandle<()>,
     /// Is the key input disabled?
     pub key_input_disabled: Arc<AtomicBool>,
+    /// Is it listening for events?
+    running: Arc<AtomicBool>,
 }
 
 impl EventHandler {
@@ -46,12 +51,14 @@ impl EventHandler {
         let tick_rate = Duration::from_millis(tick_rate);
         let (sender, receiver) = mpsc::channel();
         let key_input_disabled = Arc::new(AtomicBool::new(false));
+        let running = Arc::new(AtomicBool::new(true));
         let handler = {
             let sender = sender.clone();
             let key_input_disabled = key_input_disabled.clone();
+            let running = running.clone();
             thread::spawn(move || {
                 let mut last_tick = Instant::now();
-                loop {
+                while running.load(Ordering::Relaxed) {
                     let timeout = tick_rate
                         .checked_sub(last_tick.elapsed())
                         .unwrap_or(tick_rate);
@@ -80,6 +87,7 @@ impl EventHandler {
             receiver,
             handler,
             key_input_disabled,
+            running,
         }
     }
 
@@ -89,5 +97,10 @@ impl EventHandler {
     /// there is no data available and it's possible for more data to be sent.
     pub fn next(&self) -> Result<Event> {
         Ok(self.receiver.recv()?)
+    }
+
+    /// Stops the event listener.
+    pub fn stop(&self) {
+        self.running.store(false, Ordering::Relaxed);
     }
 }

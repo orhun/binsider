@@ -45,11 +45,11 @@ pub fn run(args: Args) -> Result<()> {
     let bytes = file_data.as_slice();
     let file_info = FileInfo::new(path.to_str().unwrap_or_default(), bytes)?;
     let analyzer = Analyzer::new(file_info, args.min_strings_len)?;
-    start_tui(analyzer)
+    start_tui(analyzer, args)
 }
 
 /// Starts the terminal user interface.
-pub fn start_tui(analyzer: Analyzer) -> Result<()> {
+pub fn start_tui(analyzer: Analyzer, args: Args) -> Result<()> {
     // Create an application.
     let mut state = State::new(analyzer)?;
 
@@ -109,6 +109,12 @@ pub fn start_tui(analyzer: Analyzer) -> Result<()> {
                 state.scroll_index = 0;
                 tui.toggle_pause()?;
                 state.handle_tab()?;
+            }
+            Event::Restart(path) => {
+                tui.exit()?;
+                let mut args = args.clone();
+                args.file = path;
+                run(args)?;
             }
         }
     }

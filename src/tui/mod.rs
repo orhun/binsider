@@ -111,6 +111,7 @@ impl<B: Backend> Tui<B> {
         terminal::disable_raw_mode()?;
         crossterm::execute!(io::stderr(), LeaveAlternateScreen, DisableMouseCapture)?;
         self.terminal.show_cursor()?;
+        self.events.stop();
         Ok(())
     }
 }

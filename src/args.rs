@@ -2,7 +2,7 @@ use clap::Parser;
 use std::path::PathBuf;
 
 /// Argument parser powered by [`clap`].
-#[derive(Debug, Default, Parser)]
+#[derive(Clone, Debug, Default, Parser)]
 #[clap(
     version,
     author = clap::crate_authors!("\n"),

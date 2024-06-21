@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use std::sync::mpsc;
 
 use crate::error::{Error, Result};
@@ -110,15 +111,25 @@ impl<'a> State<'a> {
                 }
             },
             Command::ShowDetails => {
-                if self.tab == Tab::DynamicAnalysis && !self.system_calls_loaded {
+                if self.tab == Tab::General {
+                    event_sender
+                        .send(Event::Restart(
+                            self.list.selected().map(|v| PathBuf::from(v[1].clone())),
+                        ))
+                        .expect("failed to send trace event");
+                    return Ok(());
+                } else if self.tab == Tab::DynamicAnalysis && !self.system_calls_loaded {
                     event_sender
                         .send(Event::Trace)
                         .expect("failed to send trace event");
                     return Ok(());
-                } else if self.tab == Tab::General {
-                    webbrowser::open(env!("CARGO_PKG_REPOSITORY"))?;
                 } else {
                     self.show_details = !self.show_details;
+                }
+            }
+            Command::OpenRepo => {
+                if self.tab == Tab::General {
+                    webbrowser::open(env!("CARGO_PKG_REPOSITORY"))?;
                 }
             }
             Command::TraceCalls => {
@@ -311,8 +322,9 @@ impl<'a> State<'a> {
         match self.tab {
             Tab::General => {
                 vec![
+                    ("Enter", "Analyze library"),
+                    ("o", "Visit Repository"),
                     ("Tab", "Next"),
-                    ("Enter", "Visit Repository"),
                     ("q", "Quit"),
                 ]
             }

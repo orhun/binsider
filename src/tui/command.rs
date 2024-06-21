@@ -15,6 +15,8 @@ pub enum ScrollType {
 /// Application command.
 #[derive(Debug, PartialEq, Eq)]
 pub enum Command {
+    /// Open repository URL.
+    OpenRepo,
     /// Show details.
     ShowDetails,
     /// Next.
@@ -87,6 +89,7 @@ impl From<KeyEvent> for Command {
             }
             KeyCode::Backspace => Self::Input(InputCommand::Resume(Event::Key(key_event))),
             KeyCode::Enter => Self::ShowDetails,
+            KeyCode::Char('o') => Self::OpenRepo,
             KeyCode::Char('r') => Self::TraceCalls,
             _ => Self::Nothing,
         }

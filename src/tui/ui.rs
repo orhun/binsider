@@ -344,6 +344,10 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
         info_area,
     );
 
+    if state.list.items.is_empty() {
+        return;
+    }
+
     let max_row_width = state
         .list
         .items
