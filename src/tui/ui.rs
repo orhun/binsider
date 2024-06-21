@@ -355,7 +355,7 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
         .map(|v| v.join(" ").len())
         .max()
         .unwrap_or_default() as u16
-        + 6;
+        + 5;
 
     let table_area = Layout::new(
         Direction::Horizontal,
@@ -385,7 +385,19 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
                 .into_iter()
                 .map(Row::new)
                 .collect::<Vec<Row>>(),
-            &[Constraint::Percentage(50), Constraint::Percentage(50)],
+            &[
+                Constraint::Min(
+                    state
+                        .list
+                        .items
+                        .iter()
+                        .map(|v| v[0].len())
+                        .max()
+                        .unwrap_or_default() as u16
+                        + 1,
+                ),
+                Constraint::Percentage(100),
+            ],
         )
         .header(Row::new(vec!["Library".bold(), "Path".bold()]))
         .block(
