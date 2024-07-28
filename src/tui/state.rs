@@ -118,11 +118,11 @@ impl<'a> State<'a> {
             },
             Command::ShowDetails => {
                 if self.tab == Tab::General {
-                    event_sender
-                        .send(Event::Restart(
-                            self.list.selected().map(|v| PathBuf::from(v[1].clone())),
-                        ))
-                        .expect("failed to send trace event");
+                    if let Some(path) = self.list.selected().map(|v| PathBuf::from(v[1].clone())) {
+                        event_sender
+                            .send(Event::Restart(Some(path)))
+                            .expect("failed to send trace event");
+                    }
                     return Ok(());
                 } else if self.tab == Tab::DynamicAnalysis && !self.system_calls_loaded {
                     event_sender
