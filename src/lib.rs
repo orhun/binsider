@@ -36,15 +36,18 @@ use tracer::TraceData;
 use tui::{state::State, ui::Tab, Tui};
 
 /// Runs binsider.
-pub fn run(args: Args) -> Result<()> {
-    let mut path = args.file.clone().unwrap_or(env::current_exe()?);
+pub fn run(mut args: Args) -> Result<()> {
+    if args.files.is_empty() {
+        args.files.push(env::current_exe()?);
+    }
+    let mut path = args.files[args.files.len() - 1].clone();
     if !path.exists() {
         path = which::which(path.to_string_lossy().to_string())?;
     }
     let file_data = fs::read(&path)?;
     let bytes = file_data.as_slice();
     let file_info = FileInfo::new(path.to_str().unwrap_or_default(), bytes)?;
-    let analyzer = Analyzer::new(file_info, args.min_strings_len)?;
+    let analyzer = Analyzer::new(file_info, args.min_strings_len, args.files.clone())?;
     start_tui(analyzer, args)
 }
 
@@ -111,10 +114,19 @@ pub fn start_tui(analyzer: Analyzer, args: Args) -> Result<()> {
                 state.handle_tab()?;
             }
             Event::Restart(path) => {
-                tui.exit()?;
                 let mut args = args.clone();
-                args.file = path;
-                run(args)?;
+                match path {
+                    Some(path) => {
+                        args.files.push(path);
+                    }
+                    None => {
+                        args.files.pop();
+                    }
+                }
+                if !args.files.is_empty() {
+                    tui.exit()?;
+                    run(args)?;
+                }
             }
         }
     }

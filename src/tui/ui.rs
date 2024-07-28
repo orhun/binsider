@@ -113,9 +113,23 @@ pub fn render(state: &mut State, frame: &mut Frame) {
                     .fg(Color::White),
             );
         frame.render_widget(tabs, chunks[0]);
+        let mut files = Vec::new();
+        for (i, file) in state.analyzer.files.iter().enumerate() {
+            if i != state.analyzer.files.len() - 1 {
+                files.push(
+                    file.file_name()
+                        .map(|v| v.to_string_lossy().to_string())
+                        .unwrap_or_else(|| "?".to_string())
+                        .italic(),
+                );
+                files.push("→ ".fg(Color::Rgb(100, 100, 100)));
+            } else {
+                files.push(file.to_string_lossy().to_string().italic());
+            }
+        }
+        files.push(" ".into());
         frame.render_widget(
-            Paragraph::new(format!("{} ", state.analyzer.file.path).italic())
-                .alignment(Alignment::Right),
+            Paragraph::new(Line::from(files)).alignment(Alignment::Right),
             chunks[1],
         )
     }

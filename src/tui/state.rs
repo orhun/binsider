@@ -80,6 +80,12 @@ impl<'a> State<'a> {
                         self.input_mode = false;
                     }
                     InputCommand::Resume(event) => {
+                        if self.tab == Tab::General {
+                            event_sender
+                                .send(Event::Restart(None))
+                                .expect("failed to send restart event");
+                            return Ok(());
+                        }
                         if !self.input.value().is_empty() {
                             self.input_mode = true;
                             self.input.handle_event(&event);
@@ -325,6 +331,7 @@ impl<'a> State<'a> {
                     ("Enter", "Analyze library"),
                     ("o", "Visit Repository"),
                     ("Tab", "Next"),
+                    ("Bksp", "Back"),
                     ("q", "Quit"),
                 ]
             }

@@ -13,13 +13,16 @@ use ratatui::text::Line;
 use rust_strings::BytesConfig;
 use std::{
     fmt::{self, Debug, Formatter},
+    path::PathBuf,
     sync::mpsc,
     thread,
 };
 
 /// Binary analyzer.
 pub struct Analyzer<'a> {
-    /// File infomration.
+    /// List of files that are being analyzed.
+    pub files: Vec<PathBuf>,
+    /// Current file information.
     pub file: FileInfo<'a>,
     /// Elf properties.
     pub elf: Elf,
@@ -47,13 +50,18 @@ impl Debug for Analyzer<'_> {
 
 impl<'a> Analyzer<'a> {
     /// Constructs a new instance.
-    pub fn new(mut file_info: FileInfo<'a>, strings_len: usize) -> Result<Self> {
+    pub fn new(
+        mut file_info: FileInfo<'a>,
+        strings_len: usize,
+        files: Vec<PathBuf>,
+    ) -> Result<Self> {
         let elf_bytes = ElfBytes::<AnyEndian>::minimal_parse(file_info.bytes)?;
         let elf = Elf::try_from(elf_bytes)?;
         let heh = Heh::new(file_info.open_file()?, Encoding::Ascii, 0)
             .map_err(|e| Error::HexdumpError(e.to_string()))?;
         let dependencies = DependencyAnalyzer::default().analyze(file_info.path)?;
         Ok(Self {
+            files,
             file: file_info,
             elf,
             strings: None,

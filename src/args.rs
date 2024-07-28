@@ -19,8 +19,8 @@ use std::path::PathBuf;
 )]
 pub struct Args {
     /// Binary / ELF object file.
-    #[arg(env, name = "ELF")]
-    pub file: Option<PathBuf>,
+    #[arg(env, name = "FILE")]
+    pub files: Vec<PathBuf>,
 
     /// Minimum length of strings.
     #[arg(env, short = 'n', long = "min-len", default_value = "15")]
