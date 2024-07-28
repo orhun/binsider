@@ -321,7 +321,11 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
     let info_width = lines.iter().map(|v| v.width()).max().unwrap_or_default() as u16 + 2;
     let area = Layout::new(
         Direction::Vertical,
-        [Constraint::Percentage(50), Constraint::Percentage(50)],
+        if state.list.items.is_empty() {
+            vec![Constraint::Percentage(100)]
+        } else {
+            vec![Constraint::Percentage(50), Constraint::Percentage(50)]
+        },
     )
     .split(area[2].inner(&Margin {
         horizontal: 0,
