@@ -1,5 +1,5 @@
 use crate::{error::Result, tracer::TraceData};
-use crossterm::event::{self, Event as CrosstermEvent, KeyEvent, MouseEvent};
+use ratatui::crossterm::event::{self, Event as CrosstermEvent, KeyEvent, MouseEvent};
 use std::path::PathBuf;
 use std::sync::{
     atomic::{AtomicBool, Ordering},

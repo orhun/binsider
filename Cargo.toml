@@ -7,29 +7,28 @@ repository = "https://github.com/orhun/binsider"
 edition = "2021"
 
 [dependencies]
-ratatui = "0.26.1"
-crossterm = "0.27.0"
+ratatui = "0.27.0"
 clap = { version = "4.4.2", features = ["derive", "env", "wrap_help", "cargo"] }
-thiserror = "1.0.48"
+thiserror = "1.0.63"
 elf = "0.7.1"
-rust-strings = "0.4.0"
-heh = "0.5.0"
-tui-input = "0.8.0"
-tui-popup = "0.2.4"
+rust-strings = "0.6.0"
+heh = "0.6.0"
+tui-input = "0.9.0"
+tui-popup = "0.4.4"
 unicode-width = "0.1.11"
 textwrap = "0.16.1"
-lurk-cli = { version = "0.3.5" }
+lurk-cli = "0.3.6"
 nix = { version = "0.29.0", features = ["ptrace", "signal"] }
-ansi-to-tui = "4.0.1"
+ansi-to-tui = "=4.0.1"
 console = "0.15.8"
-which = "6.0.1"
+which = "6.0.2"
 better-panic = "0.3.0"
-tui-big-text = "0.4.2"
+tui-big-text = "0.5.2"
 chrono = "0.4.38"
 bytesize = "1.3.0"
-sysinfo = { version = "0.30.12", default-features = false }
+sysinfo = { version = "0.31.2", default-features = false, features = ["user"] }
 webbrowser = "1.0.1"
-lddtree = "0.3.4"
+lddtree = "0.3.5"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"

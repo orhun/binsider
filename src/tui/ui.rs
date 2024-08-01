@@ -196,52 +196,46 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
     .margin(1)
     .split(rect);
 
-    if let Ok(banner) = BigTextBuilder::default()
+    let banner = BigTextBuilder::default()
         .pixel_size(PixelSize::Sextant)
         .lines([format!("{}.", env!("CARGO_PKG_NAME")).into()])
-        .build()
-    {
-        let banner_width = 34;
-        let banner_area = Layout::new(
-            Direction::Horizontal,
-            [
-                Constraint::Length(
-                    (area[1].width.checked_sub(banner_width)).unwrap_or_default() / 2,
-                ),
-                Constraint::Min(banner_width),
-                Constraint::Length(
-                    (area[1].width.checked_sub(banner_width)).unwrap_or_default() / 2,
-                ),
-            ],
-        )
-        .split(area[1]);
-        frame.render_widget(banner, banner_area[1]);
-        frame.render_widget(
-            Paragraph::new(Text::from(vec![
-                Line::default(),
-                Line::default(),
-                Line::default(),
-                Line::from(vec![
-                    "Analyze ELF binaries ".white(),
-                    "like a boss.".cyan().italic(),
-                ]),
-                Line::from(
-                    ratatui::symbols::line::HORIZONTAL
-                        .repeat(33)
-                        .fg(Color::Rgb(100, 100, 100)),
-                ),
-                Line::from(env!("CARGO_PKG_REPOSITORY").italic()),
-                Line::from(vec![
-                    "[".fg(Color::Rgb(100, 100, 100)),
-                    "with ♥ by ".into(),
-                    "@orhun".cyan(),
-                    "]".fg(Color::Rgb(100, 100, 100)),
-                ]),
-            ]))
-            .centered(),
-            banner_area[1],
-        );
-    }
+        .build();
+    let banner_width = 34;
+    let banner_area = Layout::new(
+        Direction::Horizontal,
+        [
+            Constraint::Length((area[1].width.checked_sub(banner_width)).unwrap_or_default() / 2),
+            Constraint::Min(banner_width),
+            Constraint::Length((area[1].width.checked_sub(banner_width)).unwrap_or_default() / 2),
+        ],
+    )
+    .split(area[1]);
+    frame.render_widget(banner, banner_area[1]);
+    frame.render_widget(
+        Paragraph::new(Text::from(vec![
+            Line::default(),
+            Line::default(),
+            Line::default(),
+            Line::from(vec![
+                "Analyze ELF binaries ".white(),
+                "like a boss.".cyan().italic(),
+            ]),
+            Line::from(
+                ratatui::symbols::line::HORIZONTAL
+                    .repeat(33)
+                    .fg(Color::Rgb(100, 100, 100)),
+            ),
+            Line::from(env!("CARGO_PKG_REPOSITORY").italic()),
+            Line::from(vec![
+                "[".fg(Color::Rgb(100, 100, 100)),
+                "with ♥ by ".into(),
+                "@orhun".cyan(),
+                "]".fg(Color::Rgb(100, 100, 100)),
+            ]),
+        ]))
+        .centered(),
+        banner_area[1],
+    );
 
     let lines = vec![
         Line::from(vec![
@@ -327,7 +321,7 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
             vec![Constraint::Percentage(50), Constraint::Percentage(50)]
         },
     )
-    .split(area[2].inner(&Margin {
+    .split(area[2].inner(Margin {
         horizontal: 0,
         vertical: 1,
     }));
@@ -602,7 +596,7 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             Scrollbar::new(ScrollbarOrientation::VerticalRight)
                 .begin_symbol(Some("↑"))
                 .end_symbol(Some("↓")),
-            area.inner(&Margin {
+            area.inner(Margin {
                 vertical: 1,
                 horizontal: 0,
             }),
@@ -663,7 +657,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         frame.render_widget(Block::bordered(), rect);
         frame.render_widget(
             Paragraph::new("Loading...".italic()).alignment(Alignment::Center),
-            rect.inner(&Margin {
+            rect.inner(Margin {
                 vertical: 1,
                 horizontal: 0,
             }),
@@ -738,7 +732,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         Scrollbar::new(ScrollbarOrientation::VerticalRight)
             .begin_symbol(Some("↑"))
             .end_symbol(Some("↓")),
-        rect.inner(&Margin {
+        rect.inner(Margin {
             vertical: 1,
             horizontal: 0,
         }),
@@ -822,15 +816,12 @@ fn render_details(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
                 lines
             })
             .collect();
-        let popup = Popup::new(
-            vec![
-                "|".fg(Color::Rgb(100, 100, 100)),
-                "Details".white().bold(),
-                "|".fg(Color::Rgb(100, 100, 100)),
-            ],
-            lines,
-        );
-        frame.render_widget(popup.to_widget(), area);
+        let popup = Popup::new(Text::from(lines)).title(Line::from(vec![
+            "|".fg(Color::Rgb(100, 100, 100)),
+            "Details".white().bold(),
+            "|".fg(Color::Rgb(100, 100, 100)),
+        ]));
+        frame.render_widget(&popup, area);
     }
 }
 
@@ -887,7 +878,7 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
             Scrollbar::new(ScrollbarOrientation::VerticalRight)
                 .begin_symbol(Some("↑"))
                 .end_symbol(Some("↓")),
-            rect.inner(&Margin {
+            rect.inner(Margin {
                 vertical: 1,
                 horizontal: 0,
             }),
@@ -904,15 +895,12 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
                 .into_iter()
                 .filter(|v| v.width() != 0)
                 .collect::<Vec<Line>>();
-            let popup = Popup::new(
-                vec![
-                    "|".fg(Color::Rgb(100, 100, 100)),
-                    "Details".white().bold(),
-                    "|".fg(Color::Rgb(100, 100, 100)),
-                ],
-                summary,
-            );
-            frame.render_widget(popup.to_widget(), rect);
+            let popup = Popup::new(Text::from(summary)).title(Line::from(vec![
+                "|".fg(Color::Rgb(100, 100, 100)),
+                "Details".white().bold(),
+                "|".fg(Color::Rgb(100, 100, 100)),
+            ]));
+            frame.render_widget(&popup, rect);
         }
     }
 }
