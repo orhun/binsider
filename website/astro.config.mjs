@@ -11,6 +11,9 @@ export default defineConfig({
       title: "Binsider",
       social: {
         github: "https://github.com/orhun/binsider",
+        mastodon: "https://fosstodon.org/@orhun",
+        "x.com": "https://twitter.com/orhundev",
+        linkedin: "https://www.linkedin.com/in/orhunp",
       },
       logo: {
         dark: "./src/assets/binsider-logo-dark.png",
