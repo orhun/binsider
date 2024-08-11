@@ -1,12 +1,27 @@
-<footer class="footer">
-  <div class="container">
-    <p class="small-text">&copy; {new Date().getFullYear()} Binsider. All rights reserved.</p>
-    <p class="small-text">
-      Built with <a href="https://ratatui.rs" target="_blank" rel="noopener noreferrer">Rust & Ratatui</a> on <a href="https://github.com/orhun/binsider" target="_blank" rel="noopener noreferrer">GitHub</a> 🦀
-    </p>
-    <p class="small-text">In memory of Jia Tan 🏴</p>
-  </div>
-</footer>
+---
+import type { Props } from '@astrojs/starlight/props';
+import Default from '@astrojs/starlight/components/Footer.astro';
+
+const isHomepage = Astro.props.slug === '';
+---
+
+{
+  isHomepage ? (
+    <footer class="footer">
+      <div class="container">
+        <p class="small-text">&copy; {new Date().getFullYear()} Binsider. All rights reserved.</p>
+        <p class="small-text">
+          Built with <a href="https://ratatui.rs" target="_blank" rel="noopener noreferrer">Rust & Ratatui</a> on <a href="https://github.com/orhun/binsider" target="_blank" rel="noopener noreferrer">GitHub</a> 🦀
+        </p>
+        <p class="small-text">In memory of Jia Tan 🏴</p>
+      </div>
+    </footer>
+  ) : (
+    <Default {...Astro.props}>
+      <slot />
+    </Default>
+  )
+}
 
 <style>
   .footer {
