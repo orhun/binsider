@@ -1,0 +1,33 @@
+---
+import type { Props } from "@astrojs/starlight/props";
+
+import Search from "@astrojs/starlight/components/Search.astro";
+import SiteTitle from "@astrojs/starlight/components/SiteTitle.astro";
+import ThemeSelect from "@astrojs/starlight/components/ThemeSelect.astro";
+import SocialIcons from "@astrojs/starlight/components/SocialIcons.astro";
+import LanguageSelect from "@astrojs/starlight/components/LanguageSelect.astro";
+import textLight from '../../src/assets/binsider-text-light.png';
+import textDark from '../../src/assets/binsider-text-dark.png';
+
+---
+
+<div class="flex h-full items-center justify-between">
+  <div class="flex items-center">
+    <SiteTitle {...Astro.props} />
+    <img class="light:sl-hidden ml-3 max-h-6" src={textDark.src} alt="Light text" />
+    <img class="dark:sl-hidden ml-3 max-h-6" src={textLight.src} alt="Dark text"/>
+  </div>
+  <div class="flex flex-grow"></div>
+  <div class="flex px-6">
+    <Search {...Astro.props} />
+  </div>
+  <div class="hidden items-center gap-4 md:flex">
+    <span class="block h-8 border-r border-gray-500"></span>
+    <div class="flex items-center gap-4">
+      <SocialIcons {...Astro.props} />
+      <span class="block h-8 border-r border-gray-500"></span>
+    </div>
+    <ThemeSelect {...Astro.props} />
+    <LanguageSelect {...Astro.props} />
+  </div>
+</div>
