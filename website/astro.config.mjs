@@ -22,6 +22,7 @@ export default defineConfig({
       },
       components: {
         Header: "./src/components/Header.astro",
+        Footer: "./src/components/Footer.astro",
       },
       customCss: ["./src/tailwind.css"],
       sidebar: [
@@ -42,6 +43,9 @@ export default defineConfig({
           },
         },
       ],
+      editLink: {
+        baseUrl: "https://github.com/orhun/binsider/edit/main/website",
+      },
     }),
     tailwind({ applyBaseStyles: false }),
   ],

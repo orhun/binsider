@@ -1,0 +1,39 @@
+<footer class="footer">
+  <div class="container">
+    <p class="small-text">&copy; {new Date().getFullYear()} Binsider. All rights reserved.</p>
+    <p class="small-text">
+      Built with <a href="https://ratatui.rs" target="_blank" rel="noopener noreferrer">Rust & Ratatui</a> on <a href="https://github.com/orhun/binsider" target="_blank" rel="noopener noreferrer">GitHub</a> 🦀
+    </p>
+    <p class="small-text">In memory of Jia Tan 🏴</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--astro-background);
+    padding: 1rem 0;
+    text-align: center;
+    border-top: 1px solid var(--astro-border);
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .small-text {
+    margin: 0;
+    color: var(--astro-text-secondary);
+    font-size: 0.875rem;
+  }
+
+  a {
+    color: var(--astro-link);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+</style>
