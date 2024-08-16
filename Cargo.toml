@@ -3,8 +3,14 @@ name = "binsider"
 version = "0.1.0"
 description = "Analyze ELF binaries like a boss"
 authors = ["Orhun Parmaksız <orhunparmaksiz@gmail.com>"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+homepage = "https://binsider.dev"
 repository = "https://github.com/orhun/binsider"
+keywords = ["analyze", "binary", "tui", "elf"]
+categories = ["command-line-utilities"]
 edition = "2021"
+rust-version = "1.74.1"
 
 [dependencies]
 ratatui = "0.27.0"
