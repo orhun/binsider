@@ -135,7 +135,7 @@ impl<'a> State<'a> {
             }
             Command::OpenRepo => {
                 if self.tab == Tab::General {
-                    webbrowser::open(env!("CARGO_PKG_REPOSITORY"))?;
+                    webbrowser::open(env!("CARGO_PKG_HOMEPAGE"))?;
                 }
             }
             Command::TraceCalls => {
@@ -329,7 +329,7 @@ impl<'a> State<'a> {
             Tab::General => {
                 vec![
                     ("Enter", "Analyze library"),
-                    ("o", "Visit Repository"),
+                    ("o", "Open Documentation"),
                     ("Tab", "Next"),
                     ("Bksp", "Back"),
                     ("q", "Quit"),
