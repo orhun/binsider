@@ -1,0 +1,16 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import Default from '@astrojs/starlight/components/Hero.astro';
+
+import demoImage from '../../src/assets/binsider-general-tab.png';
+---
+
+<div style="text-align: center;">
+  <img
+    src={demoImage.src}
+    style="margin: 0;"
+    alt="demo"
+  />
+</div>
+
+<Default {...Astro.props}><slot /></Default>
