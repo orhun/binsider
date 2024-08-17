@@ -11,7 +11,7 @@ const { owner, repo } = Astro.props;
     constructor() {
       super();
 
-      const approximate = (count) => {
+      const approximate = (count: number): string => {
         if (count >= 1000) {
           // Show numbers over 1000 as x.yk. So 1234 becomes 1.2k.
           const mag = Math.trunc(count / 100) / 10;
@@ -33,7 +33,10 @@ const { owner, repo } = Astro.props;
           }
         })
         .then(data => {
-          this.querySelector('#star-count').textContent = approximate(data.stargazers_count);
+          const starCountElement = this.querySelector('#star-count');
+          if (starCountElement !== null) {
+            starCountElement.textContent = approximate(data.stargazers_count);
+          }
         }).catch(() => {});
     }
   }

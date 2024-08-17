@@ -20,7 +20,10 @@ const { owner, repo } = Astro.props;
           }
         })
         .then(data => {
-          this.querySelector("#version").textContent = data[0].name.replace(/^v/, "");
+          const versionElement = this.querySelector("#version");
+          if (versionElement !== null) {
+            versionElement.textContent = data[0].name.replace(/^v/, "");
+          }
         })
         .catch(() => {
           // Handle the error case (optional)
