@@ -1,0 +1,50 @@
+:root {
+  --sl-font: "DejaVu Sans";
+  --sl-color-accent-low: #3c3836;
+  --sl-color-accent: #90a85a;
+  --sl-color-accent-high: #edc371;
+  --sl-color-white: #ebdbb2;
+  --sl-color-gray-1: #fbf1c7;
+  --sl-color-gray-2: #d5c4a1;
+  --sl-color-gray-3: #bdae93;
+  --sl-color-gray-4: #a89984;
+  --sl-color-gray-5: #504945;
+  --sl-color-gray-6: #3c3836;
+  --sl-color-black: #282828;
+}
+
+:root[data-theme="light"] {
+  --sl-font: "DejaVu Sans";
+  --sl-color-accent-low: #f2e5bc;
+  --sl-color-accent: #d65d0e;
+  --sl-color-accent-high: #d65d0e;
+  --sl-color-white: #282828;
+  --sl-color-gray-1: #3c3836;
+  --sl-color-gray-2: #504945;
+  --sl-color-gray-3: #665c54;
+  --sl-color-gray-4: #bdae93;
+  --sl-color-gray-5: #d5c4a1;
+  --sl-color-gray-6: #fbf1c7;
+  --sl-color-gray-7: #f2e5bc;
+  --sl-color-black: #ebdbb2;
+}
+
+.hero {
+  grid-template-columns: 1fr;
+  padding: 1rem;
+}
+
+.hero .copy {
+  align-items: center;
+}
+
+.hero .actions {
+  justify-content: center;
+}
+
+h1[data-page-title],
+a.site-title {
+  font-family: var(--__sl-font-mono);
+  font-weight: bold;
+  color: var(--color-brand);
+}

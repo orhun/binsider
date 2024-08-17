@@ -1,6 +1,7 @@
 ---
 import type { Props } from '@astrojs/starlight/props';
 import Default from '@astrojs/starlight/components/Footer.astro';
+import Stat from "./Footer/Stat.astro";
 
 const isHomepage = Astro.props.slug === '';
 ---
@@ -9,9 +10,14 @@ const isHomepage = Astro.props.slug === '';
   isHomepage ? (
     <footer class="footer">
       <div class="container">
+        <p>
+        Built with <a href="https://rustlang.org" target="_blank" rel="noopener noreferrer">Rust</a> & <a href="https://ratatui.rs" target="_blank" rel="noopener noreferrer">Ratatui</a> 🦀🐁 <span class="small-text">with 🖤 from @orhun</p>
+        </p>
+        <Stat />
+        <br>
+        <br>
         <p class="small-text">&copy; {new Date().getFullYear()} Binsider. All rights reserved.</p>
         <p class="small-text">
-          Built with <a href="https://ratatui.rs" target="_blank" rel="noopener noreferrer">Rust & Ratatui</a> on <a href="https://github.com/orhun/binsider" target="_blank" rel="noopener noreferrer">GitHub</a> 🦀
         </p>
         <p class="small-text">In memory of Jia Tan 🏴</p>
       </div>

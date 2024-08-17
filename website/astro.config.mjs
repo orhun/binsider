@@ -24,7 +24,11 @@ export default defineConfig({
         Header: "./src/components/Header.astro",
         Footer: "./src/components/Footer.astro",
       },
-      customCss: ["./src/tailwind.css"],
+      customCss: [
+        "@fontsource/dejavu-sans/400.css",
+        "./src/tailwind.css",
+        "./src/styles/custom.css",
+      ],
       sidebar: [
         {
           label: "Guides",

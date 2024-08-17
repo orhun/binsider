@@ -1,0 +1,33 @@
+---
+const { owner, repo } = Astro.props;
+---
+
+<project-version data-owner={owner} data-repo={repo}>
+  <span id="version">0.0.0</span>
+</project-version>
+
+<script>
+  class ProjectVersion extends HTMLElement {
+    constructor() {
+      super();
+      const { owner, repo } = this.dataset;
+      fetch(`https://api.github.com/repos/${owner}/${repo}/releases`)
+        .then(res => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            throw new Error("Failed to fetch the latest version.");
+          }
+        })
+        .then(data => {
+          this.querySelector("#version").textContent = data[0].name.replace(/^v/, "");
+        })
+        .catch(() => {
+          // Handle the error case (optional)
+        });
+    }
+  }
+
+  customElements.define('project-version', ProjectVersion);
+</script>
+

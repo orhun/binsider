@@ -1,0 +1,42 @@
+---
+const { owner, repo } = Astro.props;
+---
+
+<project-stars data-owner={owner} data-repo={repo}>
+  <span id="star-count">0+</span>
+</project-stars>
+
+<script>
+  class ProjectStars extends HTMLElement {
+    constructor() {
+      super();
+
+      const approximate = (count) => {
+        if (count >= 1000) {
+          // Show numbers over 1000 as x.yk. So 1234 becomes 1.2k.
+          const mag = Math.trunc(count / 100) / 10;
+          return `${mag}k+`;
+        } else {
+          // Show numbers below 1000 as xy0+. So 789 becomes 780.
+          const mag = Math.trunc(count / 10) * 10;
+          return `${mag}+`;
+        }
+      }
+
+      const {owner, repo} = this.dataset;
+      fetch(`https://api.github.com/repos/${owner}/${repo}`)
+        .then(res => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            throw new Error('Network response was not OK.');
+          }
+        })
+        .then(data => {
+          this.querySelector('#star-count').textContent = approximate(data.stargazers_count);
+        }).catch(() => {});
+    }
+  }
+
+  customElements.define('project-stars', ProjectStars)
+</script>

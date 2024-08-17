@@ -1,0 +1,20 @@
+---
+import Icon from "./Icon.astro";
+import Stars from "./Stars.astro";
+import Version from "./Version.astro";
+---
+
+<div class="stat not-content">
+  <Icon name="github" /><div class="not-content">orhun/binsider</div>
+  <Icon name="star" /><Stars owner="orhun" repo="binsider" />
+  <Icon name="tag" /><Version owner="orhun" repo="binsider" />
+</div>
+
+<style>
+  div.stat {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+</style>
