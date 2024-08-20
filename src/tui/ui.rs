@@ -155,8 +155,12 @@ pub fn render(state: &mut State, frame: &mut Frame) {
             frame.render_widget(Block::new().borders(Borders::BOTTOM), chunks[1])
         }
     }
-    let chunks =
-        Layout::vertical([Constraint::Percentage(100), Constraint::Min(1)]).split(chunks[1]);
+    render_key_bindings(state, frame, chunks[1]);
+}
+
+/// Renders the key bindings.
+pub fn render_key_bindings(state: &mut State, frame: &mut Frame, rect: Rect) {
+    let chunks = Layout::vertical([Constraint::Percentage(100), Constraint::Min(1)]).split(rect);
     let key_bindings = state.get_key_bindings();
     frame.render_widget(
         Paragraph::new(
@@ -167,7 +171,7 @@ pub fn render(state: &mut State, frame: &mut Frame) {
                     .flat_map(|(i, (keys, desc))| {
                         vec![
                             "[".fg(Color::Rgb(100, 100, 100)),
-                            keys.cyan(),
+                            keys.yellow(),
                             "→ ".fg(Color::Rgb(100, 100, 100)),
                             Span::from(*desc),
                             "]".fg(Color::Rgb(100, 100, 100)),
@@ -218,7 +222,7 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
             Line::default(),
             Line::from(vec![
                 "Analyze ELF binaries ".white(),
-                "like a boss.".cyan().italic(),
+                "like a boss.".yellow().italic(),
             ]),
             Line::from(
                 ratatui::symbols::line::HORIZONTAL
@@ -228,7 +232,9 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
             Line::from(env!("CARGO_PKG_REPOSITORY").italic()),
             Line::from(vec![
                 "[".fg(Color::Rgb(100, 100, 100)),
-                "with ♥ by ".into(),
+                "with ".into(),
+                "♥".cyan(),
+                " by ".into(),
                 "@orhun".cyan(),
                 "]".fg(Color::Rgb(100, 100, 100)),
             ]),
@@ -831,7 +837,7 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
         frame.render_widget(
             Paragraph::new(vec![Line::from(vec![
                 "Press ".into(),
-                "Enter".cyan(),
+                "Enter".yellow(),
                 " to run the executable.".into(),
             ])])
             .block(Block::bordered())
@@ -910,7 +916,7 @@ fn get_input_line<'a>(state: &'a State) -> Line<'a> {
     if !state.input.value().is_empty() || state.input_mode {
         Line::from(vec![
             "|".fg(Color::Rgb(100, 100, 100)),
-            "search: ".green(),
+            "search: ".yellow(),
             state.input.value().white(),
             if state.input_mode { " " } else { "" }.into(),
             "|".fg(Color::Rgb(100, 100, 100)),
