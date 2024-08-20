@@ -1,7 +1,7 @@
 use crate::{elf::Info, tui::state::State};
 use ansi_to_tui::IntoText;
 use ratatui::{
-    layout::{Alignment, Constraint, Direction, Layout, Margin, Rect},
+    layout::{Alignment, Constraint, Direction, Layout, Margin, Position, Rect},
     style::{Color, Modifier, Style, Stylize},
     text::{Line, Span, Text},
     widgets::{
@@ -83,7 +83,7 @@ pub fn render(state: &mut State, frame: &mut Frame) {
     )
     .direction(Direction::Vertical)
     .margin(1)
-    .split(frame.size());
+    .split(frame.area());
 
     {
         frame.render_widget(
@@ -760,7 +760,7 @@ fn render_cursor(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
                 height: 1,
             },
         );
-        frame.set_cursor(x, y);
+        frame.set_cursor_position(Position::new(x, y));
     }
 }
 
