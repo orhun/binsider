@@ -1,16 +1,16 @@
 :root {
   --sl-font: "DejaVu Sans";
-  --sl-color-accent-low: #3c3836;
-  --sl-color-accent: #90a85a;
-  --sl-color-accent-high: #edc371;
-  --sl-color-white: #ebdbb2;
-  --sl-color-gray-1: #fbf1c7;
-  --sl-color-gray-2: #d5c4a1;
-  --sl-color-gray-3: #bdae93;
-  --sl-color-gray-4: #a89984;
-  --sl-color-gray-5: #504945;
-  --sl-color-gray-6: #3c3836;
-  --sl-color-black: #282828;
+  --sl-color-accent-low: #2e2c2b;
+  --sl-color-accent: #6a9589;
+  --sl-color-accent-high: #a0936e;
+  --sl-color-white: #dcd7ba;
+  --sl-color-gray-1: #e8e6e3;
+  --sl-color-gray-2: #cfcfcf;
+  --sl-color-gray-3: #888787;
+  --sl-color-gray-4: #6f6f6f;
+  --sl-color-gray-5: #4a4846;
+  --sl-color-gray-6: #1f1f1f;
+  --sl-color-black: #161616;
 }
 
 :root[data-theme="light"] {
