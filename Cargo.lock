@@ -196,6 +196,7 @@ dependencies = [
  "console",
  "elf",
  "heh",
+ "itertools",
  "lddtree",
  "lurk-cli",
  "nix",

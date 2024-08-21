@@ -553,12 +553,14 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                 Row::new(items.iter().enumerate().map(|(i, value)| {
                     Cell::from(Line::from(
                         if value.width() > max_row_width && i == items.len() - 1 {
-                            vec![
+                            let mut spans = highlight_search_result(
                                 value.chars().take(max_row_width).collect::<String>().into(),
-                                "…".fg(Color::Rgb(100, 100, 100)),
-                            ]
+                                state,
+                            );
+                            spans.push("…".fg(Color::Rgb(100, 100, 100)));
+                            spans
                         } else {
-                            vec![value.to_string().into()]
+                            highlight_search_result(value.to_string().into(), state)
                         },
                     ))
                 }))
@@ -676,24 +678,25 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
     frame.render_stateful_widget(
         Table::new(
             items.map(|items| {
-                Row::new(vec![Cell::from(Line::from({
+                Row::new(vec![Cell::from({
                     let index = format!("{:>p$}", items[0], p = left_padding);
                     let value = items[1].to_string();
-                    let mut line = vec![index.clone().cyan(), " ".into()];
+                    let mut spans = vec![index.clone().cyan(), " ".into()];
                     if index.width() + value.width() > max_row_width {
-                        line.push(
+                        spans.extend(highlight_search_result(
                             value
                                 .chars()
                                 .take(max_row_width.saturating_sub(index.width()))
                                 .collect::<String>()
                                 .into(),
-                        );
-                        line.push("…".fg(Color::Rgb(100, 100, 100)));
+                            state,
+                        ));
+                        spans.push("…".fg(Color::Rgb(100, 100, 100)));
                     } else {
-                        line.push(value.into());
+                        spans.extend(highlight_search_result(value.into(), state))
                     }
-                    line
-                }))])
+                    Line::from(spans)
+                })])
             }),
             &[Constraint::Percentage(100)],
         )
@@ -728,7 +731,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
                 )
                 .title_bottom(get_input_line(state)),
         )
-        .highlight_style(Style::default().add_modifier(Modifier::BOLD)),
+        .highlight_style(Style::default().fg(Color::Green).bold()),
         rect,
         &mut list_state,
     );
@@ -856,26 +859,34 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
         }
 
         frame.render_widget(
-            Paragraph::new(state.analyzer.system_calls.clone())
-                .block(
-                    Block::bordered()
-                        .title(vec![
+            Paragraph::new(
+                state
+                    .analyzer
+                    .system_calls
+                    .clone()
+                    .into_iter()
+                    .map(|line| highlight_search_result(line, state).into())
+                    .collect::<Vec<Line>>(),
+            )
+            .block(
+                Block::bordered()
+                    .title(vec![
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                        "System Calls".white().bold(),
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                    ])
+                    .title_bottom(
+                        Line::from(vec![
                             "|".fg(Color::Rgb(100, 100, 100)),
-                            "System Calls".white().bold(),
+                            "Total: ".into(),
+                            state.analyzer.system_calls.len().to_string().white().bold(),
                             "|".fg(Color::Rgb(100, 100, 100)),
                         ])
-                        .title_bottom(
-                            Line::from(vec![
-                                "|".fg(Color::Rgb(100, 100, 100)),
-                                "Total: ".into(),
-                                state.analyzer.system_calls.len().to_string().white().bold(),
-                                "|".fg(Color::Rgb(100, 100, 100)),
-                            ])
-                            .right_aligned(),
-                        )
-                        .title_bottom(get_input_line(state)),
-                )
-                .scroll((state.scroll_index as u16, 0)),
+                        .right_aligned(),
+                    )
+                    .title_bottom(get_input_line(state)),
+            )
+            .scroll((state.scroll_index as u16, 0)),
             rect,
         );
 
@@ -923,5 +934,21 @@ fn get_input_line<'a>(state: &'a State) -> Line<'a> {
         ])
     } else {
         Line::default()
+    }
+}
+
+/// Returns the line with the search result highlighted.
+fn highlight_search_result<'a>(line: Line<'a>, state: &'a State) -> Vec<Span<'a>> {
+    let line_str = line.to_string();
+    if line_str.contains(state.input.value()) && !state.input.value().is_empty() {
+        let splits = line_str.split(state.input.value());
+        let chunks = splits.into_iter().map(|c| Span::from(c.to_owned()));
+        let pattern = Span::styled(
+            state.input.value(),
+            Style::new().bg(Color::Yellow).fg(Color::Black),
+        );
+        itertools::intersperse(chunks, pattern).collect::<Vec<Span>>()
+    } else {
+        line.spans.clone()
     }
 }

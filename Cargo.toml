@@ -35,6 +35,7 @@ bytesize = "1.3.0"
 sysinfo = { version = "0.31.2", default-features = false, features = ["user"] }
 webbrowser = "1.0.1"
 lddtree = "0.3.5"
+itertools = "0.13.0"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"
