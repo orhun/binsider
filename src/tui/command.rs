@@ -70,8 +70,8 @@ impl From<KeyEvent> for Command {
             }
             KeyCode::Esc | KeyCode::Char('q') => Self::Exit,
             KeyCode::Tab => Self::Next(ScrollType::Tab, 1),
-            KeyCode::Char('t') => Self::Top,
-            KeyCode::Char('b') => Self::Bottom,
+            KeyCode::Char('t') | KeyCode::Home => Self::Top,
+            KeyCode::Char('b') | KeyCode::End => Self::Bottom,
             KeyCode::Char('+') => Self::Increment,
             KeyCode::Char('-') => Self::Decrement,
             KeyCode::Char('c') | KeyCode::Char('C') => {
