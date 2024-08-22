@@ -162,28 +162,28 @@ pub fn render(state: &mut State, frame: &mut Frame) {
 pub fn render_key_bindings(state: &mut State, frame: &mut Frame, rect: Rect) {
     let chunks = Layout::vertical([Constraint::Percentage(100), Constraint::Min(1)]).split(rect);
     let key_bindings = state.get_key_bindings();
-    frame.render_widget(
-        Paragraph::new(
-            Line::from(
-                key_bindings
-                    .iter()
-                    .enumerate()
-                    .flat_map(|(i, (keys, desc))| {
-                        vec![
-                            "[".fg(Color::Rgb(100, 100, 100)),
-                            keys.yellow(),
-                            "→ ".fg(Color::Rgb(100, 100, 100)),
-                            Span::from(*desc),
-                            "]".fg(Color::Rgb(100, 100, 100)),
-                            if i != key_bindings.len() - 1 { " " } else { "" }.into(),
-                        ]
-                    })
-                    .collect::<Vec<Span>>(),
-            )
-            .alignment(Alignment::Center),
-        ),
-        chunks[1],
+    let line = Line::from(
+        key_bindings
+            .iter()
+            .enumerate()
+            .flat_map(|(i, (keys, desc))| {
+                vec![
+                    "[".fg(Color::Rgb(100, 100, 100)),
+                    keys.yellow(),
+                    "→ ".fg(Color::Rgb(100, 100, 100)),
+                    Span::from(*desc),
+                    "]".fg(Color::Rgb(100, 100, 100)),
+                    if i != key_bindings.len() - 1 { " " } else { "" }.into(),
+                ]
+            })
+            .collect::<Vec<Span>>(),
     );
+    if line.width() as u16 > chunks[1].width.saturating_sub(25) {
+        if get_input_line(state).width() != 0 && state.tab != Tab::StaticAnalysis {
+            return;
+        }
+    }
+    frame.render_widget(Paragraph::new(line.alignment(Alignment::Center)), chunks[1]);
 }
 
 /// Renders the general info tab.
