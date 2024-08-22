@@ -61,8 +61,6 @@ a.site-title {
   margin: 0;
   max-width: 100%;
   height: auto;
-  text-align: center;
-  filter: invert(0);
 }
 
 [data-theme="light"] .demo-image {
