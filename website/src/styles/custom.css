@@ -15,18 +15,26 @@
 
 :root[data-theme="light"] {
   --sl-font: "DejaVu Sans";
-  --sl-color-accent-low: #f2e5bc;
-  --sl-color-accent: #d65d0e;
-  --sl-color-accent-high: #d65d0e;
-  --sl-color-white: #282828;
-  --sl-color-gray-1: #3c3836;
-  --sl-color-gray-2: #504945;
-  --sl-color-gray-3: #665c54;
-  --sl-color-gray-4: #bdae93;
-  --sl-color-gray-5: #d5c4a1;
-  --sl-color-gray-6: #fbf1c7;
-  --sl-color-gray-7: #f2e5bc;
-  --sl-color-black: #ebdbb2;
+  --sl-color-accent-low: #d4d2d0;
+  --sl-color-accent: #4f7166;
+  --sl-color-accent-high: #b58f5e;
+  --sl-color-white: #2f2b23;
+  --sl-color-gray-1: #1f1f1f;
+  --sl-color-gray-2: #383838;
+  --sl-color-gray-3: #777777;
+  --sl-color-gray-4: #909090;
+  --sl-color-gray-5: #b5b5b5;
+  --sl-color-gray-6: #e0e0e0;
+  --sl-color-black: #ededed;
+}
+
+.a {
+  color: var(--sl-color-accent-high);
+  text-decoration: none;
+}
+
+.a:hover {
+  text-decoration: underline;
 }
 
 .hero {
@@ -47,4 +55,35 @@ a.site-title {
   font-family: var(--__sl-font-mono);
   font-weight: bold;
   color: var(--color-brand);
+}
+
+.demo-image {
+  margin: 0;
+  max-width: 100%;
+  height: auto;
+  text-align: center;
+  filter: invert(0);
+}
+
+[data-theme="light"] .demo-image {
+  filter: invert(1);
+}
+
+[data-theme="light"] .hero-link {
+  filter: invert(1);
+}
+
+.action {
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.action:hover {
+  color: var(--sl-color-accent-high);
+}
+
+.action.primary:hover {
+  color: var(--sl-color-black);
+  background-color: var(--sl-color-white);
 }

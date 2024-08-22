@@ -5,10 +5,9 @@ import Default from '@astrojs/starlight/components/Hero.astro';
 import demoImage from '../../src/assets/binsider-general-tab.png';
 ---
 
-<div style="text-align: center;">
+<div class="demo-image">
   <img
     src={demoImage.src}
-    style="margin: 0; max-width: 100%; height: auto;"
     alt="demo"
   />
 </div>
@@ -24,3 +23,4 @@ It allows you to easily inspect strings, examine linked libraries, and perform a
 </p>
 
 <Default {...Astro.props}><slot /></Default>
+

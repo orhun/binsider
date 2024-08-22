@@ -11,10 +11,17 @@ import Version from "./Version.astro";
 </div>
 
 <style>
-  div.stat {
-    display: inline-flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-  }
+div.stat {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+div.stat:hover {
+  color: var(--sl-color-accent-high);
+}
 </style>
