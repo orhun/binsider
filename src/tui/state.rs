@@ -22,8 +22,6 @@ pub struct State<'a> {
     pub tab: Tab,
     /// Elf info.
     pub info_index: usize,
-    /// Scroll index.
-    pub scroll_index: usize,
     /// List items.
     pub list: SelectableList<Vec<String>>,
     /// Show heh.
@@ -38,6 +36,10 @@ pub struct State<'a> {
     pub strings_loaded: bool,
     /// System calls completed.
     pub system_calls_loaded: bool,
+    /// System calls scroll index.
+    pub dynamic_scroll_index: usize,
+    /// File info scroll index.
+    pub general_scroll_index: usize,
 }
 
 impl<'a> State<'a> {
@@ -47,7 +49,6 @@ impl<'a> State<'a> {
             running: true,
             tab: Tab::default(),
             info_index: 0,
-            scroll_index: 0,
             list: SelectableList::default(),
             analyzer,
             show_heh: false,
@@ -56,6 +57,8 @@ impl<'a> State<'a> {
             input_mode: false,
             strings_loaded: false,
             system_calls_loaded: false,
+            dynamic_scroll_index: 0,
+            general_scroll_index: 0,
         };
         state.handle_tab()?;
         Ok(state)
@@ -155,11 +158,15 @@ impl<'a> State<'a> {
                         self.info_index = (self.info_index.checked_add(amount).unwrap_or_default())
                             % ELF_INFO_TABS.len();
                         self.handle_tab()?;
+                    } else if self.tab == Tab::General {
+                        self.general_scroll_index =
+                            self.general_scroll_index.saturating_add(amount);
                     }
                 }
                 ScrollType::List => {
                     if self.tab == Tab::DynamicAnalysis {
-                        self.scroll_index = self.scroll_index.saturating_add(amount);
+                        self.dynamic_scroll_index =
+                            self.dynamic_scroll_index.saturating_add(amount);
                     } else {
                         self.list.next(amount)
                     }
@@ -176,11 +183,15 @@ impl<'a> State<'a> {
                             .checked_sub(amount)
                             .unwrap_or(ELF_INFO_TABS.len() - 1);
                         self.handle_tab()?;
+                    } else if self.tab == Tab::General {
+                        self.general_scroll_index =
+                            self.general_scroll_index.saturating_sub(amount);
                     }
                 }
                 ScrollType::List => {
                     if self.tab == Tab::DynamicAnalysis {
-                        self.scroll_index = self.scroll_index.saturating_sub(amount);
+                        self.dynamic_scroll_index =
+                            self.dynamic_scroll_index.saturating_sub(amount);
                     } else {
                         self.list.previous(amount)
                     }
@@ -188,14 +199,14 @@ impl<'a> State<'a> {
             },
             Command::Top => {
                 if self.tab == Tab::DynamicAnalysis {
-                    self.scroll_index = 0;
+                    self.dynamic_scroll_index = 0;
                 } else {
                     self.list.first();
                 }
             }
             Command::Bottom => {
                 if self.tab == Tab::DynamicAnalysis {
-                    self.scroll_index = self
+                    self.dynamic_scroll_index = self
                         .analyzer
                         .tracer
                         .syscalls

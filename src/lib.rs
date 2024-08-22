@@ -109,7 +109,7 @@ pub fn start_tui(analyzer: Analyzer, args: Args) -> Result<()> {
                     },
                 };
                 state.system_calls_loaded = true;
-                state.scroll_index = 0;
+                state.dynamic_scroll_index = 0;
                 tui.toggle_pause()?;
                 state.handle_tab()?;
             }

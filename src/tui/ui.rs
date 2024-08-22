@@ -351,6 +351,11 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
     )
     .split(info_area)[0];
 
+    let max_height = lines.len().saturating_sub(info_area.height as usize) + 2;
+    if max_height < state.general_scroll_index {
+        state.general_scroll_index = max_height;
+    }
+
     frame.render_widget(
         Paragraph::new(lines)
             .block(
@@ -358,6 +363,7 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
                     .title_alignment(Alignment::Center)
                     .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
             )
+            .scroll((state.general_scroll_index as u16, 0))
             .wrap(Wrap { trim: true }),
         info_area,
     );
@@ -854,8 +860,8 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
             .len()
             .saturating_sub(rect.height as usize)
             + 2;
-        if max_height < state.scroll_index {
-            state.scroll_index = max_height;
+        if max_height < state.dynamic_scroll_index {
+            state.dynamic_scroll_index = max_height;
         }
 
         frame.render_widget(
@@ -886,7 +892,7 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
                     )
                     .title_bottom(get_input_line(state)),
             )
-            .scroll((state.scroll_index as u16, 0)),
+            .scroll((state.dynamic_scroll_index as u16, 0)),
             rect,
         );
 
@@ -899,7 +905,7 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
                 vertical: 1,
                 horizontal: 0,
             }),
-            &mut ScrollbarState::new(max_height).position(state.scroll_index),
+            &mut ScrollbarState::new(max_height).position(state.dynamic_scroll_index),
         );
 
         if state.show_details && !state.analyzer.tracer.summary.is_empty() {
