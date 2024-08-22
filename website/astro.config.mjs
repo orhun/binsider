@@ -32,21 +32,24 @@ export default defineConfig({
       ],
       sidebar: [
         {
-          label: "Guides",
-          items: [
-            // Each item here is one entry in the navigation menu.
-            {
-              label: "Example Guide",
-              slug: "guides/example",
-            },
-          ],
-        },
-        {
-          label: "Reference",
+          label: "Getting Started",
           autogenerate: {
-            directory: "reference",
+            directory: "getting-started",
           },
         },
+        {
+          label: "Installation",
+          autogenerate: {
+            directory: "installation",
+          },
+        },
+        {
+          label: "Usage",
+          autogenerate: {
+            directory: "usage",
+          },
+        },
+        "pricing",
       ],
       editLink: {
         baseUrl: "https://github.com/orhun/binsider/edit/main/website",
