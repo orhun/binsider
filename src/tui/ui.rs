@@ -555,12 +555,12 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                         if value.width() > max_row_width && i == items.len() - 1 {
                             let mut spans = highlight_search_result(
                                 value.chars().take(max_row_width).collect::<String>().into(),
-                                state,
+                                &state.input,
                             );
                             spans.push("…".fg(Color::Rgb(100, 100, 100)));
                             spans
                         } else {
-                            highlight_search_result(value.to_string().into(), state)
+                            highlight_search_result(value.to_string().into(), &state.input)
                         },
                     ))
                 }))
@@ -689,11 +689,11 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
                                 .take(max_row_width.saturating_sub(index.width()))
                                 .collect::<String>()
                                 .into(),
-                            state,
+                            &state.input,
                         ));
                         spans.push("…".fg(Color::Rgb(100, 100, 100)));
                     } else {
-                        spans.extend(highlight_search_result(value.into(), state))
+                        spans.extend(highlight_search_result(value.into(), &state.input))
                     }
                     Line::from(spans)
                 })])
@@ -865,7 +865,7 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
                     .system_calls
                     .clone()
                     .into_iter()
-                    .map(|line| highlight_search_result(line, state).into())
+                    .map(|line| highlight_search_result(line, &state.input).into())
                     .collect::<Vec<Line>>(),
             )
             .block(
@@ -938,17 +938,63 @@ fn get_input_line<'a>(state: &'a State) -> Line<'a> {
 }
 
 /// Returns the line with the search result highlighted.
-fn highlight_search_result<'a>(line: Line<'a>, state: &'a State) -> Vec<Span<'a>> {
+fn highlight_search_result<'a>(line: Line<'a>, input: &'a Input) -> Vec<Span<'a>> {
     let line_str = line.to_string();
-    if line_str.contains(state.input.value()) && !state.input.value().is_empty() {
-        let splits = line_str.split(state.input.value());
+    if line_str.contains(input.value()) && !input.value().is_empty() {
+        let splits = line_str.split(input.value());
         let chunks = splits.into_iter().map(|c| Span::from(c.to_owned()));
         let pattern = Span::styled(
-            state.input.value(),
+            input.value(),
             Style::new().bg(Color::Yellow).fg(Color::Black),
         );
         itertools::intersperse(chunks, pattern).collect::<Vec<Span>>()
     } else {
         line.spans.clone()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn test_highlight_search_string() {
+        let line: Line = "onetwothree".into();
+        let query = Input::new("two".into());
+        let highlighted = highlight_search_result(line, &query);
+        assert_eq!(
+            vec![
+                Span::raw("one"),
+                Span::styled("two", Style::new().bg(Color::Yellow).fg(Color::Black)),
+                Span::raw("three")
+            ],
+            highlighted
+        );
+    }
+
+    // This test is not passing.
+    //
+    // See this Discord message for more info:
+    // <https://discord.com/channels/1070692720437383208/1072907135664529508/1275922734291095734>
+    #[test]
+    #[ignore]
+    fn test_highlight_search_line() {
+        let line: Line = vec![
+            Span::raw("one"),
+            Span::styled("two", Style::new().bg(Color::Blue).fg(Color::Black)),
+            Span::raw("three"),
+        ]
+        .into();
+        let query = Input::new("one".into());
+        let highlighted = highlight_search_result(line, &query);
+        assert_eq!(
+            vec![
+                Span::styled("one", Style::new().bg(Color::Yellow).fg(Color::Black)),
+                Span::styled("two", Style::new().bg(Color::Blue).fg(Color::Black)),
+                Span::raw("three")
+            ],
+            highlighted
+        );
     }
 }

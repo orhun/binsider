@@ -103,7 +103,8 @@ mod tests {
     fn test_init() -> Result<()> {
         assert!(Analyzer::new(
             FileInfo::new("Cargo.toml", get_test_bytes()?.as_slice())?,
-            4
+            4,
+            vec![]
         )
         .is_ok());
         Ok(())
@@ -112,7 +113,11 @@ mod tests {
     #[test]
     fn test_extract_strings() -> Result<()> {
         let test_bytes = get_test_bytes()?;
-        let mut analyzer = Analyzer::new(FileInfo::new("Cargo.toml", test_bytes.as_slice())?, 4)?;
+        let mut analyzer = Analyzer::new(
+            FileInfo::new("Cargo.toml", test_bytes.as_slice())?,
+            4,
+            vec![],
+        )?;
         let (tx, rx) = mpsc::channel();
         analyzer.extract_strings(tx);
         if let Event::FileStrings(strings) = rx.recv()? {
