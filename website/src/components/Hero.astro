@@ -26,20 +26,22 @@ import Default from '@astrojs/starlight/components/Hero.astro';
 <script>
   import { index, images } from '../slider.js';
 
+  const leftButton = document.querySelector('.left');
+  const rightButton = document.querySelector('.right');
   const imageElement = document.querySelector('.demo-image');
   const mainTextElement = document.querySelector('.main-text');
   const descriptionElement = document.querySelector('.description');
 
   const updateImage = () => {
 
-    imageElement.classList.add('anim');
-    setTimeout(() => {
-      imageElement.classList.remove('anim');
-    }, 300);
-
     const image = images.get()[index.get()];
-
     if (imageElement) {
+
+      imageElement.addEventListener('click', goRight);
+      imageElement.classList.add('anim');
+      setTimeout(() => {
+        imageElement.classList.remove('anim');
+      }, 300);
       imageElement.src = image.src.src;
       imageElement.alt = image.alt;
     }
@@ -64,9 +66,14 @@ import Default from '@astrojs/starlight/components/Hero.astro';
   };
 
   updateImage();
-  document.querySelector('.left').addEventListener('click', goLeft);
-  document.querySelector('.right').addEventListener('click', goRight);
-  document.querySelector('.demo-image').addEventListener('click', goRight);
+
+  if (leftButton) {
+    leftButton.addEventListener('click', goLeft);
+  }
+
+  if (rightButton) {
+    rightButton.addEventListener('click', goRight);
+  }
 </script>
 
 <style>
