@@ -42,8 +42,8 @@ import Default from '@astrojs/starlight/components/Hero.astro';
       setTimeout(() => {
         imageElement.classList.remove('anim');
       }, 300);
-      imageElement.src = image.src.src;
-      imageElement.alt = image.alt;
+      imageElement.setAttribute('src', image.src.src);
+      imageElement.setAttribute('alt', image.alt);
     }
 
     if (mainTextElement) {
