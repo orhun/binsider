@@ -1,32 +1,144 @@
 ---
 import type { Props } from '@astrojs/starlight/props';
 import Default from '@astrojs/starlight/components/Hero.astro';
-
-import demoImage from '../../src/assets/binsider-general-tab.png';
 ---
 
-<div class="container">
-  <img
-    src={demoImage.src}
-    alt="demo"
-    class="demo-image"
-  />
+<div class="main">
+  <div class="slider-container">
+    <button class="slider-button left">&lt;</button>
+    <div class="image-container">
+      <img class="demo-image"/>
+    </div>
+    <button class="slider-button right">&gt;</button>
+  </div>
+
+  <p class="main-text">
+    binsider gets inside of the ELF binaries.
+  </p>
+  <p class="description">
+    It provides powerful tools for both static and dynamic analysis, offering features similar to readelf and strace.
+    It allows you to easily inspect strings, examine linked libraries, and perform a hexdump, all within a user-friendly terminal user interface.
+  </p>
 </div>
-
-<p>
-
-binsider gets inside of the ELF binaries.
-
-It provides powerful tools for both static and dynamic analysis, offering features similar to readelf and strace.
-
-It allows you to easily inspect strings, examine linked libraries, and perform a hexdump, all within a user-friendly terminal user interface.
-
-</p>
 
 <Default {...Astro.props}><slot /></Default>
 
+<script>
+  import { index, images } from '../slider.js';
+
+  const imageElement = document.querySelector('.demo-image');
+  const mainTextElement = document.querySelector('.main-text');
+  const descriptionElement = document.querySelector('.description');
+
+  const updateImage = () => {
+
+    imageElement.classList.add('anim');
+    setTimeout(() => {
+      imageElement.classList.remove('anim');
+    }, 300);
+
+    const image = images.get()[index.get()];
+
+    if (imageElement) {
+      imageElement.src = image.src.src;
+      imageElement.alt = image.alt;
+    }
+
+    if (mainTextElement) {
+      mainTextElement.textContent = image.text;
+    }
+
+    if (descriptionElement) {
+      descriptionElement.textContent = image.description;
+    }
+  };
+
+  const goLeft = () => {
+    index.set(index.get() === 0 ? images.get().length - 1 : index.get() - 1);
+    updateImage();
+  };
+
+  const goRight = () => {
+    index.set(index.get() === images.get().length - 1 ? 0 : index.get() + 1);
+    updateImage();
+  };
+
+  updateImage();
+  document.querySelector('.left').addEventListener('click', goLeft);
+  document.querySelector('.right').addEventListener('click', goRight);
+  document.querySelector('.demo-image').addEventListener('click', goRight);
+</script>
+
 <style>
-  .container {
+  @keyframes intro {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  div.main {
+    animation: intro 2s both;
+    animation-delay: 0.15s;
+  }
+
+  .main-text {
+    color: var(--sl-color-accent);
+    text-align: center;
+    width: 75%;
+    margin: 5px auto;
+    font-style: italic;
+  }
+
+  .description {
+    color: var(--sl-color-gray-2);
+    line-height: 1.6;
+    text-align: center;
+    width: 70%;
+    margin: 10px auto;
+  }
+
+  .demo-image {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .image-container {
     text-align: center;
   }
+
+  .image-container img {
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .anim {
+    transform: scale(1.01);
+  }
+
+  .slider-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slider-button {
+    color: var(--sl-color-accent);
+    background-color: var(--sl-color-black);
+    border: 2px solid var(--sl-color-gray-5);
+    padding: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    font-weight: bold;
+    margin: 5px;
+  }
+
+  .slider-button:hover {
+    color: var(--sl-color-black);
+    background-color: var(--sl-color-white);
+  }
+
 </style>
