@@ -179,7 +179,9 @@ pub fn render_key_bindings(state: &mut State, frame: &mut Frame, rect: Rect) {
             .collect::<Vec<Span>>(),
     );
     if line.width() as u16 > chunks[1].width.saturating_sub(25) {
-        if get_input_line(state).width() != 0 && state.tab != Tab::StaticAnalysis {
+        if get_input_line(state).width() != 0
+            && (state.tab != Tab::StaticAnalysis || state.tab != Tab::Hexdump)
+        {
             return;
         }
     }
