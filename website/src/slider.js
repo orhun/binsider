@@ -14,7 +14,7 @@ export const images = atom([
     alt: "General Analysis",
     text: '"Get inside of the ELF binaries."',
     description:
-      "Binsider provides powerful tools for both static and dynamic analysis, offering features similar to readelf and strace. It allows you to easily inspect strings, examine linked libraries, and perform a hexdump, all within a user-friendly terminal user interface.",
+      "Binsider offers powerful static and dynamic analysis tools, similar to readelf(1) and strace(1). It lets you inspect strings, examine linked libraries, and perform hexdumps, all within a user-friendly TUI.",
   },
   {
     src: staticAnalysis,
@@ -35,13 +35,13 @@ export const images = atom([
     alt: "Strings",
     text: '"Strings are always interesting."',
     description:
-      "It searches for printable character sequences in binaries for you and supports searching within them.",
+      "It searches for sequences of printable characters in binaries and supports searching within those sequences for discovering specific patterns or data.",
   },
   {
     src: hexdump,
     alt: "Hexdump",
     text: '"Good ol\' hexdump."',
     description:
-      "It provides detailed hexdump analysis, allowing you to view binary data in a readable hexadecimal format. You can also modify file data in hex or ASCII format.",
+      "It provides detailed hexdump analysis, allowing you to view and modify binary data in a readable hexadecimal or ASCII format.",
   },
 ]);
