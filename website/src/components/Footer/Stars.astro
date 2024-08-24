@@ -3,7 +3,7 @@ const { owner, repo } = Astro.props;
 ---
 
 <project-stars data-owner={owner} data-repo={repo}>
-  <span id="star-count">0+</span>
+  <p class="star-count">0+</p>
 </project-stars>
 
 <script>
@@ -18,8 +18,9 @@ const { owner, repo } = Astro.props;
           return `${mag}k+`;
         } else {
           // Show numbers below 1000 as xy0+. So 789 becomes 780.
-          const mag = Math.trunc(count / 10) * 10;
-          return `${mag}+`;
+          // const mag = Math.trunc(count / 10) * 10;
+          // return `${mag}+`;
+          return `${count}+`;
         }
       }
 
@@ -33,8 +34,8 @@ const { owner, repo } = Astro.props;
           }
         })
         .then(data => {
-          const starCountElement = this.querySelector('#star-count');
-          if (starCountElement !== null) {
+          const starCountElement = document.querySelector('.star-count');
+          if (starCountElement) {
             starCountElement.textContent = approximate(data.stargazers_count);
           }
         }).catch(() => {});
