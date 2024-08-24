@@ -1,0 +1,24 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import Default from '@astrojs/starlight/components/Head.astro';
+import config from '../../astro.config.mjs';
+import socialCard from "../assets/binsider-social-card.png";
+
+const title =
+  config.integrations.find((integration) => integration.title)?.title ||
+  "default";
+---
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content={Astro.site} />
+<meta property="og:title" content={`${title}`} />
+<meta property="og:description" content={`${config.description}`} />
+
+<meta property="og:image" content={`${socialCard.src}`} />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script defer src="https://umami.orhun.dev/script.js" data-website-id="8e36ad06-9958-4a03-865a-505b1440c1b9"></script>
+
+<Default {...Astro.props}><slot /></Default>

@@ -5,6 +5,7 @@ import tailwind from "@astrojs/tailwind";
 // https://astro.build/config
 export default defineConfig({
   site: "https://binsider.dev",
+  description: "Analyze ELF binaries like a boss.",
   integrations: [
     starlight({
       title: "Binsider",
@@ -20,6 +21,8 @@ export default defineConfig({
         replacesTitle: true,
       },
       components: {
+        Head: "./src/components/Head.astro",
+        Header: "./src/components/Header.astro",
         Header: "./src/components/Header.astro",
         Hero: "./src/components/Hero.astro",
         Footer: "./src/components/Footer.astro",
