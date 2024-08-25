@@ -194,7 +194,7 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
     let area = Layout::new(
         Direction::Vertical,
         [
-            Constraint::Percentage(10),
+            Constraint::Percentage(5),
             Constraint::Length(7),
             Constraint::Percentage(100),
         ],
@@ -246,11 +246,6 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
     );
 
     let lines = vec![
-        Line::from(vec![
-            "File".cyan(),
-            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.name.to_string().white(),
-        ]),
         Line::from(vec![
             "Size".cyan(),
             Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
@@ -321,18 +316,24 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
     ];
 
     let info_width = lines.iter().map(|v| v.width()).max().unwrap_or_default() as u16 + 2;
+    let rect = area[2].inner(Margin {
+        horizontal: 0,
+        vertical: 1,
+    });
     let area = Layout::new(
         Direction::Vertical,
         if state.list.items.is_empty() {
-            vec![Constraint::Percentage(100)]
+            vec![Constraint::Max(lines.len() as u16 + 2)]
+        } else if (lines.len() as u16).saturating_sub(2) < rect.height / 2 {
+            vec![
+                Constraint::Min(lines.len() as u16 + 2),
+                Constraint::Percentage(100),
+            ]
         } else {
             vec![Constraint::Percentage(50), Constraint::Percentage(50)]
         },
     )
-    .split(area[2].inner(Margin {
-        horizontal: 0,
-        vertical: 1,
-    }));
+    .split(rect);
 
     let info_area = Layout::new(
         Direction::Horizontal,
@@ -344,15 +345,6 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
     )
     .split(area[0])[1];
 
-    let info_area = Layout::new(
-        Direction::Vertical,
-        [
-            Constraint::Min(lines.len() as u16 + 2),
-            Constraint::Percentage(100),
-        ],
-    )
-    .split(info_area)[0];
-
     let max_height = lines.len().saturating_sub(info_area.height as usize) + 2;
     if max_height < state.general_scroll_index {
         state.general_scroll_index = max_height;
@@ -362,6 +354,13 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
         Paragraph::new(lines)
             .block(
                 Block::bordered()
+                    .title(Line::from(vec![
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                        "File".cyan(),
+                        Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+                        state.analyzer.file.name.to_string().white().bold(),
+                        "|".fg(Color::Rgb(100, 100, 100)),
+                    ]))
                     .title_alignment(Alignment::Center)
                     .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
             )
