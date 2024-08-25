@@ -12,6 +12,8 @@ pub enum ScrollType {
     Table,
     /// Main list.
     List,
+    /// Block.
+    Block,
 }
 
 /// Application command.
@@ -50,6 +52,8 @@ impl From<KeyEvent> for Command {
         match key_event.code {
             KeyCode::Right | KeyCode::Char('l') => Self::Next(ScrollType::Table, 1),
             KeyCode::Left | KeyCode::Char('h') => Self::Previous(ScrollType::Table, 1),
+            KeyCode::Char('n') => Self::Next(ScrollType::Block, 1),
+            KeyCode::Char('p') => Self::Previous(ScrollType::Block, 1),
             KeyCode::Down | KeyCode::Char('j') => Self::Next(ScrollType::List, 1),
             KeyCode::Up | KeyCode::Char('k') => Self::Previous(ScrollType::List, 1),
             KeyCode::PageDown => Self::Next(ScrollType::List, 5),

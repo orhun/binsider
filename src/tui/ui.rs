@@ -345,9 +345,9 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
     )
     .split(area[0])[1];
 
-    let max_height = lines.len().saturating_sub(info_area.height as usize) + 2;
-    if max_height < state.general_scroll_index {
-        state.general_scroll_index = max_height;
+    let max_height = lines.len().saturating_sub(info_area.height as usize);
+    if max_height + 2 < state.general_scroll_index {
+        state.general_scroll_index = max_height + 2;
     }
 
     frame.render_widget(
@@ -367,6 +367,16 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
             .scroll((state.general_scroll_index as u16, 0))
             .wrap(Wrap { trim: true }),
         info_area,
+    );
+    frame.render_stateful_widget(
+        Scrollbar::new(ScrollbarOrientation::VerticalRight)
+            .begin_symbol(Some("↑"))
+            .end_symbol(Some("↓")),
+        info_area.inner(Margin {
+            vertical: 1,
+            horizontal: 0,
+        }),
+        &mut ScrollbarState::new(max_height).position(state.general_scroll_index),
     );
 
     if state.list.items.is_empty() {
@@ -400,16 +410,17 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
         ],
     )
     .split(table_area[1])[0];
+    let items = state
+        .list
+        .items
+        .clone()
+        .into_iter()
+        .map(Row::new)
+        .collect::<Vec<Row>>();
 
     frame.render_stateful_widget(
         Table::new(
-            state
-                .list
-                .items
-                .clone()
-                .into_iter()
-                .map(Row::new)
-                .collect::<Vec<Row>>(),
+            items.clone(),
             &[
                 Constraint::Min(
                     state
@@ -438,6 +449,17 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
         .highlight_style(Style::default().fg(Color::Green)),
         table_area,
         &mut state.list.state,
+    );
+    frame.render_stateful_widget(
+        Scrollbar::new(ScrollbarOrientation::VerticalRight)
+            .begin_symbol(Some("↑"))
+            .end_symbol(Some("↓")),
+        table_area.inner(Margin {
+            vertical: 1,
+            horizontal: 0,
+        }),
+        &mut ScrollbarState::new(items.len())
+            .position(state.list.state.selected().unwrap_or_default()),
     );
 }
 
@@ -499,6 +521,10 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             [Constraint::Percentage(50), Constraint::Percentage(50)],
         )
         .split(chunks[0]);
+        let max_height = headers.len().saturating_sub(chunks[0].height as usize);
+        if max_height + 3 < state.headers_scroll_index {
+            state.headers_scroll_index = max_height + 3;
+        }
         frame.render_widget(
             Paragraph::new(headers)
                 .block(
@@ -508,11 +534,30 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                             "File Headers".white().bold(),
                             "|".fg(Color::Rgb(100, 100, 100)),
                         ])
-                        .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
+                        .border_style(Style::default().fg(if state.block_index == 0 {
+                            Color::Yellow
+                        } else {
+                            Color::Rgb(100, 100, 100)
+                        })),
                 )
+                .scroll((state.headers_scroll_index as u16, 0))
                 .wrap(Wrap { trim: true }),
             chunks[0],
         );
+        frame.render_stateful_widget(
+            Scrollbar::new(ScrollbarOrientation::VerticalRight)
+                .begin_symbol(Some("↑"))
+                .end_symbol(Some("↓")),
+            chunks[0].inner(Margin {
+                vertical: 1,
+                horizontal: 0,
+            }),
+            &mut ScrollbarState::new(max_height).position(state.headers_scroll_index),
+        );
+        let max_height = notes.len().saturating_sub(chunks[0].height as usize);
+        if max_height + 2 < state.notes_scroll_index {
+            state.notes_scroll_index = max_height + 2;
+        }
         frame.render_widget(
             Paragraph::new(notes)
                 .block(
@@ -522,10 +567,25 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                             "Notes".white().bold(),
                             "|".fg(Color::Rgb(100, 100, 100)),
                         ])
-                        .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
+                        .border_style(Style::default().fg(if state.block_index == 1 {
+                            Color::Yellow
+                        } else {
+                            Color::Rgb(100, 100, 100)
+                        })),
                 )
+                .scroll((state.notes_scroll_index as u16, 0))
                 .wrap(Wrap { trim: true }),
             chunks[1],
+        );
+        frame.render_stateful_widget(
+            Scrollbar::new(ScrollbarOrientation::VerticalRight)
+                .begin_symbol(Some("↑"))
+                .end_symbol(Some("↓")),
+            chunks[1].inner(Margin {
+                vertical: 1,
+                horizontal: 0,
+            }),
+            &mut ScrollbarState::new(max_height).position(state.notes_scroll_index),
         );
     }
     {
@@ -585,7 +645,11 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             ))
             .block(
                 Block::bordered()
-                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100)))
+                    .border_style(Style::default().fg(if state.block_index == 2 {
+                        Color::Yellow
+                    } else {
+                        Color::Rgb(100, 100, 100)
+                    }))
                     .title_bottom(
                         if items_len != 0 {
                             Line::from(vec![

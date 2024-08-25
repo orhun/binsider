@@ -22,6 +22,8 @@ pub struct State<'a> {
     pub tab: Tab,
     /// Elf info.
     pub info_index: usize,
+    /// Selected block in static analysis.
+    pub block_index: usize,
     /// List items.
     pub list: SelectableList<Vec<String>>,
     /// Show heh.
@@ -40,6 +42,10 @@ pub struct State<'a> {
     pub dynamic_scroll_index: usize,
     /// File info scroll index.
     pub general_scroll_index: usize,
+    /// Notes scroll index.
+    pub notes_scroll_index: usize,
+    /// File headers scroll index.
+    pub headers_scroll_index: usize,
 }
 
 impl<'a> State<'a> {
@@ -49,6 +55,7 @@ impl<'a> State<'a> {
             running: true,
             tab: Tab::default(),
             info_index: 0,
+            block_index: 2,
             list: SelectableList::default(),
             analyzer,
             show_heh: false,
@@ -59,6 +66,8 @@ impl<'a> State<'a> {
             system_calls_loaded: false,
             dynamic_scroll_index: 0,
             general_scroll_index: 0,
+            notes_scroll_index: 0,
+            headers_scroll_index: 0,
         };
         state.handle_tab()?;
         Ok(state)
@@ -167,8 +176,25 @@ impl<'a> State<'a> {
                     if self.tab == Tab::DynamicAnalysis {
                         self.dynamic_scroll_index =
                             self.dynamic_scroll_index.saturating_add(amount);
+                    } else if self.tab == Tab::StaticAnalysis {
+                        match self.block_index {
+                            0 => {
+                                self.headers_scroll_index =
+                                    self.headers_scroll_index.saturating_add(amount);
+                            }
+                            1 => {
+                                self.notes_scroll_index =
+                                    self.notes_scroll_index.saturating_add(amount);
+                            }
+                            _ => self.list.next(amount),
+                        }
                     } else {
                         self.list.next(amount)
+                    }
+                }
+                ScrollType::Block => {
+                    if self.tab == Tab::StaticAnalysis {
+                        self.block_index = (self.block_index.saturating_add(1)) % 3;
                     }
                 }
             },
@@ -192,8 +218,25 @@ impl<'a> State<'a> {
                     if self.tab == Tab::DynamicAnalysis {
                         self.dynamic_scroll_index =
                             self.dynamic_scroll_index.saturating_sub(amount);
+                    } else if self.tab == Tab::StaticAnalysis {
+                        match self.block_index {
+                            0 => {
+                                self.headers_scroll_index =
+                                    self.headers_scroll_index.saturating_sub(amount);
+                            }
+                            1 => {
+                                self.notes_scroll_index =
+                                    self.notes_scroll_index.saturating_sub(amount);
+                            }
+                            _ => self.list.previous(amount),
+                        }
                     } else {
                         self.list.previous(amount)
+                    }
+                }
+                ScrollType::Block => {
+                    if self.tab == Tab::StaticAnalysis {
+                        self.block_index = self.block_index.checked_sub(1).unwrap_or(2);
                     }
                 }
             },
@@ -339,8 +382,9 @@ impl<'a> State<'a> {
         match self.tab {
             Tab::General => {
                 vec![
-                    ("Enter", "Analyze library"),
-                    ("o", "Open Documentation"),
+                    ("o", "Open docs"),
+                    ("⏎ ", "Analyze lib"),
+                    ("h/j/k/l", "Scroll"),
                     ("Tab", "Next"),
                     ("Bksp", "Back"),
                     ("q", "Quit"),
@@ -350,6 +394,7 @@ impl<'a> State<'a> {
                 ("Enter", "Details"),
                 ("/", "Search"),
                 ("h/j/k/l", "Scroll"),
+                ("n/p", "Toggle"),
                 ("Tab", "Next"),
                 ("q", "Quit"),
             ],
