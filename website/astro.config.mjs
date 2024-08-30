@@ -40,6 +40,7 @@ export default defineConfig({
         },
         {
           label: "Installation",
+          collapsed: true,
           autogenerate: {
             directory: "installation",
           },

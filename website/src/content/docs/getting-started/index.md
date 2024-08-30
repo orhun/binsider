@@ -1,0 +1,45 @@
+---
+title: Quickstart
+---
+
+Start by [installing](/installation/crates-io) `binsider`:
+
+```bash
+cargo install binsider
+```
+
+Also, check the other installation methods on the left sidebar.
+
+Now you are ready to dive into the binaries! ✨ Simpy run:
+
+```bash
+binsider <binary>
+```
+
+You can also run `binsider` without any arguments to analyze the `binsider` binary itself!
+
+![demo](../../assets/quickstart.gif)
+
+<center>
+
+`binsider` helps you get inside of the ELF binaries.
+
+</center>
+
+:::note[ELF?]
+
+[ELF](https://en.wikipedia.org/wiki/Executable_and_Linkable_Format) (Executable and Linkable Format) is the standard executable format for Linux and other Unix-like operating systems. They are used for executables, shared libraries, and core dumps.
+
+:::
+
+It provides a Terminal User Interface ([TUI](https://en.wikipedia.org/wiki/Text-based_user_interface)) which is designed to perform:
+
+- [General analysis](/usage/general-analysis) about a file including listing the shared libraries.
+- [Static analysis](/usage/static-analysis) for exploring the ELF layout.
+- [Dynamic analysis](/usage/dynamic-analysis) for debugging and tracing.
+- [String extraction](/usage/strings) for finding interesting strings.
+- [Hexdump](/usage/hexdump) for viewing the binary content.
+
+For detailed documentation on these features, please refer to the links provided above.
+
+Happy hacking! 💣

@@ -2,11 +2,11 @@ import { atom } from "nanostores";
 
 export const index = atom(0);
 
-import generalAnalysis from "./assets/demo/general-analysis.gif";
-import staticAnalysis from "./assets/demo/static-analysis.gif";
-import dynamicAnalysis from "./assets/demo/dynamic-analysis.gif";
-import strings from "./assets/demo/strings.gif";
-import hexdump from "./assets/demo/hexdump.gif";
+import generalAnalysis from "./assets/demo/binsider-general-analysis.gif";
+import staticAnalysis from "./assets/demo/binsider-static-analysis.gif";
+import dynamicAnalysis from "./assets/demo/binsider-dynamic-analysis.gif";
+import strings from "./assets/demo/binsider-strings.gif";
+import hexdump from "./assets/demo/binsider-hexdump.gif";
 
 export const images = atom([
   {

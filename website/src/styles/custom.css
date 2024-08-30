@@ -71,10 +71,12 @@ a.site-title {
   filter: invert(1);
 }
 
+[data-theme="light"] img[loading="lazy"] {
+  filter: invert(1);
+}
+
 .action {
-  transition:
-    color 0.2s ease,
-    background-color 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease;
 }
 
 .action:hover {
@@ -84,4 +86,15 @@ a.site-title {
 .action.primary:hover {
   color: var(--sl-color-black);
   background-color: var(--sl-color-white);
+}
+
+kbd {
+  color: var(--sl-color-accent-high);
+  background-color: var(--sl-color-gray-6);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+}
+
+strong {
+  text-shadow: 0 0 5px var(--sl-color-gray-3);
 }
