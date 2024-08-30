@@ -178,12 +178,11 @@ pub fn render_key_bindings(state: &mut State, frame: &mut Frame, rect: Rect) {
             })
             .collect::<Vec<Span>>(),
     );
-    if line.width() as u16 > chunks[1].width.saturating_sub(25) {
-        if get_input_line(state).width() != 0
-            && (state.tab != Tab::StaticAnalysis || state.tab != Tab::Hexdump)
-        {
-            return;
-        }
+    if line.width() as u16 > chunks[1].width.saturating_sub(25)
+        && get_input_line(state).width() != 0
+        && (state.tab != Tab::StaticAnalysis || state.tab != Tab::Hexdump)
+    {
+        return;
     }
     frame.render_widget(Paragraph::new(line.alignment(Alignment::Center)), chunks[1]);
 }
@@ -534,11 +533,13 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                             "File Headers".white().bold(),
                             "|".fg(Color::Rgb(100, 100, 100)),
                         ])
-                        .border_style(Style::default().fg(if state.block_index == 0 {
-                            Color::Yellow
-                        } else {
-                            Color::Rgb(100, 100, 100)
-                        })),
+                        .border_style({
+                            if state.block_index == 0 {
+                                Style::default().fg(Color::White).bold()
+                            } else {
+                                Style::default().fg(Color::Rgb(100, 100, 100))
+                            }
+                        }),
                 )
                 .scroll((state.headers_scroll_index as u16, 0))
                 .wrap(Wrap { trim: true }),
