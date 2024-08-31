@@ -8,6 +8,7 @@ use crate::tui::event::Event;
 use crate::tui::ui::{Tab, ELF_INFO_TABS, MAIN_TABS};
 use crate::tui::widgets::SelectableList;
 use ansi_to_tui::IntoText;
+use heh::windows::Window;
 use tui_input::backend::crossterm::EventHandler;
 use tui_input::Input;
 
@@ -122,8 +123,39 @@ impl<'a> State<'a> {
                         .handle_input(&event)
                         .map_err(|e| Error::HexdumpError(e.to_string()))?;
                 }
-                HexdumpCommand::Warn(message) => {
-                    self.analyzer.heh.labels.notification = message;
+                HexdumpCommand::HandleCustom(event, original_event) => {
+                    self.analyzer
+                        .heh
+                        .handle_input(
+                            &if self.analyzer.heh.key_handler.is_focusing(Window::Search)
+                                || self
+                                    .analyzer
+                                    .heh
+                                    .key_handler
+                                    .is_focusing(Window::JumpToByte)
+                            {
+                                original_event
+                            } else {
+                                event
+                            },
+                        )
+                        .map_err(|e| Error::HexdumpError(e.to_string()))?;
+                }
+                HexdumpCommand::Warn(message, event) => {
+                    if self.analyzer.heh.key_handler.is_focusing(Window::Search)
+                        || self
+                            .analyzer
+                            .heh
+                            .key_handler
+                            .is_focusing(Window::JumpToByte)
+                    {
+                        self.analyzer
+                            .heh
+                            .handle_input(&event)
+                            .map_err(|e| Error::HexdumpError(e.to_string()))?;
+                    } else {
+                        self.analyzer.heh.labels.notification = message;
+                    }
                 }
                 HexdumpCommand::Cancel => {
                     self.tab = ((self.tab as usize + 1) % MAIN_TABS.len()).into();

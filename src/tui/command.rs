@@ -130,8 +130,7 @@ pub enum InputCommand {
 impl InputCommand {
     /// Parses the event.
     pub fn parse(key_event: KeyEvent, input: &Input) -> Self {
-        if key_event.code == KeyCode::Char('q')
-            || key_event.code == KeyCode::Esc
+        if key_event.code == KeyCode::Esc
             || (key_event.code == KeyCode::Backspace && input.value().is_empty())
         {
             Self::Exit
@@ -148,8 +147,10 @@ impl InputCommand {
 pub enum HexdumpCommand {
     /// Handle hexdump event.
     Handle(Event),
+    /// Handle hexdump event with a custom key.
+    HandleCustom(Event, Event),
     /// Warn.
-    Warn(String),
+    Warn(String, Event),
     /// Cancel hexdump.
     Cancel,
     /// Exit application.
@@ -165,23 +166,23 @@ impl HexdumpCommand {
             Self::Cancel
         } else if key_event.code == KeyCode::Char('s') {
             if is_read_only {
-                Self::Warn(String::from("file is read-only"))
+                Self::Warn(String::from("file is read-only"), Event::Key(key_event))
             } else {
-                Self::Handle(Event::Key(KeyEvent::new(
-                    KeyCode::Char('s'),
-                    KeyModifiers::CONTROL,
-                )))
+                Self::HandleCustom(
+                    Event::Key(KeyEvent::new(KeyCode::Char('s'), KeyModifiers::CONTROL)),
+                    Event::Key(key_event),
+                )
             }
         } else if key_event.code == KeyCode::Char('g') {
-            Self::Handle(Event::Key(KeyEvent::new(
-                KeyCode::Char('j'),
-                KeyModifiers::CONTROL,
-            )))
+            Self::HandleCustom(
+                Event::Key(KeyEvent::new(KeyCode::Char('j'), KeyModifiers::CONTROL)),
+                Event::Key(key_event),
+            )
         } else if key_event.code == KeyCode::Char('n') {
-            Self::Handle(Event::Key(KeyEvent::new(
-                KeyCode::Char('e'),
-                KeyModifiers::CONTROL,
-            )))
+            Self::HandleCustom(
+                Event::Key(KeyEvent::new(KeyCode::Char('e'), KeyModifiers::CONTROL)),
+                Event::Key(key_event),
+            )
         } else {
             Self::Handle(Event::Key(key_event))
         }
