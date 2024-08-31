@@ -26,7 +26,7 @@ You can also run `binsider` without any arguments to analyze the `binsider` bina
 
 </center>
 
-:::note[ELF?]
+:::note[What the heck is ELF?]
 
 [ELF](https://en.wikipedia.org/wiki/Executable_and_Linkable_Format) (Executable and Linkable Format) is the standard executable format for Linux and other Unix-like operating systems. They are used for executables, shared libraries, and core dumps.
 
