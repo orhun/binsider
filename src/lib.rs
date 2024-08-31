@@ -42,7 +42,11 @@ pub fn run(mut args: Args) -> Result<()> {
     }
     let mut path = args.files[args.files.len() - 1].clone();
     if !path.exists() {
-        path = which::which(path.to_string_lossy().to_string())?;
+        let resolved_path = which::which(path.to_string_lossy().to_string())?;
+        if let Some(file) = args.files.iter_mut().find(|f| **f == path) {
+            *file = resolved_path.clone();
+        }
+        path = resolved_path;
     }
     let file_data = fs::read(&path)?;
     let bytes = file_data.as_slice();
