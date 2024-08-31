@@ -13,26 +13,26 @@ edition = "2021"
 rust-version = "1.74.1"
 
 [dependencies]
-ratatui = "0.28.0"
+ratatui = "0.28.1"
 clap = { version = "4.4.2", features = ["derive", "env", "wrap_help", "cargo"] }
 thiserror = "1.0.63"
 elf = "0.7.1"
 rust-strings = "0.6.0"
 heh = "0.6.1"
-tui-input = "0.10.0"
+tui-input = "0.10.1"
 tui-popup = "0.5.0"
 unicode-width = "0.1.11"
 textwrap = "0.16.1"
 lurk-cli = "0.3.6"
 nix = { version = "0.29.0", features = ["ptrace", "signal"] }
-ansi-to-tui = "=4.0.1"
+ansi-to-tui = "=4.1.0"
 console = "0.15.8"
 which = "6.0.3"
 better-panic = "0.3.0"
 tui-big-text = "0.6.0"
 chrono = "0.4.38"
 bytesize = "1.3.0"
-sysinfo = { version = "0.31.2", default-features = false, features = ["user"] }
+sysinfo = { version = "0.31.4", default-features = false, features = ["user"] }
 webbrowser = "1.0.1"
 lddtree = "0.3.5"
 itertools = "0.13.0"
