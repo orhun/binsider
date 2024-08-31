@@ -84,9 +84,14 @@ impl<'a> State<'a> {
                 match command {
                     InputCommand::Handle(event) => {
                         self.input.handle_event(&event);
+                        if self.tab == Tab::DynamicAnalysis {
+                            self.dynamic_scroll_index = 0;
+                        }
                     }
                     InputCommand::Enter => {
-                        self.input_mode = true;
+                        if !(self.tab == Tab::DynamicAnalysis && !self.system_calls_loaded) {
+                            self.input_mode = true;
+                        }
                     }
                     InputCommand::Confirm => {
                         self.input_mode = false;
