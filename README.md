@@ -2,6 +2,9 @@
     <img src="https://raw.githubusercontent.com/orhun/binsider/main/website/src/assets/binsider-logo-dark.png#gh-dark-mode-only" width="300"></a>
     <img src="https://raw.githubusercontent.com/orhun/binsider/main/website/src/assets/binsider-logo-light.png#gh-light-mode-only" width="300"></a>
     <br>
+    <img src="https://raw.githubusercontent.com/orhun/binsider/main/website/src/assets/binsider-text-dark.png#gh-dark-mode-only" width="170"></a>
+    <img src="https://raw.githubusercontent.com/orhun/binsider/main/website/src/assets/binsider-text-light.png#gh-light-mode-only" width="170"></a>
+    <br>
     <br>
     <a href="https://github.com/orhun/git-cliff/releases">
         <img src="https://img.shields.io/github/v/release/orhun/git-cliff?style=flat&labelColor=1d1d1d&color=f8be75&logo=GitHub&logoColor=white"></a>
