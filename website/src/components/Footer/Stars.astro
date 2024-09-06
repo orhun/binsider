@@ -1,46 +1,27 @@
 ---
 const { owner, repo } = Astro.props;
+
+let starCount = 0;
+try {
+  const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
+  if (response.ok) {
+    const data = await response.json();
+    starCount = data.stargazers_count;
+  }
+} catch (error) {
+  console.error('Failed to fetch GitHub stars:', error);
+}
+
+const approximate = (count:number) => {
+  if (count >= 1000) {
+    const mag = Math.trunc(count / 100) / 10;
+    return `${mag}k+`;
+  } else {
+    return `${count}+`;
+  }
+};
 ---
 
 <project-stars data-owner={owner} data-repo={repo}>
-  <p class="star-count">0+</p>
+  <p class="star-count">{approximate(starCount)}</p>
 </project-stars>
-
-<script>
-  class ProjectStars extends HTMLElement {
-    constructor() {
-      super();
-
-      const approximate = (count: number): string => {
-        if (count >= 1000) {
-          // Show numbers over 1000 as x.yk. So 1234 becomes 1.2k.
-          const mag = Math.trunc(count / 100) / 10;
-          return `${mag}k+`;
-        } else {
-          // Show numbers below 1000 as xy0+. So 789 becomes 780.
-          // const mag = Math.trunc(count / 10) * 10;
-          // return `${mag}+`;
-          return `${count}+`;
-        }
-      }
-
-      const {owner, repo} = this.dataset;
-      fetch(`https://api.github.com/repos/${owner}/${repo}`)
-        .then(res => {
-          if (res.ok) {
-            return res.json();
-          } else {
-            throw new Error('Network response was not OK.');
-          }
-        })
-        .then(data => {
-          const starCountElement = document.querySelector('.star-count');
-          if (starCountElement) {
-            starCountElement.textContent = approximate(data.stargazers_count);
-          }
-        }).catch(() => {});
-    }
-  }
-
-  customElements.define('project-stars', ProjectStars)
-</script>
