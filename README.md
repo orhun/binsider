@@ -38,10 +38,40 @@
 
 You can learn how to use **binsider** at <https://binsider.dev>.
 
+### General Analysis
+
+[![General analysis](website/src/assets/demo/binsider-general-analysis.gif)](https://binsider.dev/usage/general-analysis)
+
+### Static Analysis
+
+[![Static analysis](website/src/assets/demo/binsider-static-analysis.gif)](https://binsider.dev/usage/static-analysis)
+
+### Dynamic Analysis
+
+[![Dynamic analysis](website/src/assets/demo/binsider-dynamic-analysis.gif)](https://binsider.dev/usage/dynamic-analysis)
+
+### String Extraction
+
+[![String extraction](website/src/assets/demo/binsider-strings.gif)](https://binsider.dev/usage/strings)
+
+### Hexdump
+
+[![Hexdump](website/src/assets/demo/binsider-hexdump.gif)](https://binsider.dev/usage/hexdump)
+
+## Acknowledgements
+
+Shoutout to [Harun Ocaksız](https://instagram.com/harunocaksiz) for sticking with me during our military service in the summer of 2024 and creating the awesome **binsider** logo! (o7)
+
+## Contributing
+
+See the [contribution guidelines](CONTRIBUTING.md).
+
 ## License
 
 Licensed under either of [Apache License Version 2.0](./LICENSE-APACHE) or [The MIT License](./LICENSE-MIT) at your option.
 
+🦀 ノ( º \_ º ノ) - respect crables!
+
 ## Copyright
 
-Copyright © 2024, [git-cliff contributors](mailto:git-cliff@protonmail.com)
+Copyright © 2024, [Orhun Parmaksız](mailto:orhunparmaksiz@gmail.com)
