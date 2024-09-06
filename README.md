@@ -6,6 +6,9 @@
     <img src="https://raw.githubusercontent.com/orhun/binsider/main/website/src/assets/binsider-text-light.png#gh-light-mode-only" width="170"></a>
     <br>
     <br>
+    <em>"Swiss army knife for reverse engineers."</em>
+    <br>
+    <br>
     <a href="https://github.com/orhun/git-cliff/releases">
         <img src="https://img.shields.io/github/v/release/orhun/git-cliff?style=flat&labelColor=1d1d1d&color=f8be75&logo=GitHub&logoColor=white"></a>
     <a href="https://crates.io/crates/git-cliff/">
@@ -28,8 +31,6 @@
   <a href="https://binsider.dev/getting-started/">Documentation</a> |
   <a href="https://binsider.dev/">Website</a>
 </h4>
-
-<p align="center"><em>"Swiss army knife for reverse engineers."</em></p>
 
 😼🕵️‍♂️ **Binsider** can perform static and dynamic analysis, inspect strings, examine linked libraries, and perform hexdumps, all within a user-friendly terminal user interface!
 
