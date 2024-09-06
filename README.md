@@ -1,7 +1,7 @@
 <p align="center">
-    <a href="https://binsider.dev">
-        <img src="https://raw.githubusercontent.com/orhun/binsider/main/website/src/assets/binsider-logo-dark.png#gh-dark-mode-only" width="300"></a>
-        <img src="https://raw.githubusercontent.com/orhun/binsider/main/website/src/assets/binsider-logo-light.png#gh-light-mode-only" width="300"></a>
+    <img src="https://raw.githubusercontent.com/orhun/binsider/main/website/src/assets/binsider-logo-dark.png#gh-dark-mode-only" width="300"></a>
+    <img src="https://raw.githubusercontent.com/orhun/binsider/main/website/src/assets/binsider-logo-light.png#gh-light-mode-only" width="300"></a>
+    <br>
     <br>
     <a href="https://github.com/orhun/git-cliff/releases">
         <img src="https://img.shields.io/github/v/release/orhun/git-cliff?style=flat&labelColor=1d1d1d&color=f8be75&logo=GitHub&logoColor=white"></a>
@@ -26,22 +26,13 @@
   <a href="https://binsider.dev/">Website</a>
 </h4>
 
-<center>
-
-_"Swiss army knife for reverse engineers."_
+<p align="center"><em>"Swiss army knife for reverse engineers."</em></p>
 
 😼🕵️‍♂️ **Binsider** can perform static and dynamic analysis, inspect strings, examine linked libraries, and perform hexdumps, all within a user-friendly terminal user interface!
 
-</center>
+## Features
 
-## Documentation
-
-Learn how to use **git-cliff** from the [documentation](https://git-cliff.org/docs).
-
-- [Installation](https://git-cliff.org/docs/installation/)
-- [Usage](https://git-cliff.org/docs/usage/examples)
-- [Configuration](https://git-cliff.org/docs/configuration)
-- [Templating](https://git-cliff.org/docs/category/templating)
+You can learn how to use **binsider** at <https://binsider.dev>.
 
 ## License
 
