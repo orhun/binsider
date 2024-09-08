@@ -66,11 +66,7 @@ You can retrieve general binary file information, including file size, ownership
 
 [![General analysis](website/src/assets/demo/binsider-general-analysis.gif)](https://binsider.dev/usage/general-analysis)
 
-<p align="center">
-
-<https://binsider.dev/usage/general-analysis>
-
-</p>
+➡️ <https://binsider.dev/usage/general-analysis>
 
 ### Static Analysis
 
@@ -78,11 +74,7 @@ You can analyze the ELF layout (such as sections, segments, symbols, and relocat
 
 [![Static analysis](website/src/assets/demo/binsider-static-analysis.gif)](https://binsider.dev/usage/static-analysis)
 
-<p align="center">
-
-<https://binsider.dev/usage/static-analysis>
-
-</p>
+➡️ <https://binsider.dev/usage/static-analysis>
 
 ### Dynamic Analysis
 
@@ -90,11 +82,7 @@ It is possible to execute the binary and trace the system calls, signals, and th
 
 [![Dynamic analysis](website/src/assets/demo/binsider-dynamic-analysis.gif)](https://binsider.dev/usage/dynamic-analysis)
 
-<p align="center">
-
-<https://binsider.dev/usage/dynamic-analysis>
-
-</p>
+➡️ <https://binsider.dev/usage/dynamic-analysis>
 
 ### String Extraction
 
@@ -102,11 +90,7 @@ Similar to the [`strings(1)`](https://linux.die.net/man/1/strings) command, `bin
 
 [![String extraction](website/src/assets/demo/binsider-strings.gif)](https://binsider.dev/usage/strings)
 
-<p align="center">
-
-<https://binsider.dev/usage/strings>
-
-</p>
+➡️ <https://binsider.dev/usage/strings>
 
 ### Hexdump
 
@@ -114,11 +98,7 @@ Similar to the [`strings(1)`](https://linux.die.net/man/1/strings) command, `bin
 
 [![Hexdump](website/src/assets/demo/binsider-hexdump.gif)](https://binsider.dev/usage/hexdump)
 
-<p align="center">
-
-<https://binsider.dev/usage/hexdump>
-
-</p>
+➡️ <https://binsider.dev/usage/hexdump>
 
 ## Acknowledgements
 
