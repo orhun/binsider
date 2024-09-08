@@ -34,29 +34,90 @@
 
 😼🕵️‍♂️ **Binsider** can perform static and dynamic analysis, inspect strings, examine linked libraries, and perform hexdumps, all within a user-friendly terminal user interface!
 
+## Quickstart
+
+Install `binsider` with `cargo`:
+
+```bash
+cargo install binsider
+```
+
+> [!NOTE]  
+> See the other [installation methods](https://binsider.dev/installation/crates-io/) 📦
+
+After the installation, you are pretty much set! 💯
+
+Just dive into the binaries by running `binsider`:
+
+```bash
+binsider <binary>
+```
+
+![Demo](website/src/content/assets/quickstart.gif)
+
 ## Features
 
-You can learn how to use **binsider** at <https://binsider.dev>.
+The detailed documentation is available at <https://binsider.dev>.
 
 ### General Analysis
 
+You can retrieve general binary file information, including file size, ownership, permissions, date, and linked shared libraries (similar to [`stat(1)`](https://www.man7.org/linux/man-pages/man1/stat.1.html) and [`ldd(1)`](https://www.man7.org/linux/man-pages/man1/ldd.1.html)).
+
 [![General analysis](website/src/assets/demo/binsider-general-analysis.gif)](https://binsider.dev/usage/general-analysis)
+
+<p align="center">
+
+<https://binsider.dev/usage/general-analysis>
+
+</p>
 
 ### Static Analysis
 
+You can analyze the ELF layout (such as sections, segments, symbols, and relocations) and navigate through them to get an in-depth understanding of the binary.
+
 [![Static analysis](website/src/assets/demo/binsider-static-analysis.gif)](https://binsider.dev/usage/static-analysis)
+
+<p align="center">
+
+<https://binsider.dev/usage/static-analysis>
+
+</p>
 
 ### Dynamic Analysis
 
+It is possible to execute the binary and trace the system calls, signals, and the program's execution flow similar to [`strace(1)`](https://man7.org/linux/man-pages/man1/strace.1.html) and [`ltrace(1)`](https://man7.org/linux/man-pages/man1/ltrace.1.html).
+
 [![Dynamic analysis](website/src/assets/demo/binsider-dynamic-analysis.gif)](https://binsider.dev/usage/dynamic-analysis)
+
+<p align="center">
+
+<https://binsider.dev/usage/dynamic-analysis>
+
+</p>
 
 ### String Extraction
 
+Similar to the [`strings(1)`](https://linux.die.net/man/1/strings) command, `binsider` is able to extract strings from the binary file with the purpose of discovering interesting strings such as URLs, passwords, and other sensitive information.
+
 [![String extraction](website/src/assets/demo/binsider-strings.gif)](https://binsider.dev/usage/strings)
+
+<p align="center">
+
+<https://binsider.dev/usage/strings>
+
+</p>
 
 ### Hexdump
 
+`binsider` provides a rich dashboard along with a hexdump view to analyze the binary content in a structured manner.
+
 [![Hexdump](website/src/assets/demo/binsider-hexdump.gif)](https://binsider.dev/usage/hexdump)
+
+<p align="center">
+
+<https://binsider.dev/usage/hexdump>
+
+</p>
 
 ## Acknowledgements
 
