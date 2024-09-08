@@ -57,7 +57,8 @@ binsider <binary>
 
 ## Features
 
-The detailed documentation is available at <https://binsider.dev>.
+> [!NOTE]  
+> The detailed documentation is available at <https://binsider.dev> 📚
 
 ### General Analysis
 
