@@ -90,7 +90,7 @@ impl<'a> State<'a> {
                         }
                     }
                     InputCommand::Enter => {
-                        if !(self.tab == Tab::DynamicAnalysis && !self.system_calls_loaded) {
+                        if self.tab != Tab::DynamicAnalysis || self.system_calls_loaded {
                             self.input_mode = true;
                         }
                     }
