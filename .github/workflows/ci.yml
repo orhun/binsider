@@ -76,7 +76,9 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Generate code coverage
-        run: cargo llvm-cov --lcov --output-path lcov.info
+        run: |
+          cargo build
+          cargo llvm-cov --lcov --output-path lcov.info
         env:
           OUT_DIR: target
 
