@@ -1,4 +1,4 @@
-name: Deploy website
+name: Website
 
 on:
   push:
@@ -35,7 +35,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build:
-    name: Build website
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -46,7 +46,7 @@ jobs:
           path: ./website
 
   deploy:
-    name: Deploy website
+    name: Deploy
     needs: build
     runs-on: ubuntu-latest
     environment:
