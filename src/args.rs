@@ -7,8 +7,8 @@ use std::path::PathBuf;
     version,
     author = clap::crate_authors!("\n"),
     about,
-	rename_all_env = "screaming-snake",
-	help_template = "\
+    rename_all_env = "screaming-snake",
+    help_template = "\
 {before-help}{name} {version}
 {author-with-newline}{about-with-newline}
 {usage-heading}

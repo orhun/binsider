@@ -1,0 +1,197 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: "0 0 * * 0"
+
+jobs:
+  build:
+    name: Build on ${{ matrix.build.OS }} (${{ matrix.build.TARGET }})
+    runs-on: ${{ matrix.build.OS }}
+    strategy:
+      fail-fast: false
+      matrix:
+        build:
+          - {
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: x86_64-unknown-linux-gnu,
+            }
+          - {
+              OS: windows-2022,
+              TOOLCHAIN: stable,
+              TARGET: x86_64-pc-windows-msvc,
+            }
+          - { OS: macos-14, TOOLCHAIN: stable, TARGET: x86_64-apple-darwin }
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.build.TOOLCHAIN }}
+          targets: ${{ matrix.build.TARGET }}
+
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build the project
+        run: cargo build --locked --verbose
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binsider-${{ matrix.build.TARGET }}-assets
+          path: target/debug/binsider*
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Generate code coverage
+        run: cargo llvm-cov --lcov --output-path lcov.info
+        env:
+          OUT_DIR: target
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          name: code-coverage-report
+          files: lcov.info
+          fail_ci_if_error: true
+          verbose: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  commit-format:
+    name: Commit format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        if: github.event_name != 'pull_request'
+        uses: actions/checkout@v4
+
+      - name: Checkout the repository
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Run committed
+        uses: crate-ci/committed@master
+        with:
+          args: "-vv"
+          commits: "HEAD"
+
+  code-format:
+    name: Code format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+
+      - name: Check code formatting
+        run: cargo fmt --all -- --check
+
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install editorconfig-checker
+        uses: editorconfig-checker/action-editorconfig-checker@main
+
+      - name: Check file formatting
+        run: editorconfig-checker
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check lints
+        run: cargo clippy -- -D warnings
+
+  deny:
+    name: Deny
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Run cargo-deny
+        uses: EmbarkStudios/cargo-deny-action@v1
+        with:
+          command: check all
+
+  links:
+    name: Links
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@v1
+        with:
+          args: -v *.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  typos:
+    name: Typos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Check typos
+        uses: crate-ci/typos@master
+
+  msrv:
+    name: MSRV
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Install cargo-binstall
+        uses: taiki-e/install-action@cargo-binstall
+
+      - name: Install cargo-msrv
+        run: cargo binstall -y --force cargo-msrv
+
+      - name: Run cargo-msrv
+        run: cargo msrv --output-format json verify | tail -n 1 | jq --exit-status '.success'

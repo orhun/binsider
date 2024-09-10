@@ -10,7 +10,7 @@ cargo install binsider
 
 Also, check the other installation methods on the left sidebar.
 
-Now you are ready to dive into the binaries! ✨ Simpy run:
+Now you are ready to dive into the binaries! ✨ Simply run:
 
 ```bash
 binsider <binary>

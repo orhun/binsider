@@ -21,6 +21,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  links:
+    name: Links
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@v1
+        with:
+          args: -v website/src/content/docs/
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build:
     name: Build website
     runs-on: ubuntu-latest

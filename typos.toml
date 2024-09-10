@@ -1,0 +1,6 @@
+# configuration for https://github.com/crate-ci/typos
+
+[default.extend-words]
+ratatui = "ratatui"
+rela = "rela"
+siz = "siz"
