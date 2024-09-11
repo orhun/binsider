@@ -30,7 +30,7 @@ jobs:
       - name: Prepare release assets
         run: |
           mkdir -p release
-          cp {LICENSE,README.md,CHANGELOG.md} release/
+          cp {LICENSE-MIT,LICENSE-APACHE,README.md,CHANGELOG.md} release/
           cp target/${{ matrix.TARGET }}/release/binsider release/ && strip -s release/binsider
           mv release/ binsider-${{env.RELEASE_VERSION}}/
 
