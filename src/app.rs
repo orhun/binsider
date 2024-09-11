@@ -94,6 +94,7 @@ mod tests {
     fn get_test_path() -> PathBuf {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("target")
+            .join("debug")
             .join(format!("{}-coverage", env!("CARGO_PKG_NAME")))
     }
 
