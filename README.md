@@ -36,6 +36,9 @@
 
 ## Quickstart
 
+> [!TIP]
+> Watch the quickstart video to get a glimpse of what `binsider` can do: [https://youtu.be/InhVCQoc5ZE](https://youtu.be/InhVCQoc5ZE)
+
 Install `binsider` with `cargo`:
 
 ```bash

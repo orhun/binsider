@@ -1,0 +1,29 @@
+---
+const videoId = "InhVCQoc5ZE";
+---
+
+<div class="yt-video">
+  <iframe
+    class="video-iframe"
+    src={`https://www.youtube.com/embed/${videoId}?si=9DGG4-lZZ9v9RfTd`}
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen>
+  </iframe>
+</div>
+
+<style>
+  .yt-video {
+    display: flex;
+    justify-content: center;
+  }
+
+  .video-iframe {
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--sl-color-gray-5);
+  }
+</style>

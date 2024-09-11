@@ -3,7 +3,10 @@ import type { Props } from '@astrojs/starlight/props';
 import Default from '@astrojs/starlight/components/Hero.astro';
 
 const isHomepage = Astro.props.slug === '';
+
+import VideoEmbed from './Video.astro';
 ---
+
 
 {
   isHomepage ? (
@@ -24,7 +27,11 @@ const isHomepage = Astro.props.slug === '';
         It allows you to easily inspect strings, examine linked libraries, and perform a hexdump, all within a user-friendly terminal user interface.
       </p>
     </div>
+
     <Default {...Astro.props}><slot /></Default>
+
+    <VideoEmbed/>
+
   ) : (
     <Default {...Astro.props}>
       <slot />
