@@ -95,7 +95,7 @@ mod tests {
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("target")
             .join("debug")
-            .join(format!("{}-coverage", env!("CARGO_PKG_NAME")))
+            .join(env!("CARGO_PKG_NAME"))
     }
 
     fn get_test_bytes() -> Result<Vec<u8>> {

@@ -78,8 +78,7 @@ jobs:
       - name: Generate code coverage
         run: |
           cargo build
-          mv target/debug/binsider target/debug/binsider-coverage
-          cargo llvm-cov --lcov --output-path lcov.info
+          cargo llvm-cov --lcov --output-path lcov.info -- --skip "app::tests"
         env:
           OUT_DIR: target
 
