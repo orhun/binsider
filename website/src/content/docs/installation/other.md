@@ -1,7 +1,7 @@
 ---
 title: Other methods
 sidebar:
-  order: 6
+  order: 7
 ---
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/binsider.svg)](https://repology.org/project/binsider/versions)

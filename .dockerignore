@@ -1,0 +1,14 @@
+# Directories
+/.git/
+/.github/
+/target/
+/website/
+
+# Files
+.editorconfig
+.gitignore
+*.md
+codecov.yml
+Dockerfile
+LICENSE*
+rustfmt.toml

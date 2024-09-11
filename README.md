@@ -46,7 +46,7 @@ cargo install binsider
 ```
 
 > [!NOTE]  
-> See the other [installation methods](https://binsider.dev/installation/crates-io/) 📦
+> See the other [installation methods](https://binsider.dev/installation/other/) 📦
 
 After the installation, you are pretty much set! 💯
 
