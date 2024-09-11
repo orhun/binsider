@@ -91,30 +91,40 @@ mod tests {
     use super::*;
     use std::{fs, path::PathBuf};
 
-    fn get_test_bytes() -> Result<Vec<u8>> {
-        let debug_binary = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+    fn get_test_path() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .join("target")
             .join("debug")
-            .join(env!("CARGO_PKG_NAME"));
+            .join(env!("CARGO_PKG_NAME"))
+    }
+
+    fn get_test_bytes() -> Result<Vec<u8>> {
+        let debug_binary = get_test_path();
         Ok(fs::read(debug_binary)?)
     }
 
     #[test]
     fn test_init() -> Result<()> {
-        assert!(Analyzer::new(
-            FileInfo::new("Cargo.toml", get_test_bytes()?.as_slice())?,
+        Analyzer::new(
+            FileInfo::new(
+                get_test_path().to_str().expect("failed to get test path"),
+                get_test_bytes()?.as_slice(),
+            )?,
             4,
-            vec![]
+            vec![],
         )
-        .is_ok());
-        Ok(())
+        .map(|_| ())
     }
 
     #[test]
     fn test_extract_strings() -> Result<()> {
         let test_bytes = get_test_bytes()?;
+        let test_path = get_test_path();
         let mut analyzer = Analyzer::new(
-            FileInfo::new("Cargo.toml", test_bytes.as_slice())?,
+            FileInfo::new(
+                test_path.to_str().expect("failed to get test path"),
+                test_bytes.as_slice(),
+            )?,
             4,
             vec![],
         )?;
