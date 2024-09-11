@@ -14,9 +14,9 @@
     <a href="https://crates.io/crates/binsider/">
         <img src="https://img.shields.io/crates/v/binsider?style=flat&labelColor=1d1d1d&color=f8be75&logo=Rust&logoColor=white"></a>
     <br>
-    <a href="https://github.com/orhun/binsider/actions?query=workflow%3A%22Continuous+Integration%22">
+    <a href="https://github.com/orhun/binsider/actions?query=workflow%3A%22CI%22">
         <img src="https://img.shields.io/github/actions/workflow/status/orhun/binsider/ci.yml?style=flat&labelColor=1d1d1d&color=white&logo=GitHub%20Actions&logoColor=white"></a>
-    <a href="https://github.com/orhun/binsider/actions?query=workflow%3A%22Continuous+Deployment%22">
+    <a href="https://github.com/orhun/binsider/actions?query=workflow%3A%22CD%22">
         <img src="https://img.shields.io/github/actions/workflow/status/orhun/binsider/cd.yml?style=flat&labelColor=1d1d1d&color=white&logo=GitHub%20Actions&logoColor=white&label=deploy"></a>
     <a href="https://hub.docker.com/r/orhunp/binsider">
         <img src="https://img.shields.io/github/actions/workflow/status/orhun/binsider/docker.yml?style=flat&labelColor=1d1d1d&color=white&label=docker&logo=Docker&logoColor=white"></a>
