@@ -25,15 +25,3 @@ CARGO_TARGET_DIR=target cargo build --release
 ```
 
 Binary will be located at `target/release/binsider`.
-
-### Shell completions
-
-```bash
-OUT_DIR=target target/release/binsider-completions
-```
-
-### Manpage
-
-```bash
-OUT_DIR=target target/release/binsider-mangen
-```

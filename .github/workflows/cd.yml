@@ -1,0 +1,82 @@
+name: CD
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  publish-github:
+    name: Publish on GitHub
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        TARGET: [x86_64-unknown-linux-gnu]
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Set the release version
+        run: echo "RELEASE_VERSION=${GITHUB_REF:11}" >> $GITHUB_ENV
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.TARGET }}
+
+      - name: Build
+        run: cargo build --release --locked --target ${{ matrix.TARGET }}
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release
+          cp {LICENSE,README.md,CHANGELOG.md} release/
+          cp target/${{ matrix.TARGET }}/release/binsider release/ && strip -s release/binsider
+          mv release/ binsider-${{env.RELEASE_VERSION}}/
+
+      - name: Create release artifacts
+        run: |
+          tar -czvf binsider-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz \
+            binsider-${{ env.RELEASE_VERSION }}/
+          sha512sum binsider-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz \
+            > binsider-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz.sha512
+
+      - name: Sign the release
+        run: |
+          echo "${{ secrets.GPG_RELEASE_KEY }}" | base64 --decode > private.key
+          echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --pinentry-mode=loopback \
+            --passphrase-fd 0 --import private.key
+          echo "${{secrets.GPG_PASSPHRASE}}" | gpg --pinentry-mode=loopback \
+            --passphrase-fd 0 --detach-sign \
+            binsider-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz
+
+      - name: Generate a changelog
+        uses: orhun/git-cliff-action@v4
+        with:
+          args: --latest --github-repo ${{ github.repository }}
+        env:
+          OUTPUT: CHANGES.md
+
+      - name: Create release
+        run: |
+          gh release create "${{ github.ref_name }}" -F CHANGES.md
+          gh release upload "${{ github.ref_name }}" \
+            binsider-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz \
+            binsider-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz.sig \
+            binsider-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz.sha512
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+
+  publish-crates-io:
+    name: Publish on crates.io
+    needs: publish-github
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Publish
+        run: cargo publish --locked --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
