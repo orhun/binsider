@@ -1,4 +1,6 @@
-//! binsider
+//! **binsider** - Analyze ELF binaries like a boss 😼🕵️‍♂️
+//!
+//! See the [documentation](https://binsider.dev) for more information.
 
 #![warn(missing_docs, clippy::unwrap_used)]
 
