@@ -3,11 +3,11 @@ const { owner, repo } = Astro.props;
 
 let latestVersion = "0.0.0";
 try {
-  const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/releases`);
+  const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/releases/latest`);
   if (response.ok) {
     const data = await response.json();
-    if (data.length > 0) {
-      latestVersion = data[0].name.replace(/^v/, "");
+    if (data.tag_name) {
+      latestVersion = data.tag_name;
     }
   }
 } catch (error) {
