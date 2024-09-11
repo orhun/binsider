@@ -101,8 +101,8 @@ commit_parsers = [
 # regex for matching git tags
 tag_pattern = "v[0-9].*"
 # regex for skipping tags
-skip_tags = "beta|alpha|rc"
+skip_tags = "beta|alpha"
 # regex for ignoring tags
-ignore_tags = ""
+ignore_tags = "rc"
 # sort the commits inside sections by oldest/newest order
 sort_commits = "newest"
