@@ -73,6 +73,7 @@ impl<'a> State<'a> {
             general_scroll_index: 0,
             notes_scroll_index: 0,
             headers_scroll_index: 0,
+            // Can be simplified after <https://github.com/dalance/termbg/pull/26>
             accent_color: termbg::rgb(Duration::from_millis(100))
                 .map(|rgb| {
                     let y = rgb.r as f64 * 0.299 + rgb.g as f64 * 0.587 + rgb.b as f64 * 0.114;
