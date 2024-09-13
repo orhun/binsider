@@ -78,7 +78,7 @@ jobs:
       - name: Generate code coverage
         run: |
           cargo build
-          cargo llvm-cov --lcov --output-path lcov.info -- --skip "app::tests"
+          cargo llvm-cov --lcov --output-path lcov.info --lib
         env:
           OUT_DIR: target
 
