@@ -758,6 +758,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
                         spans.extend(highlight_search_result(
                             value
                                 .chars()
+                                .map(|c| if c.is_whitespace() { ' ' } else { c })
                                 .take(max_row_width.saturating_sub(index.width()))
                                 .collect::<String>()
                                 .into(),
@@ -765,7 +766,14 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
                         ));
                         spans.push("…".fg(Color::Rgb(100, 100, 100)));
                     } else {
-                        spans.extend(highlight_search_result(value.into(), &state.input))
+                        spans.extend(highlight_search_result(
+                            value
+                                .chars()
+                                .map(|c| if c.is_whitespace() { ' ' } else { c })
+                                .collect::<String>()
+                                .into(),
+                            &state.input,
+                        ))
                     }
                     Line::from(spans)
                 })])
