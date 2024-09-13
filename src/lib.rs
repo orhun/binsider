@@ -131,6 +131,7 @@ pub fn start_tui(analyzer: Analyzer, args: Args) -> Result<()> {
                 }
                 if !args.files.is_empty() {
                     tui.exit()?;
+                    state.running = false;
                     run(args)?;
                 }
             }
