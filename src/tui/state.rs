@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 use std::sync::mpsc;
+use std::time::Duration;
 
 use crate::error::{Error, Result};
 use crate::prelude::Analyzer;
@@ -9,6 +10,7 @@ use crate::tui::ui::{Tab, ELF_INFO_TABS, MAIN_TABS};
 use crate::tui::widgets::SelectableList;
 use ansi_to_tui::IntoText;
 use heh::windows::Window;
+use ratatui::style::Color;
 use tui_input::backend::crossterm::EventHandler;
 use tui_input::Input;
 
@@ -47,6 +49,8 @@ pub struct State<'a> {
     pub notes_scroll_index: usize,
     /// File headers scroll index.
     pub headers_scroll_index: usize,
+    /// Terminal accent color.
+    pub accent_color: Color,
 }
 
 impl<'a> State<'a> {
@@ -69,6 +73,16 @@ impl<'a> State<'a> {
             general_scroll_index: 0,
             notes_scroll_index: 0,
             headers_scroll_index: 0,
+            accent_color: termbg::rgb(Duration::from_millis(100))
+                .map(|rgb| {
+                    let y = rgb.r as f64 * 0.299 + rgb.g as f64 * 0.587 + rgb.b as f64 * 0.114;
+                    if y < 32768.0 {
+                        Color::White
+                    } else {
+                        Color::Black
+                    }
+                })
+                .unwrap_or(Color::White),
         };
         state.handle_tab()?;
         Ok(state)

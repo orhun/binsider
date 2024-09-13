@@ -110,7 +110,7 @@ pub fn render(state: &mut State, frame: &mut Frame) {
             .highlight_style(
                 Style::default()
                     .add_modifier(Modifier::BOLD)
-                    .fg(Color::White),
+                    .fg(state.accent_color),
             );
         frame.render_widget(tabs, chunks[0]);
         let mut files = Vec::new();
@@ -222,7 +222,7 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
             Line::default(),
             Line::default(),
             Line::from(vec![
-                "Analyze ELF binaries ".white(),
+                "Analyze ELF binaries ".fg(state.accent_color),
                 "like a boss.".yellow().italic(),
             ]),
             Line::from(
@@ -248,69 +248,121 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
         Line::from(vec![
             "Size".cyan(),
             Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.size.to_string().white(),
+            state.analyzer.file.size.to_string().fg(state.accent_color),
         ]),
         Line::from(vec![
             " ".into(),
             "Blocks".cyan(),
             Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.blocks.to_string().white(),
+            state
+                .analyzer
+                .file
+                .blocks
+                .to_string()
+                .fg(state.accent_color),
             " ".into(),
         ]),
         Line::from(vec![
             "Block Size".cyan(),
             Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.block_size.to_string().white(),
+            state
+                .analyzer
+                .file
+                .block_size
+                .to_string()
+                .fg(state.accent_color),
         ]),
         Line::from(vec![
             "Device".cyan(),
             Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.links.to_string().white(),
+            state.analyzer.file.links.to_string().fg(state.accent_color),
         ]),
         Line::from(vec![
             "Inode".cyan(),
             Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.inode.to_string().white(),
+            state.analyzer.file.inode.to_string().fg(state.accent_color),
         ]),
         Line::from(vec![
             "Links".cyan(),
             Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.links.to_string().white(),
+            state.analyzer.file.links.to_string().fg(state.accent_color),
         ]),
         Line::from(vec![
             "Access".cyan(),
             Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.access.mode.to_string().white(),
+            state
+                .analyzer
+                .file
+                .access
+                .mode
+                .to_string()
+                .fg(state.accent_color),
         ]),
         Line::from(vec![
             "Uid".cyan(),
             Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.access.uid.to_string().white(),
+            state
+                .analyzer
+                .file
+                .access
+                .uid
+                .to_string()
+                .fg(state.accent_color),
         ]),
         Line::from(vec![
             "Gid".cyan(),
             Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.access.gid.to_string().white(),
+            state
+                .analyzer
+                .file
+                .access
+                .gid
+                .to_string()
+                .fg(state.accent_color),
         ]),
         Line::from(vec![
             "Access".cyan(),
             Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.date.access.to_string().white(),
+            state
+                .analyzer
+                .file
+                .date
+                .access
+                .to_string()
+                .fg(state.accent_color),
         ]),
         Line::from(vec![
             "Modify".cyan(),
             Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.date.modify.to_string().white(),
+            state
+                .analyzer
+                .file
+                .date
+                .modify
+                .to_string()
+                .fg(state.accent_color),
         ]),
         Line::from(vec![
             "Change".cyan(),
             Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.date.change.to_string().white(),
+            state
+                .analyzer
+                .file
+                .date
+                .change
+                .to_string()
+                .fg(state.accent_color),
         ]),
         Line::from(vec![
             "Birth".cyan(),
             Span::raw(":  ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.date.birth.to_string().white(),
+            state
+                .analyzer
+                .file
+                .date
+                .birth
+                .to_string()
+                .fg(state.accent_color),
         ]),
     ];
 
@@ -357,7 +409,13 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
                         "|".fg(Color::Rgb(100, 100, 100)),
                         "File".cyan(),
                         Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-                        state.analyzer.file.name.to_string().white().bold(),
+                        state
+                            .analyzer
+                            .file
+                            .name
+                            .to_string()
+                            .fg(state.accent_color)
+                            .bold(),
                         "|".fg(Color::Rgb(100, 100, 100)),
                     ]))
                     .title_alignment(Alignment::Center)
@@ -439,7 +497,7 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
             Block::bordered()
                 .title(vec![
                     "|".fg(Color::Rgb(100, 100, 100)),
-                    "Dependencies".white().bold(),
+                    "Dependencies".fg(state.accent_color).bold(),
                     "|".fg(Color::Rgb(100, 100, 100)),
                 ])
                 .title_alignment(Alignment::Center)
@@ -484,7 +542,10 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             Line::from(vec![
                 Span::styled(items[0].to_string(), Style::default().fg(Color::Cyan)),
                 Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-                Span::styled(items[1].to_string(), Style::default().fg(Color::White)),
+                Span::styled(
+                    items[1].to_string(),
+                    Style::default().fg(state.accent_color),
+                ),
             ])
         })
         .collect();
@@ -530,12 +591,12 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                     Block::bordered()
                         .title(vec![
                             "|".fg(Color::Rgb(100, 100, 100)),
-                            "File Headers".white().bold(),
+                            "File Headers".fg(state.accent_color).bold(),
                             "|".fg(Color::Rgb(100, 100, 100)),
                         ])
                         .border_style({
                             if state.block_index == 0 {
-                                Style::default().fg(Color::White).bold()
+                                Style::default().fg(state.accent_color).bold()
                             } else {
                                 Style::default().fg(Color::Rgb(100, 100, 100))
                             }
@@ -565,7 +626,7 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                     Block::bordered()
                         .title(vec![
                             "|".fg(Color::Rgb(100, 100, 100)),
-                            "Notes".white().bold(),
+                            "Notes".fg(state.accent_color).bold(),
                             "|".fg(Color::Rgb(100, 100, 100)),
                         ])
                         .border_style(Style::default().fg(if state.block_index == 1 {
@@ -601,7 +662,7 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             .highlight_style(
                 Style::default()
                     .add_modifier(Modifier::BOLD)
-                    .fg(Color::White),
+                    .fg(state.accent_color),
             );
         frame.render_widget(tabs, chunks[0]);
         let selected_index = state.list.state.selected().unwrap_or_default();
@@ -656,7 +717,7 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                             Line::from(vec![
                                 "|".fg(Color::Rgb(100, 100, 100)),
                                 format!("{}/{}", selected_index.saturating_add(1), items_len)
-                                    .white()
+                                    .fg(state.accent_color)
                                     .bold(),
                                 "|".fg(Color::Rgb(100, 100, 100)),
                             ])
@@ -706,7 +767,7 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             .highlight_style(
                 Style::default()
                     .add_modifier(Modifier::BOLD)
-                    .fg(Color::White),
+                    .fg(state.accent_color),
             );
         frame.render_widget(tabs, chunks[1]);
         render_details(state, rect, frame);
@@ -781,7 +842,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
                     Line::from(vec![
                         "|".fg(Color::Rgb(100, 100, 100)),
                         format!("Min length: {}", state.analyzer.strings_len)
-                            .white()
+                            .fg(state.accent_color)
                             .bold(),
                         "|".fg(Color::Rgb(100, 100, 100)),
                     ])
@@ -792,7 +853,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
                         Line::from(vec![
                             "|".fg(Color::Rgb(100, 100, 100)),
                             format!("{}/{}", selected_index.saturating_add(1), items_len)
-                                .white()
+                                .fg(state.accent_color)
                                 .bold(),
                             "|".fg(Color::Rgb(100, 100, 100)),
                         ])
@@ -891,7 +952,7 @@ fn render_details(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
                     lines.push(Line::from(vec![
                         Span::styled(headers[i].to_string(), Style::default().fg(Color::Cyan)),
                         Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-                        Span::styled(v, Style::default().fg(Color::White)),
+                        Span::styled(v, Style::default().fg(state.accent_color)),
                     ]));
                 }
                 lines
@@ -899,7 +960,7 @@ fn render_details(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
             .collect();
         let popup = Popup::new(Text::from(lines)).title(Line::from(vec![
             "|".fg(Color::Rgb(100, 100, 100)),
-            "Details".white().bold(),
+            "Details".fg(state.accent_color).bold(),
             "|".fg(Color::Rgb(100, 100, 100)),
         ]));
         frame.render_widget(&popup, area);
@@ -944,14 +1005,20 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
                 Block::bordered()
                     .title(vec![
                         "|".fg(Color::Rgb(100, 100, 100)),
-                        "System Calls".white().bold(),
+                        "System Calls".fg(state.accent_color).bold(),
                         "|".fg(Color::Rgb(100, 100, 100)),
                     ])
                     .title_bottom(
                         Line::from(vec![
                             "|".fg(Color::Rgb(100, 100, 100)),
                             "Total: ".into(),
-                            state.analyzer.system_calls.len().to_string().white().bold(),
+                            state
+                                .analyzer
+                                .system_calls
+                                .len()
+                                .to_string()
+                                .fg(state.accent_color)
+                                .bold(),
                             "|".fg(Color::Rgb(100, 100, 100)),
                         ])
                         .right_aligned(),
@@ -986,7 +1053,7 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
                 .collect::<Vec<Line>>();
             let popup = Popup::new(Text::from(summary)).title(Line::from(vec![
                 "|".fg(Color::Rgb(100, 100, 100)),
-                "Details".white().bold(),
+                "Details".fg(state.accent_color).bold(),
                 "|".fg(Color::Rgb(100, 100, 100)),
             ]));
             frame.render_widget(&popup, rect);
@@ -1000,7 +1067,7 @@ fn get_input_line<'a>(state: &'a State) -> Line<'a> {
         Line::from(vec![
             "|".fg(Color::Rgb(100, 100, 100)),
             "search: ".yellow(),
-            state.input.value().white(),
+            state.input.value().fg(state.accent_color),
             if state.input_mode { " " } else { "" }.into(),
             "|".fg(Color::Rgb(100, 100, 100)),
         ])
