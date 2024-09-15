@@ -1,4 +1,5 @@
-use crate::{error::Result, tracer::TraceData};
+use crate::error::Result;
+use crate::TraceData;
 use ratatui::crossterm::event::{self, Event as CrosstermEvent, KeyEvent, MouseEvent};
 use std::path::PathBuf;
 use std::sync::{

@@ -909,14 +909,30 @@ fn render_details(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
 /// Renders the dynamic analysis tab.
 pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect) {
     if !state.system_calls_loaded {
-        frame.render_widget(
-            Paragraph::new(vec![Line::from(vec![
+        let lines = if cfg!(feature = "dynamic-analysis") {
+            vec![Line::from(vec![
                 "Press ".into(),
                 "Enter".yellow(),
                 " to run the executable.".into(),
-            ])])
-            .block(Block::bordered())
-            .alignment(Alignment::Center),
+            ])]
+        } else {
+            vec![
+                Line::from(vec![
+                    "You need to enable the ".into(),
+                    "\"dynamic-analysis\"".yellow(),
+                    " feature at build time to use this functionality!".into(),
+                ]),
+                Line::from(vec![
+                    "(This is currently only supported on ".into(),
+                    "Linux".cyan(),
+                    ")".into(),
+                ]),
+            ]
+        };
+        frame.render_widget(
+            Paragraph::new(Text::from(lines))
+                .block(Block::bordered())
+                .alignment(Alignment::Center),
             rect,
         );
     } else {

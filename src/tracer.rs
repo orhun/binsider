@@ -10,17 +10,9 @@ use nix::sys::wait::{waitpid, WaitPidFlag};
 
 use crate::error::{Error, Result};
 use crate::tui::event::Event;
+use crate::TraceData;
 
 use nix::unistd::{fork, ForkResult};
-
-/// Tracer data.
-#[derive(Debug, Default)]
-pub struct TraceData {
-    /// System calls.
-    pub syscalls: Vec<u8>,
-    /// Summary.
-    pub summary: Vec<u8>,
-}
 
 /// Trace system calls and signals.
 pub fn trace_syscalls(command: &str, event_sender: mpsc::Sender<Event>) {

@@ -20,6 +20,7 @@ pub mod args;
 pub mod error;
 
 /// System call tracer.
+#[cfg(feature = "dynamic-analysis")]
 pub mod tracer;
 
 /// File information.
@@ -34,7 +35,6 @@ use prelude::*;
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
 use std::{env, fs, io};
-use tracer::TraceData;
 use tui::{state::State, ui::Tab, Tui};
 
 /// Runs binsider.
@@ -101,11 +101,13 @@ pub fn start_tui(analyzer: Analyzer, args: Args) -> Result<()> {
                     state.handle_tab()?;
                 }
             }
+            #[cfg(feature = "dynamic-analysis")]
             Event::Trace => {
                 state.system_calls_loaded = false;
                 tui.toggle_pause()?;
                 tracer::trace_syscalls(state.analyzer.file.path, tui.events.sender.clone());
             }
+            #[cfg(feature = "dynamic-analysis")]
             Event::TraceResult(syscalls) => {
                 state.analyzer.tracer = match syscalls {
                     Ok(v) => v,
@@ -119,6 +121,8 @@ pub fn start_tui(analyzer: Analyzer, args: Args) -> Result<()> {
                 tui.toggle_pause()?;
                 state.handle_tab()?;
             }
+            #[cfg(not(feature = "dynamic-analysis"))]
+            Event::Trace | Event::TraceResult(_) => {}
             Event::Restart(path) => {
                 let mut args = args.clone();
                 match path {

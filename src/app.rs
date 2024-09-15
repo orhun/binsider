@@ -2,7 +2,6 @@ use crate::{
     elf::Elf,
     error::{Error, Result},
     file::FileInfo,
-    tracer::TraceData,
     tui::event::Event,
 };
 use elf::{endian::AnyEndian, ElfBytes};
@@ -17,6 +16,15 @@ use std::{
     sync::mpsc,
     thread,
 };
+
+/// Tracer data.
+#[derive(Debug, Default)]
+pub struct TraceData {
+    /// System calls.
+    pub syscalls: Vec<u8>,
+    /// Summary.
+    pub summary: Vec<u8>,
+}
 
 /// Binary analyzer.
 pub struct Analyzer<'a> {
