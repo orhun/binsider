@@ -47,6 +47,7 @@ sysinfo = { version = "0.31.4", default-features = false, features = ["user"] }
 webbrowser = "1.0.1"
 lddtree = "0.3.5"
 itertools = "0.13.0"
+termbg = "0.5.1"
 
 [dev-dependencies]
 pretty_assertions = "1.4.0"

@@ -17,9 +17,10 @@
             cargoLock = {
               lockFile = ./Cargo.lock;
             };
+            checkType = "debug";
             checkFlags = [
-              "--skip=app::tests::test_extract_strings"
-              "--skip=app::tests::test_init"
+              "--skip=test_extract_strings"
+              "--skip=test_init"
             ];
           };
           default = binsider;

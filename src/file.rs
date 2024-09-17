@@ -134,7 +134,10 @@ impl<'a> FileInfo<'a> {
                                 metadata.ctime_nsec().try_into()?,
                             ),
                     ),
-                    birth: format_system_time(metadata.created()?),
+                    birth: metadata
+                        .created()
+                        .map(format_system_time)
+                        .unwrap_or_else(|_| String::from("not supported")),
                 }
             },
         })
