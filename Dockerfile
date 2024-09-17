@@ -1,4 +1,4 @@
-FROM rust:1.81-slim-bullseye as builder
+FROM rust:1.81-slim-bullseye AS builder
 WORKDIR /src
 COPY Cargo.toml Cargo.toml
 COPY Cargo.lock Cargo.lock
@@ -10,7 +10,7 @@ RUN cargo build --locked --release
 RUN mkdir -p build-out/
 RUN cp target/release/binsider build-out/
 
-FROM debian:bullseye-slim as runner
+FROM debian:bullseye-slim AS runner
 WORKDIR /app
 COPY --from=builder /src/build-out/binsider .
 USER 1000:1000
