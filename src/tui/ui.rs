@@ -244,127 +244,134 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
         banner_area[1],
     );
 
-    let lines = vec![
-        Line::from(vec![
-            "Size".cyan(),
-            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.size.to_string().fg(state.accent_color),
-        ]),
-        Line::from(vec![
-            " ".into(),
-            "Blocks".cyan(),
-            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state
-                .analyzer
-                .file
-                .blocks
-                .to_string()
-                .fg(state.accent_color),
-            " ".into(),
-        ]),
-        Line::from(vec![
-            "Block Size".cyan(),
-            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state
-                .analyzer
-                .file
-                .block_size
-                .to_string()
-                .fg(state.accent_color),
-        ]),
-        Line::from(vec![
-            "Device".cyan(),
-            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.links.to_string().fg(state.accent_color),
-        ]),
-        Line::from(vec![
-            "Inode".cyan(),
-            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.inode.to_string().fg(state.accent_color),
-        ]),
-        Line::from(vec![
-            "Links".cyan(),
-            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state.analyzer.file.links.to_string().fg(state.accent_color),
-        ]),
-        Line::from(vec![
-            "Access".cyan(),
-            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state
-                .analyzer
-                .file
-                .access
-                .mode
-                .to_string()
-                .fg(state.accent_color),
-        ]),
-        Line::from(vec![
-            "Uid".cyan(),
-            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state
-                .analyzer
-                .file
-                .access
-                .uid
-                .to_string()
-                .fg(state.accent_color),
-        ]),
-        Line::from(vec![
-            "Gid".cyan(),
-            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state
-                .analyzer
-                .file
-                .access
-                .gid
-                .to_string()
-                .fg(state.accent_color),
-        ]),
-        Line::from(vec![
-            "Access".cyan(),
-            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state
-                .analyzer
-                .file
-                .date
-                .access
-                .to_string()
-                .fg(state.accent_color),
-        ]),
-        Line::from(vec![
-            "Modify".cyan(),
-            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state
-                .analyzer
-                .file
-                .date
-                .modify
-                .to_string()
-                .fg(state.accent_color),
-        ]),
-        Line::from(vec![
-            "Change".cyan(),
-            Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
-            state
-                .analyzer
-                .file
-                .date
-                .change
-                .to_string()
-                .fg(state.accent_color),
-        ]),
-        Line::from(vec![
-            "Birth".cyan(),
-            Span::raw(":  ").fg(Color::Rgb(100, 100, 100)),
-            state
-                .analyzer
-                .file
-                .date
-                .birth
-                .to_string()
-                .fg(state.accent_color),
-        ]),
-    ];
+    let lines = if cfg!(target_os = "windows") {
+        vec![
+            Line::from("This feature is not implemented!"),
+            Line::from("See <https://github.com/orhun/binsider/issues/35>"),
+        ]
+    } else {
+        vec![
+            Line::from(vec![
+                "Size".cyan(),
+                Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+                state.analyzer.file.size.to_string().fg(state.accent_color),
+            ]),
+            Line::from(vec![
+                " ".into(),
+                "Blocks".cyan(),
+                Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+                state
+                    .analyzer
+                    .file
+                    .blocks
+                    .to_string()
+                    .fg(state.accent_color),
+                " ".into(),
+            ]),
+            Line::from(vec![
+                "Block Size".cyan(),
+                Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+                state
+                    .analyzer
+                    .file
+                    .block_size
+                    .to_string()
+                    .fg(state.accent_color),
+            ]),
+            Line::from(vec![
+                "Device".cyan(),
+                Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+                state.analyzer.file.links.to_string().fg(state.accent_color),
+            ]),
+            Line::from(vec![
+                "Inode".cyan(),
+                Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+                state.analyzer.file.inode.to_string().fg(state.accent_color),
+            ]),
+            Line::from(vec![
+                "Links".cyan(),
+                Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+                state.analyzer.file.links.to_string().fg(state.accent_color),
+            ]),
+            Line::from(vec![
+                "Access".cyan(),
+                Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+                state
+                    .analyzer
+                    .file
+                    .access
+                    .mode
+                    .to_string()
+                    .fg(state.accent_color),
+            ]),
+            Line::from(vec![
+                "Uid".cyan(),
+                Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+                state
+                    .analyzer
+                    .file
+                    .access
+                    .uid
+                    .to_string()
+                    .fg(state.accent_color),
+            ]),
+            Line::from(vec![
+                "Gid".cyan(),
+                Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+                state
+                    .analyzer
+                    .file
+                    .access
+                    .gid
+                    .to_string()
+                    .fg(state.accent_color),
+            ]),
+            Line::from(vec![
+                "Access".cyan(),
+                Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+                state
+                    .analyzer
+                    .file
+                    .date
+                    .access
+                    .to_string()
+                    .fg(state.accent_color),
+            ]),
+            Line::from(vec![
+                "Modify".cyan(),
+                Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+                state
+                    .analyzer
+                    .file
+                    .date
+                    .modify
+                    .to_string()
+                    .fg(state.accent_color),
+            ]),
+            Line::from(vec![
+                "Change".cyan(),
+                Span::raw(": ").fg(Color::Rgb(100, 100, 100)),
+                state
+                    .analyzer
+                    .file
+                    .date
+                    .change
+                    .to_string()
+                    .fg(state.accent_color),
+            ]),
+            Line::from(vec![
+                "Birth".cyan(),
+                Span::raw(":  ").fg(Color::Rgb(100, 100, 100)),
+                state
+                    .analyzer
+                    .file
+                    .date
+                    .birth
+                    .to_string()
+                    .fg(state.accent_color),
+            ]),
+        ]
+    };
 
     let info_width = lines.iter().map(|v| v.width()).max().unwrap_or_default() as u16 + 2;
     let rect = area[2].inner(Margin {
@@ -978,14 +985,30 @@ fn render_details(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
 /// Renders the dynamic analysis tab.
 pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect) {
     if !state.system_calls_loaded {
-        frame.render_widget(
-            Paragraph::new(vec![Line::from(vec![
+        let lines = if cfg!(feature = "dynamic-analysis") {
+            vec![Line::from(vec![
                 "Press ".into(),
                 "Enter".yellow(),
                 " to run the executable.".into(),
-            ])])
-            .block(Block::bordered())
-            .alignment(Alignment::Center),
+            ])]
+        } else {
+            vec![
+                Line::from(vec![
+                    "You need to enable the ".into(),
+                    "\"dynamic-analysis\"".yellow(),
+                    " feature at build time to use this functionality!".into(),
+                ]),
+                Line::from(vec![
+                    "(This is currently only supported on ".into(),
+                    "Linux".cyan(),
+                    ")".into(),
+                ]),
+            ]
+        };
+        frame.render_widget(
+            Paragraph::new(Text::from(lines))
+                .block(Block::bordered())
+                .alignment(Alignment::Center),
             rect,
         );
     } else {

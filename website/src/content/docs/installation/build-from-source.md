@@ -25,3 +25,13 @@ CARGO_TARGET_DIR=target cargo build --release
 ```
 
 Binary will be located at `target/release/binsider`.
+
+:::tip
+
+If the build fails you can try disabling some of the [feature flags](/installation/crates-io/#features), for example:
+
+```bash
+CARGO_TARGET_DIR=target cargo build --release --no-default-features
+```
+
+:::

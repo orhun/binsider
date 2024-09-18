@@ -8,16 +8,17 @@ See the available binaries for different operating systems/architectures from th
 
 :::note
 
-- Only the `x86_64-unknown-linux-gnu` target is provided for now.
-- Release tarballs are signed with the following PGP key: [0C9E792408F77819866E47FA85EF5848473D7F88](https://keyserver.ubuntu.com/pks/lookup?search=0x85EF5848473D7F88&op=vindex)
+- Release tarballs for Linux/macOS are signed with the following PGP key: [0C9E792408F77819866E47FA85EF5848473D7F88](https://keyserver.ubuntu.com/pks/lookup?search=0x85EF5848473D7F88&op=vindex)
+- If you are using Windows, you can simply download the zip file from the [releases page](https://github.com/orhun/binsider/releases).
 
 :::
 
-1. Download the binary from [releases](https://github.com/orhun/binsider/releases)
+1. Download the binary from [releases](https://github.com/orhun/binsider/releases):
 
 ```bash
 VERSION="0.1.0"
-wget "https://github.com/orhun/binsider/releases/download/v${VERSION}/binsider-${VERSION}-x86_64-unknown-linux-gnu.tar.gz"
+TARGET="x86_64-unknown-linux-gnu.tar.gz"
+wget "https://github.com/orhun/binsider/releases/download/v${VERSION}/binsider-${VERSION}-${TARGET}.tar.gz"
 ```
 
 2. Extract the files:

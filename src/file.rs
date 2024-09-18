@@ -4,10 +4,15 @@ use sysinfo::{Gid, Groups, Uid, Users};
 use crate::error::Result;
 use std::{
     fs::{self, File, OpenOptions},
-    os::unix::fs::{MetadataExt, PermissionsExt},
     path::PathBuf,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
+
+#[cfg(not(target_os = "windows"))]
+use std::os::unix::fs::{MetadataExt, PermissionsExt};
+
+#[cfg(target_os = "windows")]
+use std::os::windows::fs::MetadataExt;
 
 /// General file information.
 #[derive(Debug)]
@@ -64,6 +69,7 @@ pub struct FileDateInfo {
 
 impl<'a> FileInfo<'a> {
     /// Constructs a new instance.
+    #[cfg(not(target_os = "windows"))]
     pub fn new(path: &'a str, bytes: &'a [u8]) -> Result<Self> {
         let metadata = fs::metadata(path)?;
         let mode = metadata.permissions().mode();
@@ -141,6 +147,11 @@ impl<'a> FileInfo<'a> {
                 }
             },
         })
+    }
+
+    #[cfg(target_os = "windows")]
+    pub fn new(path: &'a str, bytes: &'a [u8]) -> Result<Self> {
+        unimplemented!()
     }
 
     /// Opens the file (with R/W if possible) and returns it.
