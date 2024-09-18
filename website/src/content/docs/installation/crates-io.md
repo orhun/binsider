@@ -21,3 +21,15 @@ cargo install --git https://github.com/orhun/binsider
 The minimum supported Rust version (MSRV) is `1.74.1`.
 
 :::
+
+## Features
+
+`binsider` supports the following feature flags which can be enabled or disabled during installation:
+
+- `dynamic-analysis`: Enables the [dynamic analysis](/usage/dynamic-analysis) feature. (default: enabled)
+
+e.g. To install `binsider` with the `dynamic-analysis` feature disabled:
+
+```bash
+cargo install binsider --no-default-features
+```
