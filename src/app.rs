@@ -7,7 +7,7 @@ use crate::{
 use elf::{endian::AnyEndian, ElfBytes};
 use heh::app::Application as Heh;
 use heh::decoder::Encoding;
-use lddtree::{DependencyAnalyzer, DependencyTree};
+use lddtree::DependencyAnalyzer;
 use ratatui::text::Line;
 use rust_strings::BytesConfig;
 use std::{
@@ -45,7 +45,7 @@ pub struct Analyzer<'a> {
     /// System calls.
     pub system_calls: Vec<Line<'a>>,
     /// Library dependencies.
-    pub dependencies: DependencyTree,
+    pub dependencies: Vec<(String, String)>,
 }
 
 impl Debug for Analyzer<'_> {
@@ -67,8 +67,8 @@ impl<'a> Analyzer<'a> {
         let elf = Elf::try_from(elf_bytes)?;
         let heh = Heh::new(file_info.open_file()?, Encoding::Ascii, 0)
             .map_err(|e| Error::HexdumpError(e.to_string()))?;
-        let dependencies = DependencyAnalyzer::default().analyze(file_info.path)?;
         Ok(Self {
+            dependencies: Self::extract_libs(&file_info)?,
             files,
             file: file_info,
             elf,
@@ -77,8 +77,36 @@ impl<'a> Analyzer<'a> {
             heh,
             tracer: TraceData::default(),
             system_calls: Vec::new(),
-            dependencies,
         })
+    }
+
+    /// Extracts the library dependencies.
+    pub fn extract_libs(file_info: &FileInfo<'a>) -> Result<Vec<(String, String)>> {
+        let mut dependencies = DependencyAnalyzer::default()
+            .analyze(file_info.path)?
+            .libraries
+            .clone()
+            .into_iter()
+            .map(|(name, lib)| {
+                (
+                    name.to_string(),
+                    lib.realpath
+                        .unwrap_or(lib.path)
+                        .to_string_lossy()
+                        .to_string(),
+                )
+            })
+            .collect::<Vec<(String, String)>>();
+        dependencies.sort_by(|a, b| {
+            let lib_condition1 = a.0.starts_with("lib");
+            let lib_condition2 = b.0.starts_with("lib");
+            match (lib_condition1, lib_condition2) {
+                (true, false) => std::cmp::Ordering::Less,
+                (false, true) => std::cmp::Ordering::Greater,
+                _ => a.0.cmp(&b.0),
+            }
+        });
+        Ok(dependencies)
     }
 
     /// Returns the sequences of printable characters.

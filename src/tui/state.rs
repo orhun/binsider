@@ -351,18 +351,9 @@ impl<'a> State<'a> {
                 self.list = SelectableList::with_items(
                     self.analyzer
                         .dependencies
-                        .libraries
                         .clone()
                         .into_iter()
-                        .map(|(name, lib)| {
-                            vec![
-                                name.to_string(),
-                                lib.realpath
-                                    .unwrap_or(lib.path)
-                                    .to_string_lossy()
-                                    .to_string(),
-                            ]
-                        })
+                        .map(|(name, lib)| vec![name, lib])
                         .collect(),
                 );
             }
