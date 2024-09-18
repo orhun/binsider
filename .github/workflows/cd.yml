@@ -28,6 +28,18 @@ jobs:
           - {
               OS: ubuntu-22.04,
               TOOLCHAIN: stable,
+              TARGET: aarch64-unknown-linux-gnu,
+              ALL_FEATURES: true,
+            }
+          - {
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: riscv64gc-unknown-linux-gnu,
+              ALL_FEATURES: true,
+            }
+          - {
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
               TARGET: i686-unknown-linux-gnu,
               ALL_FEATURES: false,
             }
@@ -35,12 +47,6 @@ jobs:
               OS: ubuntu-22.04,
               TOOLCHAIN: stable,
               TARGET: i686-unknown-linux-musl,
-              ALL_FEATURES: false,
-            }
-          - {
-              OS: ubuntu-22.04,
-              TOOLCHAIN: stable,
-              TARGET: aarch64-unknown-linux-gnu,
               ALL_FEATURES: false,
             }
           - {
