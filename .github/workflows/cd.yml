@@ -7,11 +7,90 @@ on:
 
 jobs:
   publish-github:
-    name: Publish on GitHub
-    runs-on: ubuntu-22.04
+    name: Publish for ${{ matrix.build.OS }} (${{ matrix.build.TARGET }})
+    runs-on: ${{ matrix.build.OS }}
     strategy:
+      fail-fast: false
       matrix:
-        TARGET: [x86_64-unknown-linux-gnu]
+        build:
+          - {
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: x86_64-unknown-linux-gnu,
+              ALL_FEATURES: true,
+            }
+          - {
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: x86_64-unknown-linux-musl,
+              ALL_FEATURES: true,
+            }
+          - {
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: i686-unknown-linux-gnu,
+              ALL_FEATURES: false,
+            }
+          - {
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: i686-unknown-linux-musl,
+              ALL_FEATURES: false,
+            }
+          - {
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: aarch64-unknown-linux-gnu,
+              ALL_FEATURES: false,
+            }
+          - {
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: aarch64-unknown-linux-musl,
+              ALL_FEATURES: false,
+            }
+          - {
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: armv5te-unknown-linux-gnueabi,
+              ALL_FEATURES: false,
+            }
+          - {
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: armv7-unknown-linux-gnueabihf,
+              ALL_FEATURES: false,
+            }
+          - {
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: arm-unknown-linux-gnueabi,
+              ALL_FEATURES: false,
+            }
+          - {
+              OS: ubuntu-22.04,
+              TOOLCHAIN: stable,
+              TARGET: arm-unknown-linux-gnueabihf,
+              ALL_FEATURES: false,
+            }
+          - {
+              OS: windows-2022,
+              TOOLCHAIN: stable,
+              TARGET: x86_64-pc-windows-msvc,
+              ALL_FEATURES: false,
+            }
+          - {
+              OS: macos-14,
+              TOOLCHAIN: stable,
+              TARGET: x86_64-apple-darwin,
+              ALL_FEATURES: false,
+            }
+          - {
+              OS: macos-14,
+              TOOLCHAIN: stable,
+              TARGET: aarch64-apple-darwin,
+              ALL_FEATURES: false,
+            }
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
@@ -20,52 +99,76 @@ jobs:
         run: echo "RELEASE_VERSION=${GITHUB_REF:11}" >> $GITHUB_ENV
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@master
         with:
-          targets: ${{ matrix.TARGET }}
+          toolchain: ${{ matrix.build.TOOLCHAIN }}
+          targets: ${{ matrix.build.TARGET }}
+
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
 
       - name: Build
-        run: cargo build --release --locked --target ${{ matrix.TARGET }}
+        shell: bash
+        run: |
+          if [ "${{ matrix.build.ALL_FEATURES }}" = true ]; then
+            cargo build --release --locked --target ${{ matrix.build.TARGET }}
+          else
+            cargo build --release --no-default-features --locked --target ${{ matrix.build.TARGET }}
+          fi
 
       - name: Prepare release assets
+        shell: bash
         run: |
           mkdir -p release
           cp {LICENSE-MIT,LICENSE-APACHE,README.md,CHANGELOG.md} release/
-          cp target/${{ matrix.TARGET }}/release/binsider release/ && strip -s release/binsider
+          if [ "${{ matrix.build.OS }}" = "windows-2022" ]; then
+            cp target/${{ matrix.build.TARGET }}/release/binsider.exe release/
+          else
+            cp target/${{ matrix.build.TARGET }}/release/binsider release/ && strip -s release/binsider
+          fi
           mv release/ binsider-${{env.RELEASE_VERSION}}/
 
       - name: Create release artifacts
+        shell: bash
         run: |
-          tar -czvf binsider-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz \
-            binsider-${{ env.RELEASE_VERSION }}/
-          sha512sum binsider-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz \
-            > binsider-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz.sha512
+          if [ "${{ matrix.build.OS }}" = "windows-2022" ]; then
+            7z a -tzip "binsider-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}.zip" \
+              binsider-${{ env.RELEASE_VERSION }}/
+          else
+            tar -czvf binsider-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}.tar.gz \
+              binsider-${{ env.RELEASE_VERSION }}/
+            shasum -a 512 binsider-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}.tar.gz \
+              > binsider-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}.tar.gz.sha512
+          fi
 
       - name: Sign the release
+        if: matrix.build.OS != 'windows-2022'
         run: |
           echo "${{ secrets.GPG_RELEASE_KEY }}" | base64 --decode > private.key
           echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --pinentry-mode=loopback \
             --passphrase-fd 0 --import private.key
           echo "${{secrets.GPG_PASSPHRASE}}" | gpg --pinentry-mode=loopback \
             --passphrase-fd 0 --detach-sign \
-            binsider-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz
+            binsider-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}.tar.gz
 
       - name: Generate a changelog
         uses: orhun/git-cliff-action@v4
+        id: git-cliff
         with:
           args: --latest --github-repo ${{ github.repository }}
         env:
           OUTPUT: CHANGES.md
 
-      - name: Create release
-        run: |
-          gh release create "${{ github.ref_name }}" -F CHANGES.md
-          gh release upload "${{ github.ref_name }}" \
-            binsider-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz \
-            binsider-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz.sig \
-            binsider-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz.sha512
-        env:
-          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      - name: Upload the binary releases
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file: binsider-${{ env.RELEASE_VERSION }}-${{ matrix.build.TARGET }}*
+          file_glob: true
+          overwrite: true
+          tag: ${{ github.ref }}
+          release_name: "Release v${{ env.RELEASE_VERSION }}"
+          body: ${{ steps.git-cliff.outputs.content }}
+          repo_token: ${{ secrets.RELEASE_TOKEN }}
 
   publish-crates-io:
     name: Publish on crates.io
