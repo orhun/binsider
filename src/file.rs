@@ -1,4 +1,5 @@
 use bytesize::ByteSize;
+use chrono::{TimeZone, Utc};
 use sysinfo::{Gid, Groups, Uid, Users};
 
 use crate::error::Result;
@@ -140,10 +141,15 @@ impl<'a> FileInfo<'a> {
                                 metadata.ctime_nsec().try_into()?,
                             ),
                     ),
+                    // Support for metadata.created is somewhat limited, so we fall back to the
+                    // epoch start if it's not available.
                     birth: metadata
                         .created()
-                        .map(format_system_time)
-                        .unwrap_or_else(|_| String::from("not supported")),
+                        .map(|time| format_system_time(time))
+                        .unwrap_or_else(|_| {
+                            let epoch_start = Utc.with_ymd_and_hms(1970, 1, 1, 0, 0, 0).unwrap();
+                            format!("{}", epoch_start.format("%Y-%m-%d %H:%M:%S.%f %z"))
+                        }),
                 }
             },
         })
