@@ -48,11 +48,12 @@ impl<'a> Property<'a> for Symbols {
             .map(|(i, symbol)| {
                 let name = self.names[i].to_string();
                 vec![
-                    format!("{:#x}", symbol.st_value),
-                    symbol.st_size.to_string(),
+                    name,
                     elf::to_str::st_symtype_to_string(symbol.st_symtype())
                         .trim_start_matches("STT_")
                         .to_string(),
+                    format!("{:#x}", symbol.st_value),
+                    symbol.st_size.to_string(),
                     elf::to_str::st_bind_to_string(symbol.st_bind())
                         .trim_start_matches("STB_")
                         .to_string(),
@@ -60,7 +61,6 @@ impl<'a> Property<'a> for Symbols {
                         .trim_start_matches("STV_")
                         .to_string(),
                     symbol.st_shndx.to_string(),
-                    name,
                 ]
             })
             .collect()
@@ -142,11 +142,13 @@ impl<'a> Property<'a> for DynamicSymbols {
             .enumerate()
             .map(|(i, symbol)| {
                 vec![
-                    format!("{:#x}", symbol.st_value),
-                    symbol.st_size.to_string(),
+                    self.names[i].to_string(),
+                    self.requirements[i].to_string(),
                     elf::to_str::st_symtype_to_string(symbol.st_symtype())
                         .trim_start_matches("STT_")
                         .to_string(),
+                    format!("{:#x}", symbol.st_value),
+                    symbol.st_size.to_string(),
                     elf::to_str::st_bind_to_string(symbol.st_bind())
                         .trim_start_matches("STB_")
                         .to_string(),
@@ -154,8 +156,6 @@ impl<'a> Property<'a> for DynamicSymbols {
                         .trim_start_matches("STV_")
                         .to_string(),
                     symbol.st_shndx.to_string(),
-                    self.requirements[i].to_string(),
-                    self.names[i].to_string(),
                 ]
             })
             .collect()

@@ -687,18 +687,16 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
             .take(LIST_LIMIT)
             .map(|items| {
                 Row::new(items.iter().enumerate().map(|(i, value)| {
-                    Cell::from(Line::from(
-                        if value.width() > max_row_width && i == items.len() - 1 {
-                            let mut spans = highlight_search_result(
-                                value.chars().take(max_row_width).collect::<String>().into(),
-                                &state.input,
-                            );
-                            spans.push("…".fg(Color::Rgb(100, 100, 100)));
-                            spans
-                        } else {
-                            highlight_search_result(value.to_string().into(), &state.input)
-                        },
-                    ))
+                    Cell::from(Line::from(if value.width() > max_row_width && i == 0 {
+                        let mut spans = highlight_search_result(
+                            value.chars().take(max_row_width).collect::<String>().into(),
+                            &state.input,
+                        );
+                        spans.push("…".fg(Color::Rgb(100, 100, 100)));
+                        spans
+                    } else {
+                        highlight_search_result(value.to_string().into(), &state.input)
+                    }))
                 }))
             });
         frame.render_stateful_widget(
