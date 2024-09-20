@@ -87,7 +87,7 @@ jobs:
             }
           - {
               OS: ubuntu-22.04,
-              TOOLCHAIN: stable,
+              TOOLCHAIN: nightly,
               TARGET: mipsel-unknown-linux-gnu,
               ALL_FEATURES: false,
             }
