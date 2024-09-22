@@ -1204,8 +1204,7 @@ dependencies = [
 [[package]]
 name = "lurk-cli"
 version = "0.3.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5cceb96fb968271defe0e262d52580b7de1318ef3f2dd21412fc9e854969dabd"
+source = "git+https://github.com/orhun/lurk?branch=fix/canonicalize_binary#7743e73992b313954bfb1cc7ee281e8ec5d44206"
 dependencies = [
  "anyhow",
  "atty",
