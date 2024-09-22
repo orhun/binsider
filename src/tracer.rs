@@ -9,20 +9,24 @@ use lurk_cli::Tracer;
 use nix::sys::wait::{waitpid, WaitPidFlag};
 
 use crate::error::{Error, Result};
+use crate::file::FileInfo;
 use crate::tui::event::Event;
 use crate::TraceData;
 
 use nix::unistd::{fork, ForkResult};
 
 /// Trace system calls and signals.
-pub fn trace_syscalls(command: &str, event_sender: mpsc::Sender<Event>) {
+pub fn trace_syscalls(file: &FileInfo, event_sender: mpsc::Sender<Event>) {
     let event_sender = event_sender.clone();
-    let command = command.to_string();
+    let mut command = vec![file.path.to_string()];
+    if let Some(args) = &file.arguments {
+        command.extend(args.iter().map(|s| s.to_string()));
+    }
     thread::spawn(move || {
         let run_tracer = || -> Result<()> {
             let pid = match unsafe { fork() } {
                 Ok(ForkResult::Child) => {
-                    return lurk_cli::run_tracee(&[command], &[], &None)
+                    return lurk_cli::run_tracee(&command, &[], &None)
                         .map_err(|e| Error::TraceError(e.to_string()))
                 }
                 Ok(ForkResult::Parent { child }) => child,
