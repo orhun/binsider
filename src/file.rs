@@ -153,7 +153,7 @@ impl<'a> FileInfo<'a> {
     }
 
     #[cfg(target_os = "windows")]
-    pub fn new(path: &'a str, bytes: &'a [u8]) -> Result<Self> {
+    pub fn new(path: &'a str, arguments: Option<Vec<&'a str>>, bytes: &'a [u8]) -> Result<Self> {
         unimplemented!()
     }
 
