@@ -34,7 +34,7 @@ use file::FileInfo;
 use prelude::*;
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
-use std::{env, fs, io};
+use std::{env, fs, io, path::PathBuf};
 use tui::{state::State, ui::Tab, Tui};
 
 /// Runs binsider.
@@ -43,6 +43,13 @@ pub fn run(mut args: Args) -> Result<()> {
         args.files.push(env::current_exe()?);
     }
     let mut path = args.files[args.files.len() - 1].clone();
+    let mut arguments = None;
+    let path_str = path.to_string_lossy().to_string();
+    let mut parts = path_str.split_whitespace();
+    if let Some(bin) = parts.next() {
+        path = PathBuf::from(bin);
+        arguments = Some(parts.collect());
+    }
     if !path.exists() {
         let resolved_path = which::which(path.to_string_lossy().to_string())?;
         if let Some(file) = args.files.iter_mut().find(|f| **f == path) {
@@ -52,7 +59,7 @@ pub fn run(mut args: Args) -> Result<()> {
     }
     let file_data = fs::read(&path)?;
     let bytes = file_data.as_slice();
-    let file_info = FileInfo::new(path.to_str().unwrap_or_default(), bytes)?;
+    let file_info = FileInfo::new(path.to_str().unwrap_or_default(), arguments, bytes)?;
     let analyzer = Analyzer::new(file_info, args.min_strings_len, args.files.clone())?;
     start_tui(analyzer, args)
 }
@@ -105,7 +112,7 @@ pub fn start_tui(analyzer: Analyzer, args: Args) -> Result<()> {
             Event::Trace => {
                 state.system_calls_loaded = false;
                 tui.toggle_pause()?;
-                tracer::trace_syscalls(state.analyzer.file.path, tui.events.sender.clone());
+                tracer::trace_syscalls(&state.analyzer.file, tui.events.sender.clone());
             }
             #[cfg(feature = "dynamic-analysis")]
             Event::TraceResult(syscalls) => {

@@ -19,6 +19,8 @@ use std::os::windows::fs::MetadataExt;
 pub struct FileInfo<'a> {
     /// Path of the file.
     pub path: &'a str,
+    /// Arguments of the file.
+    pub arguments: Option<Vec<&'a str>>,
     /// Bytes of the file.
     pub bytes: &'a [u8],
     /// Whether if the file is read only.
@@ -70,7 +72,7 @@ pub struct FileDateInfo {
 impl<'a> FileInfo<'a> {
     /// Constructs a new instance.
     #[cfg(not(target_os = "windows"))]
-    pub fn new(path: &'a str, bytes: &'a [u8]) -> Result<Self> {
+    pub fn new(path: &'a str, arguments: Option<Vec<&'a str>>, bytes: &'a [u8]) -> Result<Self> {
         let metadata = fs::metadata(path)?;
         let mode = metadata.permissions().mode();
 
@@ -78,6 +80,7 @@ impl<'a> FileInfo<'a> {
         let groups = Groups::new_with_refreshed_list();
         Ok(Self {
             path,
+            arguments,
             bytes,
             is_read_only: false,
             name: PathBuf::from(path)
@@ -150,7 +153,7 @@ impl<'a> FileInfo<'a> {
     }
 
     #[cfg(target_os = "windows")]
-    pub fn new(path: &'a str, bytes: &'a [u8]) -> Result<Self> {
+    pub fn new(path: &'a str, arguments: Option<Vec<&'a str>>, bytes: &'a [u8]) -> Result<Self> {
         unimplemented!()
     }
 
