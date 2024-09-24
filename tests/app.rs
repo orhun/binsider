@@ -15,6 +15,7 @@ fn test_init() -> Result<()> {
     Analyzer::new(
         FileInfo::new(
             get_test_path().to_str().expect("failed to get test path"),
+            None,
             get_test_bytes()?.as_slice(),
         )?,
         4,
@@ -30,6 +31,7 @@ fn test_extract_strings() -> Result<()> {
     let mut analyzer = Analyzer::new(
         FileInfo::new(
             test_path.to_str().expect("failed to get test path"),
+            None,
             test_bytes.as_slice(),
         )?,
         4,
