@@ -91,6 +91,10 @@ impl<'a> State<'a> {
         state.handle_tab()?;
         Ok(state)
     }
+    
+    pub fn change_analyzer(&mut self, analyzer: Analyzer<'a>) {
+        self.analyzer = analyzer;
+    }
 
     /// Runs a command and updates the state.
     pub fn run_command(
