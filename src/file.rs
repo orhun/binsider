@@ -16,13 +16,13 @@ use std::os::windows::fs::MetadataExt;
 
 /// General file information.
 #[derive(Debug)]
-pub struct FileInfo<'a> {
+pub struct FileInfo {
     /// Path of the file.
-    pub path: &'a str,
+    pub path: String,
     /// Arguments of the file.
-    pub arguments: Option<Vec<&'a str>>,
+    pub arguments: Option<Vec<String>>,
     /// Bytes of the file.
-    pub bytes: &'a [u8],
+    pub bytes: Box<[u8]>,
     /// Whether if the file is read only.
     pub is_read_only: bool,
     /// Name of the file.
@@ -69,19 +69,23 @@ pub struct FileDateInfo {
     pub birth: String,
 }
 
-impl<'a> FileInfo<'a> {
+impl FileInfo {
     /// Constructs a new instance.
     #[cfg(not(target_os = "windows"))]
-    pub fn new(path: &'a str, arguments: Option<Vec<&'a str>>, bytes: &'a [u8]) -> Result<Self> {
+    pub fn new(
+        path: &str,
+        arguments: Option<Vec<String>>,
+        bytes: impl Into<Box<[u8]>>,
+    ) -> Result<Self> {
         let metadata = fs::metadata(path)?;
         let mode = metadata.permissions().mode();
 
         let users = Users::new_with_refreshed_list();
         let groups = Groups::new_with_refreshed_list();
         Ok(Self {
-            path,
+            path: path.to_string(),
             arguments,
-            bytes,
+            bytes: bytes.into(),
             is_read_only: false,
             name: PathBuf::from(path)
                 .file_name()
@@ -153,18 +157,22 @@ impl<'a> FileInfo<'a> {
     }
 
     #[cfg(target_os = "windows")]
-    pub fn new(path: &'a str, arguments: Option<Vec<&'a str>>, bytes: &'a [u8]) -> Result<Self> {
+    pub fn new(
+        path: &str,
+        arguments: Option<Vec<String>>,
+        bytes: impl Into<Box<[u8]>>,
+    ) -> Result<Self> {
         unimplemented!()
     }
 
     /// Opens the file (with R/W if possible) and returns it.
     pub fn open_file(&mut self) -> Result<File> {
         Ok(
-            match OpenOptions::new().write(true).read(true).open(self.path) {
+            match OpenOptions::new().write(true).read(true).open(&self.path) {
                 Ok(v) => v,
                 Err(_) => {
                     self.is_read_only = true;
-                    File::open(self.path)?
+                    File::open(&self.path)?
                 }
             },
         )
