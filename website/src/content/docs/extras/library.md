@@ -40,4 +40,4 @@ let command = Command::from(&ratatui::crossterm::event::Event::Key(/* */));
 state.run_command(command, sender.clone())?;
 ```
 
-See the [demo example](https://github.com/orhun/binsider/blob/main/examples/demo.rs) for the full code.
+See the [demo example](https://github.com/orhun/binsider/blob/main/examples/demo.rs) for the full code. You can run it by `cargo run --example demo`.
