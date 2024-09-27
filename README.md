@@ -23,6 +23,8 @@
     <a href="https://docs.rs/binsider/">
         <img src="https://img.shields.io/docsrs/binsider?style=flat&labelColor=1d1d1d&color=white&logo=Rust&logoColor=white"></a>
     <br>
+    <a href="https://discord.gg/zphNxEcEK7">
+        <img src="https://img.shields.io/discord/1289166752311148554?color=f8be75&label=discord&labelColor=1d1d1d&logo=discord&logoColor=white"></a>
 </p>
 
 <h4 align="center">
@@ -108,6 +110,9 @@ Shoutout to [Harun Ocaksız](https://instagram.com/harunocaksiz) for sticking wi
 ## Contributing
 
 See the [contribution guidelines](CONTRIBUTING.md).
+
+<a href="https://discord.gg/zphNxEcEK7">
+   <img src="https://discord.com/api/guilds/1289166752311148554/embed.png?style=banner2"></a>
 
 ## License
 
