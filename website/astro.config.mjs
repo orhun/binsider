@@ -58,6 +58,13 @@ export default defineConfig({
             directory: "blog",
           },
         },
+        {
+          label: "Extras",
+          collapsed: true,
+          autogenerate: {
+            directory: "extras",
+          },
+        },
         "pricing",
       ],
       editLink: {
