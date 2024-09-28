@@ -13,6 +13,9 @@ pub mod widgets;
 /// Possible commands.
 pub mod command;
 
+/// ANSI logo.
+mod logo;
+
 use crate::error::Result;
 use event::EventHandler;
 use ratatui::backend::{Backend, CrosstermBackend};

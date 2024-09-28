@@ -6,6 +6,7 @@ use crate::error::{Error, Result};
 use crate::prelude::Analyzer;
 use crate::tui::command::*;
 use crate::tui::event::Event;
+use crate::tui::logo::Logo;
 use crate::tui::ui::{Tab, ELF_INFO_TABS, MAIN_TABS};
 use crate::tui::widgets::SelectableList;
 use ansi_to_tui::IntoText;
@@ -52,6 +53,8 @@ pub struct State<'a> {
     pub headers_scroll_index: usize,
     /// Terminal accent color.
     pub accent_color: Color,
+    /// Logo widget.
+    pub logo: Logo,
 }
 
 impl<'a> State<'a> {
@@ -83,6 +86,7 @@ impl<'a> State<'a> {
                     }
                 })
                 .unwrap_or(Color::White),
+            logo: Logo::default(),
         };
         state.handle_tab()?;
         Ok(state)
