@@ -13,6 +13,7 @@ export default defineConfig({
         mastodon: "https://fosstodon.org/@orhun",
         "x.com": "https://twitter.com/orhundev",
         linkedin: "https://www.linkedin.com/in/orhunp",
+        discord: "https://discord.gg/zphNxEcEK7",
       },
       logo: {
         dark: "./src/assets/binsider-logo-dark.png",
