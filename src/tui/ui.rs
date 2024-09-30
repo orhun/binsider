@@ -206,6 +206,9 @@ pub fn render_key_bindings(state: &mut State, frame: &mut Frame, rect: Rect) {
 
 /// Renders the general info tab.
 pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
+    let selected_index = state.list.state.selected().unwrap_or_default();
+    let items_len = state.list.items.len();
+
     frame.render_widget(Block::bordered(), rect);
     let area = Layout::new(
         Direction::Vertical,
@@ -525,7 +528,21 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
                     "|".fg(Color::Rgb(100, 100, 100)),
                 ])
                 .title_alignment(Alignment::Center)
-                .border_style(Style::default().fg(Color::Rgb(100, 100, 100))),
+                .border_style(Style::default().fg(Color::Rgb(100, 100, 100)))
+                .title_bottom(
+                    if items_len != 0 {
+                        Line::from(vec![
+                            "|".fg(Color::Rgb(100, 100, 100)),
+                            format!("{}/{}", selected_index.saturating_add(1), items_len)
+                                .fg(state.accent_color)
+                                .bold(),
+                            "|".fg(Color::Rgb(100, 100, 100)),
+                        ])
+                    } else {
+                        Line::default()
+                    }
+                    .right_aligned(),
+                ),
         )
         .highlight_style(Style::default().fg(Color::Green)),
         table_area,
