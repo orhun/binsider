@@ -52,6 +52,13 @@ export default defineConfig({
           },
         },
         {
+          label: "Blog",
+          collapsed: true,
+          autogenerate: {
+            directory: "blog",
+          },
+        },
+        {
           label: "Extras",
           collapsed: true,
           autogenerate: {
