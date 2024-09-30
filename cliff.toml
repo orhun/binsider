@@ -25,9 +25,9 @@ body = """
         - {% if commit.scope %}*({{ commit.scope }})* {% endif %}\
             {% if commit.breaking %}[**breaking**] {% endif %}\
             {{ commit.message | upper_first }}\
-              {% if commit.github.username %} by @{{ commit.github.username }}{%- endif -%}\
-              {% if commit.github.pr_number %} in \
-                [#{{ commit.github.pr_number }}]({{ self::remote_url() }}/pull/{{ commit.github.pr_number }})
+              {% if commit.remote.username %} by @{{ commit.remote.username }}{%- endif -%}\
+              {% if commit.remote.pr_number %} in \
+                [#{{ commit.remote.pr_number }}]({{ self::remote_url() }}/pull/{{ commit.remote.pr_number }})
               {%- endif %}\
     {% endfor %}
 {% endfor %}
@@ -75,11 +75,8 @@ conventional_commits = true
 filter_unconventional = true
 # regex for preprocessing the commit messages
 commit_preprocessors = [
-  # Replace issue numbers
-  #{ pattern = '\((\w+\s)?#([0-9]+)\)', replace = "([#${2}](<REPO>/issues/${2}))"},
-  # Check spelling of the commit with https://github.com/crate-ci/typos
-  # If the spelling is incorrect, it will be automatically fixed.
-  #{ pattern = '.*', replace_command = 'typos --write-changes -' },
+  # remove issue numbers from commits
+  { pattern = '\((\w+\s)?#([0-9]+)\)', replace = "" },
 ]
 # regex for parsing and grouping commits
 commit_parsers = [
