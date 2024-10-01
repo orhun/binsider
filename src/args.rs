@@ -1,6 +1,8 @@
 use clap::Parser;
 use std::path::PathBuf;
 
+use crate::tui::ui::Tab;
+
 /// Argument parser powered by [`clap`].
 #[derive(Clone, Debug, Default, Parser)]
 #[clap(
@@ -25,6 +27,10 @@ pub struct Args {
     /// Minimum length of strings.
     #[arg(env, short = 'n', long = "min-len", default_value = "15")]
     pub min_strings_len: usize,
+
+    /// The initial application tab to open.
+    #[arg(env, short = 't', long = "tab", default_value = "general")]
+    pub tab: Tab,
 }
 
 #[cfg(test)]

@@ -35,7 +35,7 @@ pub const ELF_INFO_TABS: &[Info] = &[
 ];
 
 /// Application tab.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, clap::ValueEnum)]
 pub enum Tab {
     /// General information.
     General = 0,
