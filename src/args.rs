@@ -1,7 +1,7 @@
 use clap::Parser;
 use std::path::PathBuf;
 
-use crate::prelude::Tab;
+use crate::tui::ui::Tab;
 
 /// Argument parser powered by [`clap`].
 #[derive(Clone, Debug, Default, Parser)]
@@ -28,7 +28,7 @@ pub struct Args {
     #[arg(env, short = 'n', long = "min-len", default_value = "15")]
     pub min_strings_len: usize,
 
-    /// The tab binsider will start at
+    /// The initial application tab to open.
     #[arg(env, short = 't', long = "tab", default_value = "general")]
     pub tab: Tab,
 }
