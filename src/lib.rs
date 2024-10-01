@@ -69,6 +69,9 @@ pub fn start_tui(analyzer: Analyzer, args: Args) -> Result<()> {
     // Create an application.
     let mut state = State::new(analyzer)?;
 
+    // Change tab depending on cli arguments 
+    state.set_tab(args.tab);
+
     // Initialize the terminal user interface.
     let backend = CrosstermBackend::new(io::stderr());
     let terminal = Terminal::new(backend)?;

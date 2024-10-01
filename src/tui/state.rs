@@ -484,4 +484,9 @@ impl<'a> State<'a> {
             ],
         }
     }
+
+    /// Changes the tab
+    pub fn set_tab(&mut self, tab: Tab) {
+        self.tab = tab;
+    }
 }
