@@ -16,7 +16,7 @@ See the available binaries for different operating systems/architectures from th
 1. Download the binary from [releases](https://github.com/orhun/binsider/releases):
 
 ```bash
-VERSION="0.1.0"
+VERSION="0.2.0"
 TARGET="x86_64-unknown-linux-gnu.tar.gz"
 wget "https://github.com/orhun/binsider/releases/download/v${VERSION}/binsider-${VERSION}-${TARGET}.tar.gz"
 ```
