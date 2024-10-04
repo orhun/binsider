@@ -1,6 +1,5 @@
 use std::path::PathBuf;
 use std::sync::mpsc;
-use std::time::Duration;
 
 use crate::error::{Error, Result};
 use crate::prelude::Analyzer;
@@ -12,7 +11,6 @@ use crate::tui::widgets::logo::Logo;
 use ansi_to_tui::IntoText;
 use heh::windows::Window;
 use ratatui::style::Color;
-use termbg::Theme;
 use tui_input::backend::crossterm::EventHandler;
 use tui_input::Input;
 
@@ -59,7 +57,7 @@ pub struct State<'a> {
 
 impl<'a> State<'a> {
     /// Constructs a new instance of [`State`].
-    pub fn new(analyzer: Analyzer<'a>) -> Result<Self> {
+    pub fn new(analyzer: Analyzer<'a>, accent_color: Option<Color>) -> Result<Self> {
         let mut state = Self {
             running: true,
             tab: Tab::default(),
@@ -77,15 +75,7 @@ impl<'a> State<'a> {
             general_scroll_index: 0,
             notes_scroll_index: 0,
             headers_scroll_index: 0,
-            accent_color: termbg::theme(Duration::from_millis(10))
-                .map(|theme| {
-                    if theme == Theme::Dark {
-                        Color::White
-                    } else {
-                        Color::Black
-                    }
-                })
-                .unwrap_or(Color::White),
+            accent_color: accent_color.unwrap_or(Color::White),
             logo: Logo::default(),
         };
         state.handle_tab()?;

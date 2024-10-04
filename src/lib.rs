@@ -67,7 +67,7 @@ pub fn run(mut args: Args) -> Result<()> {
 /// Starts the terminal user interface.
 pub fn start_tui(analyzer: Analyzer, args: Args) -> Result<()> {
     // Create an application.
-    let mut state = State::new(analyzer)?;
+    let mut state = State::new(analyzer, args.accent_color)?;
 
     // Change tab depending on cli arguments.
     state.set_tab(args.tab);
