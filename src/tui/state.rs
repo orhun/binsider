@@ -175,8 +175,15 @@ impl<'a> State<'a> {
                         self.analyzer.heh.labels.notification = message;
                     }
                 }
-                HexdumpCommand::Cancel => {
+                HexdumpCommand::CancelNext => {
                     self.tab = ((self.tab as usize + 1) % MAIN_TABS.len()).into();
+                    self.handle_tab()?;
+                }
+                HexdumpCommand::CancelPrevious => {
+                    self.tab = (self.tab as usize)
+                        .checked_sub(1)
+                        .unwrap_or(MAIN_TABS.len() - 1)
+                        .into();
                     self.handle_tab()?;
                 }
                 HexdumpCommand::Exit => {
@@ -255,7 +262,11 @@ impl<'a> State<'a> {
             },
             Command::Previous(scroll_type, amount) => match scroll_type {
                 ScrollType::Tab => {
-                    unimplemented!()
+                    self.tab = (self.tab as usize)
+                        .checked_sub(amount)
+                        .unwrap_or(MAIN_TABS.len() - 1)
+                        .into();
+                    self.handle_tab()?;
                 }
                 ScrollType::Table => {
                     if self.tab == Tab::StaticAnalysis {
@@ -431,6 +442,7 @@ impl<'a> State<'a> {
                     ("o", "Open docs"),
                     ("⏎ ", "Analyze lib"),
                     ("h/j/k/l", "Scroll"),
+                    ("ShiftTab", "Back"),
                     ("Tab", "Next"),
                     ("Bksp", "Back"),
                     ("q", "Quit"),
@@ -441,6 +453,7 @@ impl<'a> State<'a> {
                 ("/", "Search"),
                 ("h/j/k/l", "Scroll"),
                 ("n/p", "Toggle"),
+                ("ShiftTab", "Back"),
                 ("Tab", "Next"),
                 ("q", "Quit"),
             ],
@@ -451,6 +464,7 @@ impl<'a> State<'a> {
                         ("r", "Re-run"),
                         ("/", "Search"),
                         ("h/j/k/l", "Scroll"),
+                        ("ShiftTab", "Back"),
                         ("Tab", "Next"),
                         ("q", "Quit"),
                     ]
@@ -459,6 +473,7 @@ impl<'a> State<'a> {
                         ("Enter", "Run"),
                         ("/", "Search"),
                         ("h/j/k/l", "Scroll"),
+                        ("ShiftTab", "Back"),
                         ("Tab", "Next"),
                         ("q", "Quit"),
                     ]
@@ -470,6 +485,7 @@ impl<'a> State<'a> {
                 ("-", "Decrement"),
                 ("/", "Search"),
                 ("h/j/k/l", "Scroll"),
+                ("ShiftTab", "Back"),
                 ("Tab", "Next"),
                 ("q", "Quit"),
             ],
@@ -479,6 +495,7 @@ impl<'a> State<'a> {
                 ("/", "Search"),
                 ("n", "Endianness"),
                 ("h/j/k/l", "Scroll"),
+                ("ShiftTab", "Back"),
                 ("Tab", "Next"),
                 ("q", "Quit"),
             ],

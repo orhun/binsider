@@ -74,6 +74,7 @@ impl From<KeyEvent> for Command {
             }
             KeyCode::Esc | KeyCode::Char('q') => Self::Exit,
             KeyCode::Tab => Self::Next(ScrollType::Tab, 1),
+            KeyCode::BackTab => Self::Previous(ScrollType::Tab, 1),
             KeyCode::Char('t') | KeyCode::Home => Self::Top,
             KeyCode::Char('b') | KeyCode::End => Self::Bottom,
             KeyCode::Char('+') => Self::Increment,
@@ -151,8 +152,10 @@ pub enum HexdumpCommand {
     HandleCustom(Event, Event),
     /// Warn.
     Warn(String, Event),
-    /// Cancel hexdump.
-    Cancel,
+    /// Cancel hexdump and move to the next tab.
+    CancelNext,
+    /// Cancel hexdump and move to the previous tab.
+    CancelPrevious,
     /// Exit application.
     Exit,
 }
@@ -160,31 +163,29 @@ pub enum HexdumpCommand {
 impl HexdumpCommand {
     /// Parses the event.
     pub fn parse(key_event: KeyEvent, is_read_only: bool) -> Self {
-        if key_event.code == KeyCode::Char('q') {
-            Self::Exit
-        } else if key_event.code == KeyCode::Tab {
-            Self::Cancel
-        } else if key_event.code == KeyCode::Char('s') {
-            if is_read_only {
-                Self::Warn(String::from("file is read-only"), Event::Key(key_event))
-            } else {
-                Self::HandleCustom(
-                    Event::Key(KeyEvent::new(KeyCode::Char('s'), KeyModifiers::CONTROL)),
-                    Event::Key(key_event),
-                )
+        match key_event.code {
+            KeyCode::Char('q') => Self::Exit,
+            KeyCode::Tab => Self::CancelNext,
+            KeyCode::BackTab => Self::CancelPrevious,
+            KeyCode::Char('s') => {
+                if is_read_only {
+                    Self::Warn(String::from("file is read-only"), Event::Key(key_event))
+                } else {
+                    Self::HandleCustom(
+                        Event::Key(KeyEvent::new(KeyCode::Char('s'), KeyModifiers::CONTROL)),
+                        Event::Key(key_event),
+                    )
+                }
             }
-        } else if key_event.code == KeyCode::Char('g') {
-            Self::HandleCustom(
+            KeyCode::Char('g') => Self::HandleCustom(
                 Event::Key(KeyEvent::new(KeyCode::Char('j'), KeyModifiers::CONTROL)),
                 Event::Key(key_event),
-            )
-        } else if key_event.code == KeyCode::Char('n') {
-            Self::HandleCustom(
+            ),
+            KeyCode::Char('n') => Self::HandleCustom(
                 Event::Key(KeyEvent::new(KeyCode::Char('e'), KeyModifiers::CONTROL)),
                 Event::Key(key_event),
-            )
-        } else {
-            Self::Handle(Event::Key(key_event))
+            ),
+            _ => Self::Handle(Event::Key(key_event)),
         }
     }
 }
