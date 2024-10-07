@@ -22,6 +22,11 @@
               "--skip=test_extract_strings"
               "--skip=test_init"
             ];
+            meta = with pkgs.lib; {
+              description = "Analyze ELF binaries like a boss";
+              homepage = "https://binsider.dev/";
+              license = licenses.mit;
+            };
           };
           default = binsider;
         };
