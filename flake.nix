@@ -25,7 +25,7 @@
             meta = with pkgs.lib; {
               description = "Analyze ELF binaries like a boss";
               homepage = "https://binsider.dev/";
-              license = licenses.mit;
+              license = [ licenses.mit licenses.asl20 ];
             };
           };
           default = binsider;
