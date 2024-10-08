@@ -9,7 +9,7 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
       in
-      {
+      rec {
         packages = rec {
           binsider = pkgs.rustPlatform.buildRustPackage {
             name = "binsider";
@@ -30,6 +30,7 @@
           };
           default = binsider;
         };
+        checks.check = packages.binsider;
       }
     );
 
