@@ -175,8 +175,15 @@ impl<'a> State<'a> {
                         self.analyzer.heh.labels.notification = message;
                     }
                 }
-                HexdumpCommand::Cancel => {
+                HexdumpCommand::CancelNext => {
                     self.tab = ((self.tab as usize + 1) % MAIN_TABS.len()).into();
+                    self.handle_tab()?;
+                }
+                HexdumpCommand::CancelPrevious => {
+                    self.tab = (self.tab as usize)
+                        .checked_sub(1)
+                        .unwrap_or(MAIN_TABS.len() - 1)
+                        .into();
                     self.handle_tab()?;
                 }
                 HexdumpCommand::Exit => {
@@ -255,7 +262,11 @@ impl<'a> State<'a> {
             },
             Command::Previous(scroll_type, amount) => match scroll_type {
                 ScrollType::Tab => {
-                    unimplemented!()
+                    self.tab = (self.tab as usize)
+                        .checked_sub(amount)
+                        .unwrap_or(MAIN_TABS.len() - 1)
+                        .into();
+                    self.handle_tab()?;
                 }
                 ScrollType::Table => {
                     if self.tab == Tab::StaticAnalysis {
@@ -432,6 +443,7 @@ impl<'a> State<'a> {
                     ("⏎ ", "Analyze lib"),
                     ("h/j/k/l", "Scroll"),
                     ("Tab", "Next"),
+                    ("⇧+Tab", "Previous"),
                     ("Bksp", "Back"),
                     ("q", "Quit"),
                 ]
