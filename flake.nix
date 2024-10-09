@@ -1,25 +1,19 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?nixpkgs-unstable";
+    naersk.url = "github:nix-community/naersk";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { nixpkgs, flake-utils, ... }:
+  outputs = { nixpkgs, flake-utils, naersk, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        binsider' = { buildType }: pkgs.rustPlatform.buildRustPackage {
+        naersk' = pkgs.callPackage naersk { };
+        binsider' = { release }: naersk'.buildPackage {
           name = "binsider";
           src = ./.;
-          cargoLock = {
-            lockFile = ./Cargo.lock;
-          };
-          checkType = "debug";
-          inherit buildType;
-          checkFlags = [
-            "--skip=test_extract_strings"
-            "--skip=test_init"
-          ];
+          inherit release;
           meta = with pkgs.lib; {
             description = "Analyze ELF binaries like a boss";
             homepage = "https://binsider.dev/";
@@ -29,12 +23,12 @@
       in
       rec {
         packages = rec {
-          binsider = binsider' { buildType = "release"; };
-          binsider-debug = binsider' { buildType = "debug"; };
+          binsider = binsider' { release = true; };
+          binsider-debug = binsider' { release = false; };
           default = binsider;
         };
         checks.check = packages.binsider-debug;
-
       }
     );
 }
+
