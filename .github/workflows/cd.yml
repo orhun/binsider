@@ -86,6 +86,12 @@ jobs:
               ARGS: "--no-default-features",
             }
           - {
+              OS: ubuntu-22.04,
+              TOOLCHAIN: nightly,
+              TARGET: mipsel-unknown-linux-gnu,
+              ALL_FEATURES: false,
+            }
+          - {
               OS: windows-2022,
               TOOLCHAIN: stable,
               TARGET: x86_64-pc-windows-msvc,
