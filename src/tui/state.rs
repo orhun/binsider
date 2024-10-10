@@ -353,6 +353,26 @@ impl<'a> State<'a> {
                     self.running = false;
                 }
             }
+            Command::HumanReadable => {
+                if self.tab == Tab::StaticAnalysis {
+                    self.analyzer.elf.set_human_readable();
+                    self.list = SelectableList::with_items(
+                        self.analyzer
+                            .elf
+                            .info(&ELF_INFO_TABS[self.info_index])
+                            .items()
+                            .into_iter()
+                            .filter(|items| {
+                                self.input.value().is_empty()
+                                    || items.iter().any(|item| {
+                                        item.to_lowercase()
+                                            .contains(&self.input.value().to_lowercase())
+                                    })
+                            })
+                            .collect(),
+                    );
+                }
+            }
             Command::Nothing => {}
         }
         Ok(())
@@ -451,6 +471,7 @@ impl<'a> State<'a> {
             Tab::StaticAnalysis => vec![
                 ("Enter", "Details"),
                 ("/", "Search"),
+                ("s", "Human Readable"),
                 ("h/j/k/l", "Scroll"),
                 ("n/p", "Toggle"),
                 ("Tab", "Next"),
