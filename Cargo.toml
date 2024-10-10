@@ -25,7 +25,7 @@ dynamic-analysis = ["lurk-cli"]
 
 [dependencies]
 ratatui = "0.28.1"
-clap = { version = "4.5.19", features = ["derive", "env", "wrap_help", "cargo"] }
+clap = { version = "4.5.20", features = ["derive", "env", "wrap_help", "cargo"] }
 thiserror = "1.0.64"
 elf = "0.7.1"
 rust-strings = "0.6.0"
