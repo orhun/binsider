@@ -52,7 +52,7 @@ impl<B: Backend> Tui<B> {
     /// It enables the raw mode and sets terminal properties.
     pub fn init(&mut self) -> Result<()> {
         terminal::enable_raw_mode()?;
-        ratatui::crossterm::execute!(io::stderr(), EnterAlternateScreen, EnableMouseCapture)?;
+        ratatui::crossterm::execute!(io::stdout(), EnterAlternateScreen, EnableMouseCapture)?;
         panic::set_hook(Box::new(move |panic| {
             Self::reset().expect("failed to reset the terminal");
             better_panic::Settings::auto()
@@ -99,8 +99,8 @@ impl<B: Backend> Tui<B> {
     /// It disables the raw mode and reverts back the terminal properties.
     pub fn reset() -> Result<()> {
         terminal::disable_raw_mode()?;
-        ratatui::crossterm::execute!(io::stderr(), LeaveAlternateScreen, DisableMouseCapture)?;
-        Terminal::new(CrosstermBackend::new(io::stderr()))?.show_cursor()?;
+        ratatui::crossterm::execute!(io::stdout(), LeaveAlternateScreen, DisableMouseCapture)?;
+        Terminal::new(CrosstermBackend::new(io::stdout()))?.show_cursor()?;
         Ok(())
     }
 
@@ -109,7 +109,7 @@ impl<B: Backend> Tui<B> {
     /// It disables the raw mode and reverts back the terminal properties.
     pub fn exit(&mut self) -> Result<()> {
         terminal::disable_raw_mode()?;
-        ratatui::crossterm::execute!(io::stderr(), LeaveAlternateScreen, DisableMouseCapture)?;
+        ratatui::crossterm::execute!(io::stdout(), LeaveAlternateScreen, DisableMouseCapture)?;
         self.terminal.show_cursor()?;
         self.events.stop();
         Ok(())

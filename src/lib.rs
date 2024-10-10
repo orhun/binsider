@@ -73,7 +73,7 @@ pub fn start_tui(analyzer: Analyzer, args: Args) -> Result<()> {
     state.set_tab(args.tab);
 
     // Initialize the terminal user interface.
-    let backend = CrosstermBackend::new(io::stderr());
+    let backend = CrosstermBackend::new(io::stdout());
     let terminal = Terminal::new(backend)?;
     let events = EventHandler::new(250);
     state.analyzer.extract_strings(events.sender.clone());
