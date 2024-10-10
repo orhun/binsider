@@ -2,6 +2,37 @@
 
 [**binsider**](https://binsider.dev): Analyze ELF binaries like a boss 😼🕵️‍♂️
 
+## 0.2.1 - 2024-10-10
+
+### 🚀 Features
+
+- *(tui)* Use stdout for rendering by @orhun in [#79](https://github.com/orhun/binsider/pull/79)
+- *(ui)* Support shift+tab for going to the previous tab by @XXMA16 in [#70](https://github.com/orhun/binsider/pull/70)
+- *(cli)* Add `--tab` argument by @josueBarretogit in [#60](https://github.com/orhun/binsider/pull/60)
+- *(general)* Display the number of shared libraries by @sumit0190 in [#58](https://github.com/orhun/binsider/pull/58)
+
+### 🐛 Bug Fixes
+
+- *(tui)* [**breaking**] Query the terminal background once by @orhun in [#62](https://github.com/orhun/binsider/pull/62)
+- *(flake)* Add missing meta section to flake by @ch4og in [#74](https://github.com/orhun/binsider/pull/74)
+- *(cd)* Enable cross compilationby @orhun
+
+### ⚡ Performance
+
+- *(flake)* Speed up rebuild by using naersk by @ch4og in [#76](https://github.com/orhun/binsider/pull/76)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(deny)* Update ignored advisoriesby @orhun
+- *(ci)* Add nix flake build by @ch4og in [#75](https://github.com/orhun/binsider/pull/75)
+
+## New Contributors
+* @XXMA16 made their first contribution in [#70](https://github.com/orhun/binsider/pull/70)
+* @josueBarretogit made their first contribution in [#60](https://github.com/orhun/binsider/pull/60)
+* @sumit0190 made their first contribution in [#58](https://github.com/orhun/binsider/pull/58)
+
+**Full Changelog**: https://github.com/orhun/binsider/compare/v0.2.0...0.2.1
+
 ## 0.2.0 - 2024-09-30
 
 ✨ See the blog post about this release: <https://binsider.dev/blog/v020/>
