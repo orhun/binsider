@@ -17,8 +17,9 @@ See the available binaries for different operating systems/architectures from th
 
 ```bash
 VERSION="0.1.0"
-TARGET="x86_64-unknown-linux-gnu.tar.gz"
-wget "https://github.com/orhun/binsider/releases/download/v${VERSION}/binsider-${VERSION}-${TARGET}.tar.gz"
+ARCH="x86_64"
+TARGET="unknown-linux-gnu"
+wget "https://github.com/orhun/binsider/releases/download/v${VERSION}/binsider-${VERSION}-${ARCH}-${TARGET}.tar.gz"
 ```
 
 2. Extract the files:
@@ -30,7 +31,7 @@ tar -xvzf binsider-*.tar.gz
 3. Enter the folder and run the binary:
 
 ```bash
-cd "binsider-${version}"
+cd "binsider-${VERSION}"
 ./binsider
 ```
 
