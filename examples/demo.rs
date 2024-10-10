@@ -19,7 +19,7 @@ fn main() -> Result<()> {
         file_data.as_slice(),
     )?;
     let analyzer = Analyzer::new(file_info, 15, vec![])?;
-    let mut state = State::new(analyzer)?;
+    let mut state = State::new(analyzer, None)?;
     let (sender, receiver) = mpsc::channel();
     state.analyzer.extract_strings(sender.clone());
 

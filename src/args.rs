@@ -1,4 +1,5 @@
 use clap::Parser;
+use ratatui::style::Color;
 use std::path::PathBuf;
 
 use crate::tui::ui::Tab;
@@ -31,6 +32,10 @@ pub struct Args {
     /// The initial application tab to open.
     #[arg(env, short = 't', long = "tab", default_value = "general")]
     pub tab: Tab,
+
+    /// Accent color of the application.
+    #[arg(env, long, value_name = "COLOR")]
+    pub accent_color: Option<Color>,
 }
 
 #[cfg(test)]

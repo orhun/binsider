@@ -21,7 +21,7 @@ Then you can create a `Analyzer` struct and `State` for managing the TUI state:
 use binsider::prelude::*;
 
 let analyzer = Analyzer::new(file_info, 15, vec![])?;
-let mut state = State::new(analyzer)?;
+let mut state = State::new(analyzer, None)?;
 ```
 
 To render a frame:
