@@ -45,6 +45,8 @@ pub enum Command {
     Exit,
     /// Do nothing.
     Nothing,
+    /// Change data to human readable format
+    HumanReadable,
 }
 
 impl From<KeyEvent> for Command {
@@ -98,6 +100,7 @@ impl From<KeyEvent> for Command {
             KeyCode::Enter => Self::ShowDetails,
             KeyCode::Char('o') => Self::OpenRepo,
             KeyCode::Char('r') => Self::TraceCalls,
+            KeyCode::Char('s') => Self::HumanReadable,
             _ => Self::Nothing,
         }
     }
