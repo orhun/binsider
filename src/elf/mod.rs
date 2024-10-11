@@ -138,7 +138,7 @@ impl Elf {
         }
     }
     /// sets program_headers as human_readable
-    pub fn set_human_readable(&mut self) {
+    pub fn toggle_human_readable(&mut self) {
         self.program_headers.set_value();
     }
 }

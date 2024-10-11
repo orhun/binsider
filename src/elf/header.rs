@@ -1,7 +1,6 @@
 use crate::elf::Property;
-use elf::parse::ParsingTable;
-extern crate bytesize;
 use bytesize::ByteSize;
+use elf::parse::ParsingTable;
 use elf::section::SectionHeader;
 use elf::segment::ProgramHeader;
 use elf::string_table::StringTable;
@@ -134,43 +133,31 @@ impl From<Vec<ProgramHeader>> for ProgramHeaders {
 
 impl<'a> Property<'a> for ProgramHeaders {
     fn items(&self) -> Vec<Vec<String>> {
-        if !self.human_readable {
-            self.inner
-                .iter()
-                .map(|item| {
-                    vec![
-                        elf::to_str::p_type_to_string(item.p_type)
-                            .trim_start_matches("PT_")
-                            .to_string(),
-                        format!("{:#x}", item.p_offset),
-                        format!("{:#x}", item.p_vaddr),
-                        format!("{:#x}", item.p_paddr),
-                        format!("{:#x}", item.p_filesz),
-                        format!("{:#x}", item.p_memsz),
-                        elf::to_str::p_flags_to_string(item.p_flags),
-                        format!("{:#x}", item.p_align),
-                    ]
-                })
-                .collect()
-        } else {
-            self.inner
-                .iter()
-                .map(|item| {
-                    vec![
-                        elf::to_str::p_type_to_string(item.p_type)
-                            .trim_start_matches("PT_")
-                            .to_string(),
-                        format!("{:#x}", item.p_offset),
-                        format!("{:#x}", item.p_vaddr),
-                        format!("{:#x}", item.p_paddr),
-                        format!("{}", ByteSize(item.p_filesz)),
-                        format!("{}", ByteSize(item.p_memsz)),
-                        elf::to_str::p_flags_to_string(item.p_flags),
-                        format!("{:#x}", item.p_align),
-                    ]
-                })
-                .collect()
-        }
+        self.inner
+            .iter()
+            .map(|item| {
+                vec![
+                    elf::to_str::p_type_to_string(item.p_type)
+                        .trim_start_matches("PT_")
+                        .to_string(),
+                    format!("{:#x}", item.p_offset),
+                    format!("{:#x}", item.p_vaddr),
+                    format!("{:#x}", item.p_paddr),
+                    if self.human_readable {
+                        format!("{}", ByteSize(item.p_filesz))
+                    } else {
+                        format!("{:#x}", item.p_filesz)
+                    },
+                    if self.human_readable {
+                        format!("{}", ByteSize(item.p_memsz))
+                    } else {
+                        format!("{:#x}", item.p_memsz)
+                    },
+                    elf::to_str::p_flags_to_string(item.p_flags),
+                    format!("{:#x}", item.p_align),
+                ]
+            })
+            .collect()
     }
 }
 
