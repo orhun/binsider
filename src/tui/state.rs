@@ -457,9 +457,9 @@ impl<'a> State<'a> {
             Tab::StaticAnalysis => vec![
                 ("Enter", "Details"),
                 ("/", "Search"),
-                ("s", "Human Readable"),
                 ("h/j/k/l", "Scroll"),
                 ("n/p", "Toggle"),
+                ("s", "Readability"),
                 ("Tab", "Next"),
                 ("q", "Quit"),
             ],
