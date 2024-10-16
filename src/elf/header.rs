@@ -1,4 +1,5 @@
 use crate::elf::Property;
+use bytesize::ByteSize;
 use elf::parse::ParsingTable;
 use elf::section::SectionHeader;
 use elf::segment::ProgramHeader;
@@ -111,11 +112,23 @@ impl<'a> Property<'a> for FileHeaders {
 pub struct ProgramHeaders {
     /// Inner type.
     inner: Vec<ProgramHeader>,
+    /// Human readable format
+    human_readable: bool,
+}
+
+impl ProgramHeaders {
+    /// Toggles the value for human readable format.
+    pub fn toggle_readability(&mut self) {
+        self.human_readable = !self.human_readable;
+    }
 }
 
 impl From<Vec<ProgramHeader>> for ProgramHeaders {
     fn from(inner: Vec<ProgramHeader>) -> Self {
-        Self { inner }
+        Self {
+            inner,
+            human_readable: true,
+        }
     }
 }
 
@@ -131,8 +144,16 @@ impl<'a> Property<'a> for ProgramHeaders {
                     format!("{:#x}", item.p_offset),
                     format!("{:#x}", item.p_vaddr),
                     format!("{:#x}", item.p_paddr),
-                    format!("{:#x}", item.p_filesz),
-                    format!("{:#x}", item.p_memsz),
+                    if self.human_readable {
+                        format!("{}", ByteSize(item.p_filesz))
+                    } else {
+                        format!("{:#x}", item.p_filesz)
+                    },
+                    if self.human_readable {
+                        format!("{}", ByteSize(item.p_memsz))
+                    } else {
+                        format!("{:#x}", item.p_memsz)
+                    },
                     elf::to_str::p_flags_to_string(item.p_flags),
                     format!("{:#x}", item.p_align),
                 ]

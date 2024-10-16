@@ -343,6 +343,12 @@ impl<'a> State<'a> {
                     self.running = false;
                 }
             }
+            Command::HumanReadable => {
+                if self.tab == Tab::StaticAnalysis {
+                    self.analyzer.elf.program_headers.toggle_readability();
+                    self.handle_tab()?;
+                }
+            }
             Command::Nothing => {}
         }
         Ok(())
@@ -443,6 +449,7 @@ impl<'a> State<'a> {
                 ("/", "Search"),
                 ("h/j/k/l", "Scroll"),
                 ("n/p", "Toggle"),
+                ("s", "Readability"),
                 ("Tab", "Next"),
                 ("q", "Quit"),
             ],
