@@ -115,9 +115,10 @@ pub struct ProgramHeaders {
     /// Human readable format
     human_readable: bool,
 }
+
 impl ProgramHeaders {
-    /// Toggle's the value for human_readable format
-    pub fn set_value(&mut self) {
+    /// Toggles the value for human readable format.
+    pub fn toggle_readability(&mut self) {
         self.human_readable = !self.human_readable;
     }
 }
@@ -126,7 +127,7 @@ impl From<Vec<ProgramHeader>> for ProgramHeaders {
     fn from(inner: Vec<ProgramHeader>) -> Self {
         Self {
             inner,
-            human_readable: false,
+            human_readable: true,
         }
     }
 }

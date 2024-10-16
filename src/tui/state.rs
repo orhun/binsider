@@ -355,7 +355,7 @@ impl<'a> State<'a> {
             }
             Command::HumanReadable => {
                 if self.tab == Tab::StaticAnalysis {
-                    self.analyzer.elf.toggle_human_readable();
+                    self.analyzer.elf.program_headers.toggle_readability();
                     self.handle_tab()?;
                 }
             }

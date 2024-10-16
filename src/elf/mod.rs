@@ -137,8 +137,4 @@ impl Elf {
             Info::Notes => todo!(),
         }
     }
-    /// sets program_headers as human_readable
-    pub fn toggle_human_readable(&mut self) {
-        self.program_headers.set_value();
-    }
 }
