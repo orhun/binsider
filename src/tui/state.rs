@@ -203,9 +203,11 @@ impl<'a> State<'a> {
                 }
             }
             Command::TraceCalls => {
-                event_sender
-                    .send(Event::Trace)
-                    .expect("failed to send trace event");
+                if self.tab == Tab::DynamicAnalysis {
+                    event_sender
+                        .send(Event::Trace)
+                        .expect("failed to send trace event");
+                }
             }
             Command::Next(scroll_type, amount) => match scroll_type {
                 ScrollType::Tab => {
