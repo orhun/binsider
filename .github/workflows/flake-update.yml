@@ -1,0 +1,26 @@
+name: Update Nix flake
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 0" # weekly
+jobs:
+  update-flake:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@v28
+
+      - name: Update flake.lock
+        uses: DeterminateSystems/update-flake-lock@v24
+        with:
+          commit-msg: "chore(deps): bump flake.lock"
+          pr-title: "chore(deps): bump flake.lock"
+          pr-labels: |
+            dependencies
+            github_actions
