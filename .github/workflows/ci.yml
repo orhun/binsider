@@ -148,6 +148,8 @@ jobs:
   nix-flake:
     name: Build Nix flake
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
@@ -158,10 +160,13 @@ jobs:
       - name: Restore and cache Nix store
         uses: nix-community/cache-nix-action@v5
         with:
-          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix') }}
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.nix', 'flake.lock', 'Cargo.lock', 'Cargo.toml') }}
           restore-prefixes-first-match: nix-${{ runner.os }}-
           gc-max-store-size-linux: 1073741824
-          purge: false
+          purge: true
+          purge-prefixes: nix-${{ runner.os }}-
+          purge-created: 0
+          purge-primary-key: never
 
       - name: Check Nix flake
         run: nix flake check --all-systems
