@@ -931,13 +931,10 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
 
 /// Renders the cursor.
 fn render_cursor(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
+    let scroll = state.input.visual_scroll(area.width as usize);
     if state.input_mode {
         let (x, y) = (
-            area.x
-                + Input::default()
-                    .with_value(format!("search: {}", state.input.value()))
-                    .visual_cursor() as u16
-                + 2,
+            area.x + ((state.input.visual_cursor()).max(scroll) - scroll) as u16 + 10, // +10: simply to jump over the box chars and "search: " string
             area.bottom().saturating_sub(1),
         );
         frame.render_widget(
