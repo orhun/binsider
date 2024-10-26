@@ -332,8 +332,10 @@ impl<'a> State<'a> {
             }
             Command::Decrement => {
                 if self.tab == Tab::Strings {
-                    self.analyzer.strings_len =
-                        self.analyzer.strings_len.checked_sub(1).unwrap_or_default();
+                    if self.analyzer.strings_len > 1 {
+                        self.analyzer.strings_len =
+                            self.analyzer.strings_len.checked_sub(1).unwrap_or_default();
+                    }
                     self.strings_loaded = false;
                     self.analyzer.extract_strings(event_sender.clone());
                 }
