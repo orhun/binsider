@@ -2,9 +2,7 @@
 title: Architecture Overview
 ---
 
-**Here is automatically generated Architecture diagram**
-
-This should help getting started understanding various parts of `binsider`
+Here is an architectural diagram of `binsider` which should help in understanding the various components and how they interact with each other:
 
 ```mermaid
 graph TB
