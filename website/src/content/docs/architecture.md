@@ -1,3 +1,7 @@
+---
+title: Architecture Overview
+---
+
 **Here is automatically generated Architecture diagram**
 
 This should help getting started understanding various parts of `binsider`
