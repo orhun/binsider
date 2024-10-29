@@ -169,6 +169,15 @@ pub struct SectionHeaders {
     inner: Vec<SectionHeader>,
     /// Section names.
     names: Vec<String>,
+    /// Human readable format
+    human_readable: bool,
+}
+
+impl SectionHeaders {
+    /// Toggles the value for human readable format.
+    pub fn toggle_readability(&mut self) {
+        self.human_readable = !self.human_readable;
+    }
 }
 
 impl<'a>
@@ -209,6 +218,7 @@ impl<'a>
                         .unwrap_or_else(|_| String::from("unknown"))
                 })
                 .collect(),
+            human_readable: true,
         })
     }
 }
@@ -226,7 +236,11 @@ impl<'a> Property<'a> for SectionHeaders {
                         .to_string(),
                     format!("{:#x}", header.sh_addr),
                     format!("{:#x}", header.sh_offset),
-                    format!("{:#x}", header.sh_size),
+                    if self.human_readable {
+                        format!("{}", ByteSize(header.sh_size))
+                    } else {
+                        format!("{:#x}", header.sh_size)
+                    },
                     header.sh_entsize.to_string(),
                     format!("{:#x}", header.sh_flags),
                     header.sh_link.to_string(),
