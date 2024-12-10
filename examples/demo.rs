@@ -1,6 +1,6 @@
 //! A simple demo of how to use the binsider as a library.
 
-use std::{env, fs, path::PathBuf, sync::mpsc, time::Duration};
+use std::{fs, path::PathBuf, sync::mpsc, time::Duration};
 
 use binsider::{prelude::*, tui::ui::Tab};
 
@@ -11,7 +11,11 @@ use ratatui::{
 
 fn main() -> Result<()> {
     // Create an analyzer.
-    let path = PathBuf::from(env::args().next().expect("no file given"));
+    let mut path = PathBuf::from("ls");
+    if !path.exists() {
+        let resolved_path = which::which(path.to_string_lossy().to_string()).unwrap();
+        path = resolved_path;
+    }
     let file_data = fs::read(&path)?;
     let file_info = FileInfo::new(
         path.to_str().unwrap_or_default(),

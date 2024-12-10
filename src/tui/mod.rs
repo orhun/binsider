@@ -14,104 +14,36 @@ pub mod widgets;
 pub mod command;
 
 use crate::error::Result;
-use event::EventHandler;
-use ratatui::backend::{Backend, CrosstermBackend};
+use ratatui::backend::Backend;
 use ratatui::crossterm::event::{DisableMouseCapture, EnableMouseCapture};
 use ratatui::crossterm::terminal::{self, EnterAlternateScreen, LeaveAlternateScreen};
 use ratatui::Terminal;
-use state::State;
-use std::sync::atomic::Ordering;
 use std::{io, panic};
 
-/// Representation of a terminal user interface.
+/// Initializes the terminal interface.
 ///
-/// It is responsible for setting up the terminal,
-/// initializing the interface and handling the draw events.
-#[derive(Debug)]
-pub struct Tui<B: Backend> {
-    /// Interface to the Terminal.
-    terminal: Terminal<B>,
-    /// Terminal event handler.
-    pub events: EventHandler,
-    /// Is the interface paused?
-    pub paused: bool,
+/// It enables the raw mode and sets terminal properties.
+pub fn tui_init<B: Backend>(terminal: &mut Terminal<B>) -> Result<()> {
+    terminal::enable_raw_mode()?;
+    ratatui::crossterm::execute!(io::stderr(), EnterAlternateScreen, EnableMouseCapture)?;
+    panic::set_hook(Box::new(move |panic| {
+        better_panic::Settings::auto()
+            .most_recent_first(false)
+            .lineno_suffix(true)
+            .create_panic_handler()(panic);
+        std::process::exit(1);
+    }));
+    terminal.hide_cursor()?;
+    terminal.clear()?;
+    Ok(())
 }
 
-impl<B: Backend> Tui<B> {
-    /// Constructs a new instance of [`Tui`].
-    pub fn new(terminal: Terminal<B>, events: EventHandler) -> Self {
-        Self {
-            terminal,
-            events,
-            paused: false,
-        }
-    }
-
-    /// Initializes the terminal interface.
-    ///
-    /// It enables the raw mode and sets terminal properties.
-    pub fn init(&mut self) -> Result<()> {
-        terminal::enable_raw_mode()?;
-        ratatui::crossterm::execute!(io::stdout(), EnterAlternateScreen, EnableMouseCapture)?;
-        panic::set_hook(Box::new(move |panic| {
-            Self::reset().expect("failed to reset the terminal");
-            better_panic::Settings::auto()
-                .most_recent_first(false)
-                .lineno_suffix(true)
-                .create_panic_handler()(panic);
-            std::process::exit(1);
-        }));
-        self.terminal.hide_cursor()?;
-        self.terminal.clear()?;
-        Ok(())
-    }
-
-    /// [`Draw`] the terminal interface by [`rendering`] the widgets.
-    ///
-    /// [`Draw`]: tui::Terminal::draw
-    /// [`rendering`]: crate::ui:render
-    pub fn draw(&mut self, app: &mut State) -> Result<()> {
-        self.terminal.draw(|frame| ui::render(app, frame))?;
-        Ok(())
-    }
-
-    /// Toggles the [`paused`] state of interface.
-    ///
-    /// It disables the key input and exits the
-    /// terminal interface on pause (and vice-versa).
-    ///
-    /// [`paused`]: Tui::paused
-    pub fn toggle_pause(&mut self) -> Result<()> {
-        self.paused = !self.paused;
-        if self.paused {
-            Self::reset()?;
-        } else {
-            self.init()?;
-        }
-        self.events
-            .key_input_disabled
-            .store(self.paused, Ordering::Relaxed);
-        Ok(())
-    }
-
-    /// Reset the terminal interface.
-    ///
-    /// It disables the raw mode and reverts back the terminal properties.
-    pub fn reset() -> Result<()> {
-        terminal::disable_raw_mode()?;
-        ratatui::crossterm::execute!(io::stdout(), LeaveAlternateScreen, DisableMouseCapture)?;
-        Terminal::new(CrosstermBackend::new(io::stdout()))?.show_cursor()?;
-        Ok(())
-    }
-
-    /// Exits the terminal interface.
-    ///
-    /// It disables the raw mode and reverts back the terminal properties.
-    pub fn exit(&mut self) -> Result<()> {
-        terminal::disable_raw_mode()?;
-        ratatui::crossterm::execute!(io::stdout(), LeaveAlternateScreen, DisableMouseCapture)?;
-        self.terminal.show_cursor()?;
-        self.events.stop();
-        Ok(())
-    }
+/// Exits the terminal interface.
+///
+/// It disables the raw mode and reverts back the terminal properties.
+pub fn tui_exit<B: Backend>(terminal: &mut Terminal<B>) -> Result<()> {
+    terminal::disable_raw_mode()?;
+    ratatui::crossterm::execute!(io::stderr(), LeaveAlternateScreen, DisableMouseCapture)?;
+    terminal.show_cursor()?;
+    Ok(())
 }
