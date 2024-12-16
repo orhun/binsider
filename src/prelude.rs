@@ -1,6 +1,7 @@
 pub use super::app::*;
 pub use super::error::*;
 pub use super::file::*;
+pub use super::handle_event;
 pub use super::tui::command::*;
 pub use super::tui::event::*;
 pub use super::tui::state::*;
