@@ -20,6 +20,15 @@ export default defineConfig({
         light: "./src/assets/binsider-logo-light.png",
         replacesTitle: true,
       },
+      head: [
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'apple-touch-icon',
+            href: '/apple-touch-icon.png',
+          },
+        },
+      ],
       components: {
         Head: "./src/components/Head.astro",
         Header: "./src/components/Header.astro",
