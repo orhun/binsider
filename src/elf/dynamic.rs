@@ -24,7 +24,7 @@ impl<'a> TryFrom<Option<ParsingTable<'a, AnyEndian, Dyn>>> for Dynamic {
     }
 }
 
-impl<'a> Property<'a> for Dynamic {
+impl Property<'_> for Dynamic {
     fn items(&self) -> Vec<Vec<String>> {
         self.dynamics
             .iter()

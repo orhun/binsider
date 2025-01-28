@@ -40,7 +40,7 @@ impl<'a> TryFrom<Option<(ParsingTable<'a, AnyEndian, Symbol>, StringTable<'a>)>>
     }
 }
 
-impl<'a> Property<'a> for Symbols {
+impl Property<'_> for Symbols {
     fn items(&self) -> Vec<Vec<String>> {
         self.symbols
             .iter()
@@ -135,7 +135,7 @@ impl<'a>
     }
 }
 
-impl<'a> Property<'a> for DynamicSymbols {
+impl Property<'_> for DynamicSymbols {
     fn items(&self) -> Vec<Vec<String>> {
         self.symbols
             .iter()
