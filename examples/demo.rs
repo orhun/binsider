@@ -42,17 +42,11 @@ fn main() -> Result<()> {
         }
 
         // Handle binsider events.
-        if let Some(event) = receiver.try_recv().ok() {
-            match event {
-                Event::FileStrings(strings) => {
-                    state.strings_loaded = true;
-                    state.analyzer.strings =
-                        Some(strings?.into_iter().map(|(v, l)| (l, v)).collect());
-                    if state.tab == Tab::Strings {
-                        state.handle_tab()?;
-                    }
-                }
-                _ => {}
+        if let Ok(Event::FileStrings(strings)) = receiver.try_recv() {
+            state.strings_loaded = true;
+            state.analyzer.strings = Some(strings?.into_iter().map(|(v, l)| (l, v)).collect());
+            if state.tab == Tab::Strings {
+                state.handle_tab()?;
             }
         }
     }

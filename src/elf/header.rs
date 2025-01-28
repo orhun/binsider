@@ -21,7 +21,7 @@ impl From<ElfFileHeader<AnyEndian>> for FileHeaders {
     }
 }
 
-impl<'a> Property<'a> for FileHeaders {
+impl Property<'_> for FileHeaders {
     fn items(&self) -> Vec<Vec<String>> {
         let mut headers = Vec::new();
         headers.push(vec![
@@ -132,7 +132,7 @@ impl From<Vec<ProgramHeader>> for ProgramHeaders {
     }
 }
 
-impl<'a> Property<'a> for ProgramHeaders {
+impl Property<'_> for ProgramHeaders {
     fn items(&self) -> Vec<Vec<String>> {
         self.inner
             .iter()
@@ -223,7 +223,7 @@ impl<'a>
     }
 }
 
-impl<'a> Property<'a> for SectionHeaders {
+impl Property<'_> for SectionHeaders {
     fn items(&self) -> Vec<Vec<String>> {
         self.inner
             .iter()

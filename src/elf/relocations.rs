@@ -47,7 +47,7 @@ impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Relocations {
     }
 }
 
-impl<'a> Property<'a> for Relocations {
+impl Property<'_> for Relocations {
     fn items(&self) -> Vec<Vec<String>> {
         let mut relocations = Vec::new();
         self.rels.iter().for_each(|v| {
