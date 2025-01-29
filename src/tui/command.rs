@@ -41,6 +41,8 @@ pub enum Command {
     Hexdump(HexdumpCommand),
     /// Trace system calls.
     TraceCalls,
+    /// Sort items.
+    Sort,
     /// Exit application.
     Exit,
     /// Do nothing.
@@ -101,6 +103,7 @@ impl From<KeyEvent> for Command {
             KeyCode::Char('o') => Self::OpenRepo,
             KeyCode::Char('r') => Self::TraceCalls,
             KeyCode::Char('s') => Self::HumanReadable,
+            KeyCode::Char('S') => Self::Sort,
             _ => Self::Nothing,
         }
     }
