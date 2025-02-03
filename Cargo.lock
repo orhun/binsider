@@ -49,12 +49,12 @@ dependencies = [
 
 [[package]]
 name = "ansi-to-tui"
-version = "6.0.1"
+version = "7.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd01ee70df708c9ecb68705af08cee6fe85493992a7e205c52ddbe569314ba47"
+checksum = "67555e1f1ece39d737e28c8a017721287753af3f93225e4a445b29ccb0f5912c"
 dependencies = [
  "nom",
- "ratatui 0.28.1",
+ "ratatui 0.29.0",
  "simdutf8",
  "smallvec",
  "thiserror 1.0.69",
@@ -179,7 +179,7 @@ dependencies = [
  "lurk-cli",
  "nix",
  "pretty_assertions",
- "ratatui 0.28.1",
+ "ratatui 0.29.0",
  "rust-strings",
  "sysinfo",
  "termbg",
@@ -1941,14 +1941,14 @@ dependencies = [
 
 [[package]]
 name = "tui-big-text"
-version = "0.6.1"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8538954bdcd704ec744793be34059b54f9923eaef9ee4165f8f978432e76c0e"
+checksum = "8b046cf880cb40db75567b60ca22dc38a4165ef490be6bfad5718b22bcb6aabf"
 dependencies = [
  "derive_builder",
  "font8x8",
  "itertools 0.13.0",
- "ratatui 0.28.1",
+ "ratatui 0.29.0",
 ]
 
 [[package]]
@@ -1963,14 +1963,14 @@ dependencies = [
 
 [[package]]
 name = "tui-popup"
-version = "0.5.1"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08f7ada5028cc20b922b35e6accac4d4fca0cbe72ae5962685cf0742b31c8565"
+checksum = "d9ee3d08800c83ba0a2efaec44d225bcc3f885f30e2b520a17e2cd962b7da6ab"
 dependencies = [
  "derive-getters",
  "derive_setters",
  "document-features",
- "ratatui 0.28.1",
+ "ratatui 0.29.0",
 ]
 
 [[package]]
