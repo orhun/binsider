@@ -67,17 +67,25 @@ impl EventHandler {
                         thread::sleep(timeout);
                         continue;
                     } else if event::poll(timeout).expect("no events available") {
-                        match event::read().expect("unable to read event") {
+                        let send_result = match event::read().expect("unable to read event") {
                             CrosstermEvent::Key(e) => sender.send(Event::Key(e)),
                             CrosstermEvent::Mouse(e) => sender.send(Event::Mouse(e)),
                             CrosstermEvent::Resize(w, h) => sender.send(Event::Resize(w, h)),
                             _ => unimplemented!(),
+                        };
+                        if let Err(e) = send_result {
+                            if running.load(Ordering::Relaxed) {
+                                panic!("failed to send terminal event: {e}")
+                            }
                         }
-                        .expect("failed to send terminal event")
                     }
 
                     if last_tick.elapsed() >= tick_rate {
-                        sender.send(Event::Tick).expect("failed to send tick event");
+                        if let Err(e) = sender.send(Event::Tick) {
+                            if running.load(Ordering::Relaxed) {
+                                panic!("failed to send tick event: {e}")
+                            }
+                        }
                         last_tick = Instant::now();
                     }
                 }

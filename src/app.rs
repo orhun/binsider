@@ -31,7 +31,7 @@ pub struct Analyzer<'a> {
     /// List of files that are being analyzed.
     pub files: Vec<PathBuf>,
     /// Current file information.
-    pub file: FileInfo<'a>,
+    pub file: FileInfo,
     /// Elf properties.
     pub elf: Elf,
     /// Strings.
@@ -58,12 +58,8 @@ impl Debug for Analyzer<'_> {
 
 impl<'a> Analyzer<'a> {
     /// Constructs a new instance.
-    pub fn new(
-        mut file_info: FileInfo<'a>,
-        strings_len: usize,
-        files: Vec<PathBuf>,
-    ) -> Result<Self> {
-        let elf_bytes = ElfBytes::<AnyEndian>::minimal_parse(file_info.bytes)?;
+    pub fn new(mut file_info: FileInfo, strings_len: usize, files: Vec<PathBuf>) -> Result<Self> {
+        let elf_bytes = ElfBytes::<AnyEndian>::minimal_parse(file_info.bytes.as_ref())?;
         let elf = Elf::try_from(elf_bytes)?;
         let heh = Heh::new(file_info.open_file()?, Encoding::Ascii, 0)
             .map_err(|e| Error::HexdumpError(e.to_string()))?;
@@ -81,9 +77,9 @@ impl<'a> Analyzer<'a> {
     }
 
     /// Extracts the library dependencies.
-    pub fn extract_libs(file_info: &FileInfo<'a>) -> Result<Vec<(String, String)>> {
+    pub fn extract_libs(file_info: &FileInfo) -> Result<Vec<(String, String)>> {
         let mut dependencies = DependencyAnalyzer::default()
-            .analyze(file_info.path)?
+            .analyze(&file_info.path)?
             .libraries
             .clone()
             .into_iter()
