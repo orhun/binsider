@@ -340,6 +340,13 @@ impl<'a> State<'a> {
                     self.analyzer.extract_strings(event_sender.clone());
                 }
             }
+            Command::Sort => {
+                if self.tab == Tab::StaticAnalysis {
+                    self.analyzer.elf.symbols.cycle_sort();
+                    self.analyzer.elf.dynamic_symbols.cycle_sort();
+                    self.handle_tab()?;
+                }
+            }
             Command::Exit => {
                 if self.show_details {
                     self.show_details = false;
@@ -454,7 +461,11 @@ impl<'a> State<'a> {
                 ("/", "Search"),
                 ("h/j/k/l", "Scroll"),
                 ("n/p", "Toggle"),
-                ("s", "Readability"),
+                if self.info_index == 0 || self.info_index == 1 {
+                    ("s", "Readability")
+                } else {
+                    ("S", "Sort")
+                },
                 ("Tab", "Next"),
                 ("q", "Quit"),
             ],
