@@ -105,7 +105,7 @@ Similar to the [`strings(1)`](https://linux.die.net/man/1/strings) command, `bin
 
 ## Acknowledgements
 
-Shoutout to [Harun Ocaksız](https://instagram.com/harunocaksiz) for sticking with me during our military service in the summer of 2024 and creating the awesome **binsider** logo! (o7)
+Shoutout to [@harunocaksiz](https://github.com/harunocaksiz) for sticking with me during our military service in the summer of 2024 and creating the awesome **binsider** logo! (o7)
 
 ## Contributing
 
