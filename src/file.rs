@@ -154,7 +154,81 @@ impl<'a> FileInfo<'a> {
 
     #[cfg(target_os = "windows")]
     pub fn new(path: &'a str, arguments: Option<Vec<&'a str>>, bytes: &'a [u8]) -> Result<Self> {
-        unimplemented!()
+        use std::fs;
+        use std::os::windows::fs::MetadataExt; // For additional metadata access on Windows
+        use std::path::PathBuf;
+
+        let metadata = fs::metadata(path)?;
+        let mode = metadata.permissions().mode();
+
+        let users = Users::new_with_refreshed_list();
+        let groups = Groups::new_with_refreshed_list();
+        Ok(Self {
+            path,
+            arguments,
+            bytes,
+            is_read_only: false,
+            name: PathBuf::from(path)
+                .file_name()
+                .map(|v| v.to_string_lossy().to_string())
+                .unwrap_or_default(),
+            size: ByteSize(metadata.len()).to_string(),
+            blocks: 0,     // Not applicable for Windows
+            block_size: 0, // Not applicable for Windows
+            device: metadata.dev(),
+            inode: 0, // Not applicable for Windows
+            links: 1, // Windows does not have links like Unix
+            access: FileAccessInfo {
+                mode: format!("{:04o}/{}", mode & 0o777, {
+                    let mut s = String::new();
+                    s.push(if mode & 0o400 != 0 { 'r' } else { '-' });
+                    s.push(if mode & 0o200 != 0 { 'w' } else { '-' });
+                    s.push(if mode & 0o100 != 0 { 'x' } else { '-' });
+                    s.push(if mode & 0o040 != 0 { 'r' } else { '-' });
+                    s.push(if mode & 0o020 != 0 { 'w' } else { '-' });
+                    s.push(if mode & 0o010 != 0 { 'x' } else { '-' });
+                    s.push(if mode & 0o004 != 0 { 'r' } else { '-' });
+                    s.push(if mode & 0o002 != 0 { 'w' } else { '-' });
+                    s.push(if mode & 0o001 != 0 { 'x' } else { '-' });
+                    s
+                }),
+                uid: format!(
+                    "{}/{}",
+                    metadata.uid(),
+                    Uid::try_from(metadata.uid() as usize)
+                        .ok()
+                        .and_then(|uid| users.get_user_by_id(&uid))
+                        .map(|v| v.name())
+                        .unwrap_or("?")
+                ),
+                gid: format!(
+                    "{}/{}",
+                    metadata.gid(),
+                    groups
+                        .list()
+                        .iter()
+                        .find(|g| Gid::try_from(metadata.gid() as usize).as_ref() == Ok(g.id()))
+                        .map(|v| v.name())
+                        .unwrap_or("?")
+                ),
+            },
+            date: {
+                // Helper function to format SystemTime
+                fn format_system_time(system_time: SystemTime) -> String {
+                    let datetime: chrono::DateTime<chrono::Local> = system_time.into();
+                    format!("{}", datetime.format("%Y-%m-%d %H:%M:%S.%f %z"))
+                }
+                FileDateInfo {
+                    access: format_system_time(metadata.accessed()?),
+                    modify: format_system_time(metadata.modified()?),
+                    change: format_system_time(metadata.ctime().into()), // Windows uses ctime as the file change time
+                    birth: metadata
+                        .created()
+                        .map(format_system_time)
+                        .unwrap_or_else(|_| String::from("not supported")),
+                }
+            },
+        })
     }
 
     /// Opens the file (with R/W if possible) and returns it.
