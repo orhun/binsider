@@ -154,10 +154,6 @@ impl<'a> FileInfo<'a> {
 
     #[cfg(target_os = "windows")]
     pub fn new(path: &'a str, arguments: Option<Vec<&'a str>>, bytes: &'a [u8]) -> Result<Self> {
-        use std::fs;
-        use std::os::windows::fs::MetadataExt; // For additional metadata access on Windows
-        use std::path::PathBuf;
-
         let metadata = fs::metadata(path)?;
         let mode = metadata.permissions().mode();
 
@@ -175,42 +171,13 @@ impl<'a> FileInfo<'a> {
             size: ByteSize(metadata.len()).to_string(),
             blocks: 0,     // Not applicable for Windows
             block_size: 0, // Not applicable for Windows
-            device: metadata.dev(),
-            inode: 0, // Not applicable for Windows
-            links: 1, // Windows does not have links like Unix
+            device: 0,     // Not applicable for Windows
+            inode: 0,      // Not applicable for Windows
+            links: 1,      // Windows does not have links like Unix
             access: FileAccessInfo {
-                mode: format!("{:04o}/{}", mode & 0o777, {
-                    let mut s = String::new();
-                    s.push(if mode & 0o400 != 0 { 'r' } else { '-' });
-                    s.push(if mode & 0o200 != 0 { 'w' } else { '-' });
-                    s.push(if mode & 0o100 != 0 { 'x' } else { '-' });
-                    s.push(if mode & 0o040 != 0 { 'r' } else { '-' });
-                    s.push(if mode & 0o020 != 0 { 'w' } else { '-' });
-                    s.push(if mode & 0o010 != 0 { 'x' } else { '-' });
-                    s.push(if mode & 0o004 != 0 { 'r' } else { '-' });
-                    s.push(if mode & 0o002 != 0 { 'w' } else { '-' });
-                    s.push(if mode & 0o001 != 0 { 'x' } else { '-' });
-                    s
-                }),
-                uid: format!(
-                    "{}/{}",
-                    metadata.uid(),
-                    Uid::try_from(metadata.uid() as usize)
-                        .ok()
-                        .and_then(|uid| users.get_user_by_id(&uid))
-                        .map(|v| v.name())
-                        .unwrap_or("?")
-                ),
-                gid: format!(
-                    "{}/{}",
-                    metadata.gid(),
-                    groups
-                        .list()
-                        .iter()
-                        .find(|g| Gid::try_from(metadata.gid() as usize).as_ref() == Ok(g.id()))
-                        .map(|v| v.name())
-                        .unwrap_or("?")
-                ),
+                mode: String::from("unsupported"),
+                uid: String::from("unsupported"),
+                gid: String::from("unsupported"),
             },
             date: {
                 // Helper function to format SystemTime
@@ -221,7 +188,7 @@ impl<'a> FileInfo<'a> {
                 FileDateInfo {
                     access: format_system_time(metadata.accessed()?),
                     modify: format_system_time(metadata.modified()?),
-                    change: format_system_time(metadata.ctime().into()), // Windows uses ctime as the file change time
+                    change: format_system_time(metadata.creation_time().into()),
                     birth: metadata
                         .created()
                         .map(format_system_time)
