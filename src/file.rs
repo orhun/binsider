@@ -155,7 +155,6 @@ impl<'a> FileInfo<'a> {
     #[cfg(target_os = "windows")]
     pub fn new(path: &'a str, arguments: Option<Vec<&'a str>>, bytes: &'a [u8]) -> Result<Self> {
         let metadata = fs::metadata(path)?;
-        let mode = metadata.permissions().mode();
 
         let users = Users::new_with_refreshed_list();
         let groups = Groups::new_with_refreshed_list();
@@ -188,7 +187,7 @@ impl<'a> FileInfo<'a> {
                 FileDateInfo {
                     access: format_system_time(metadata.accessed()?),
                     modify: format_system_time(metadata.modified()?),
-                    change: format_system_time(metadata.creation_time().into()),
+                    change: String::from("unsupported"),
                     birth: metadata
                         .created()
                         .map(format_system_time)
