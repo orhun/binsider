@@ -24,25 +24,25 @@ default = ["dynamic-analysis"]
 dynamic-analysis = ["lurk-cli"]
 
 [dependencies]
-ratatui = "0.28.1"
-clap = { version = "4.5.20", features = ["derive", "env", "wrap_help", "cargo"] }
-thiserror = "2.0.11"
+ratatui = "0.29.0"
+clap = { version = "4.5.31", features = ["derive", "env", "wrap_help", "cargo"] }
+thiserror = "2.0.12"
 elf = "0.7.1"
 rust-strings = "0.6.0"
 heh = "0.6.1"
 tui-input = "0.11.1"
-tui-popup = "0.5.0"
+tui-popup = "0.6.0"
 unicode-width = "0.2.0"
-textwrap = "0.16.1"
+textwrap = "0.16.2"
 lurk-cli = { version = "0.3.9", optional = true }
 nix = { version = "0.29.0", features = ["ptrace", "signal"] }
-ansi-to-tui = "6.0.0"
-console = "0.15.8"
-which = "7.0.1"
+ansi-to-tui = "7.0.0"
+console = "0.15.11"
+which = "7.0.2"
 better-panic = "0.3.0"
-tui-big-text = "0.6.0"
-chrono = "0.4.38"
-bytesize = "1.3.0"
+tui-big-text = "0.7.1"
+chrono = "0.4.40"
+bytesize = "2.0.1"
 sysinfo = { version = "0.33.1", default-features = false, features = ["user"] }
 webbrowser = "1.0.2"
 lddtree = "0.3.5"
