@@ -160,14 +160,14 @@ pub enum HexdumpCommand {
     /// Cancel hexdump and move to the previous tab.
     CancelPrevious,
     /// Exit application.
-    Exit,
+    Exit(Event),
 }
 
 impl HexdumpCommand {
     /// Parses the event.
     pub fn parse(key_event: KeyEvent, is_read_only: bool) -> Self {
         match key_event.code {
-            KeyCode::Char('q') => Self::Exit,
+            KeyCode::Char('q') => Self::Exit(Event::Key(key_event)),
             KeyCode::Tab => Self::CancelNext,
             KeyCode::BackTab => Self::CancelPrevious,
             KeyCode::Char('s') => {

@@ -176,8 +176,21 @@ impl<'a> State<'a> {
                         .into();
                     self.handle_tab()?;
                 }
-                HexdumpCommand::Exit => {
-                    self.running = false;
+                HexdumpCommand::Exit(event) => {
+                    if self.analyzer.heh.key_handler.is_focusing(Window::Search)
+                        || self
+                            .analyzer
+                            .heh
+                            .key_handler
+                            .is_focusing(Window::JumpToByte)
+                    {
+                        self.analyzer
+                            .heh
+                            .handle_input(&event)
+                            .map_err(|e| Error::HexdumpError(e.to_string()))?;
+                    } else {
+                        self.running = false;
+                    }
                 }
             },
             Command::ShowDetails => {
