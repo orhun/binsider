@@ -3,7 +3,7 @@ use elf::{
     endian::AnyEndian, gnu_symver::SymbolVersionTable, parse::ParsingTable,
     string_table::StringTable, symbol::Symbol, ParseError,
 };
-use std::io::{Error as IoError, ErrorKind as IoErrorKind};
+use std::io::Error as IoError;
 
 /// ELF symbols wrapper.
 #[derive(Clone, Debug, Default)]
@@ -20,8 +20,7 @@ impl<'a> TryFrom<Option<(ParsingTable<'a, AnyEndian, Symbol>, StringTable<'a>)>>
         value: Option<(ParsingTable<'a, AnyEndian, Symbol>, StringTable<'a>)>,
     ) -> Result<Self, Self::Error> {
         let (parsing_table, string_table) = value.ok_or_else(|| {
-            ParseError::IOError(IoError::new(
-                IoErrorKind::Other,
+            ParseError::IOError(IoError::other(
                 "symbol table does not exist",
             ))
         })?;
@@ -92,14 +91,12 @@ impl<'a>
         ),
     ) -> Result<Self, Self::Error> {
         let (parsing_table, string_table) = value.0.ok_or_else(|| {
-            ParseError::IOError(IoError::new(
-                IoErrorKind::Other,
+            ParseError::IOError(IoError::other(
                 "symbol table does not exist",
             ))
         })?;
         let version_table = value.1.ok_or_else(|| {
-            ParseError::IOError(IoError::new(
-                IoErrorKind::Other,
+            ParseError::IOError(IoError::other(
                 "symbol version table does not exist",
             ))
         })?;

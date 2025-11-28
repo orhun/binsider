@@ -6,7 +6,7 @@ use elf::segment::ProgramHeader;
 use elf::string_table::StringTable;
 use elf::{endian::AnyEndian, file::FileHeader as ElfFileHeader};
 use elf::{to_str::*, ParseError};
-use std::io::{Error as IoError, ErrorKind as IoErrorKind};
+use std::io::Error as IoError;
 
 /// ELF file header wrapper.
 #[derive(Clone, Copy, Debug)]
@@ -195,14 +195,12 @@ impl<'a>
     ) -> Result<Self, Self::Error> {
         let (parsing_table, string_table) = (
             value.0.ok_or_else(|| {
-                ParseError::IOError(IoError::new(
-                    IoErrorKind::Other,
+                ParseError::IOError(IoError::other(
                     "parsing table does not exist",
                 ))
             })?,
             value.1.ok_or_else(|| {
-                ParseError::IOError(IoError::new(
-                    IoErrorKind::Other,
+                ParseError::IOError(IoError::other(
                     "string table does not exist",
                 ))
             })?,

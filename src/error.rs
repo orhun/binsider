@@ -42,12 +42,12 @@ pub type Result<T> = std::result::Result<T, Error>;
 mod tests {
     use super::*;
     use pretty_assertions::assert_eq;
-    use std::io::{Error as IoError, ErrorKind};
+    use std::io::Error as IoError;
 
     #[test]
     fn test_error() {
         let message = "your computer is on fire!";
-        let error = Error::from(IoError::new(ErrorKind::Other, message));
+        let error = Error::from(IoError::other(message));
         assert_eq!(format!("IO error: `{message}`"), error.to_string());
         assert_eq!(
             format!("\"IO error: `{message}`\""),

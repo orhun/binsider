@@ -1,6 +1,6 @@
 use elf::{endian::AnyEndian, note::Note as ElfNote, ElfBytes, ParseError};
 use std::fmt::Write;
-use std::io::{Error as IoError, ErrorKind as IoErrorKind};
+use std::io::Error as IoError;
 
 /// Representation of an ELF note.
 #[derive(Clone, Debug, Default)]
@@ -26,14 +26,12 @@ impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Notes {
         let section_headers = elf.section_headers_with_strtab()?;
         let (parsing_table, string_table) = (
             section_headers.0.ok_or_else(|| {
-                ParseError::IOError(IoError::new(
-                    IoErrorKind::Other,
+                ParseError::IOError(IoError::other(
                     "parsing table does not exist",
                 ))
             })?,
             section_headers.1.ok_or_else(|| {
-                ParseError::IOError(IoError::new(
-                    IoErrorKind::Other,
+                ParseError::IOError(IoError::other(
                     "string table does not exist",
                 ))
             })?,

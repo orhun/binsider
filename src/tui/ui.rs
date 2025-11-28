@@ -35,9 +35,10 @@ pub const ELF_INFO_TABS: &[Info] = &[
 ];
 
 /// Application tab.
-#[derive(Clone, Copy, Debug, Eq, PartialEq, clap::ValueEnum)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Default, clap::ValueEnum)]
 pub enum Tab {
     /// General information.
+    #[default]
     General = 0,
     /// Static analysis.
     StaticAnalysis = 1,
@@ -47,12 +48,6 @@ pub enum Tab {
     Strings = 3,
     /// Hexdump.
     Hexdump = 4,
-}
-
-impl Default for Tab {
-    fn default() -> Self {
-        Self::General
-    }
 }
 
 impl Tab {
@@ -826,7 +821,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
         .take(LIST_LIMIT);
     let left_padding = items
         .clone()
-        .last()
+        .next_back()
         .cloned()
         .unwrap_or_default()
         .first()
