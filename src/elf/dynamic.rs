@@ -12,11 +12,8 @@ pub struct Dynamic {
 impl<'a> TryFrom<Option<ParsingTable<'a, AnyEndian, Dyn>>> for Dynamic {
     type Error = ParseError;
     fn try_from(value: Option<ParsingTable<'a, AnyEndian, Dyn>>) -> Result<Self, Self::Error> {
-        let parsing_table = value.ok_or_else(|| {
-            ParseError::IOError(IoError::other(
-                "parsing table does not exist",
-            ))
-        })?;
+        let parsing_table = value
+            .ok_or_else(|| ParseError::IOError(IoError::other("parsing table does not exist")))?;
         Ok(Self {
             dynamics: parsing_table.iter().collect(),
         })

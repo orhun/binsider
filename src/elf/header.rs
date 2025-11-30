@@ -195,14 +195,10 @@ impl<'a>
     ) -> Result<Self, Self::Error> {
         let (parsing_table, string_table) = (
             value.0.ok_or_else(|| {
-                ParseError::IOError(IoError::other(
-                    "parsing table does not exist",
-                ))
+                ParseError::IOError(IoError::other("parsing table does not exist"))
             })?,
             value.1.ok_or_else(|| {
-                ParseError::IOError(IoError::other(
-                    "string table does not exist",
-                ))
+                ParseError::IOError(IoError::other("string table does not exist"))
             })?,
         );
         Ok(Self {
