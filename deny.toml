@@ -6,6 +6,7 @@ allow = [
     "MIT",
     "Apache-2.0",
     "Unicode-DFS-2016",
+    "Unicode-3.0",
     "BSD-2-Clause",
     "BSL-1.0",
     "Zlib",
@@ -17,4 +18,4 @@ unknown-git = "warn"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
 
 [advisories]
-ignore = ["RUSTSEC-2023-0040", "RUSTSEC-2023-0059"]
+ignore = ["RUSTSEC-2023-0059", "RUSTSEC-2024-0436"]

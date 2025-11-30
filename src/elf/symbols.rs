@@ -3,7 +3,7 @@ use elf::{
     endian::AnyEndian, gnu_symver::SymbolVersionTable, parse::ParsingTable,
     string_table::StringTable, symbol::Symbol, ParseError,
 };
-use std::io::{Error as IoError, ErrorKind as IoErrorKind};
+use std::io::Error as IoError;
 
 /// ELF symbols wrapper.
 #[derive(Clone, Debug, Default)]
@@ -19,12 +19,8 @@ impl<'a> TryFrom<Option<(ParsingTable<'a, AnyEndian, Symbol>, StringTable<'a>)>>
     fn try_from(
         value: Option<(ParsingTable<'a, AnyEndian, Symbol>, StringTable<'a>)>,
     ) -> Result<Self, Self::Error> {
-        let (parsing_table, string_table) = value.ok_or_else(|| {
-            ParseError::IOError(IoError::new(
-                IoErrorKind::Other,
-                "symbol table does not exist",
-            ))
-        })?;
+        let (parsing_table, string_table) = value
+            .ok_or_else(|| ParseError::IOError(IoError::other("symbol table does not exist")))?;
         Ok(Self {
             symbols: parsing_table.iter().collect(),
             names: parsing_table
@@ -91,17 +87,11 @@ impl<'a>
             Option<SymbolVersionTable<'a, AnyEndian>>,
         ),
     ) -> Result<Self, Self::Error> {
-        let (parsing_table, string_table) = value.0.ok_or_else(|| {
-            ParseError::IOError(IoError::new(
-                IoErrorKind::Other,
-                "symbol table does not exist",
-            ))
-        })?;
+        let (parsing_table, string_table) = value
+            .0
+            .ok_or_else(|| ParseError::IOError(IoError::other("symbol table does not exist")))?;
         let version_table = value.1.ok_or_else(|| {
-            ParseError::IOError(IoError::new(
-                IoErrorKind::Other,
-                "symbol version table does not exist",
-            ))
+            ParseError::IOError(IoError::other("symbol version table does not exist"))
         })?;
         Ok(Self {
             symbols: parsing_table.iter().collect(),

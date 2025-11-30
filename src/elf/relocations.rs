@@ -4,7 +4,7 @@ use elf::{
     relocation::{Rel, Rela},
     ElfBytes, ParseError,
 };
-use std::io::{Error as IoError, ErrorKind as IoErrorKind};
+use std::io::Error as IoError;
 
 /// ELF relocations wrapper.
 #[derive(Clone, Debug, Default)]
@@ -18,12 +18,9 @@ pub struct Relocations {
 impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Relocations {
     type Error = ParseError;
     fn try_from(elf: &'a ElfBytes<'a, AnyEndian>) -> Result<Self, Self::Error> {
-        let parsing_table = elf.section_headers().ok_or_else(|| {
-            ParseError::IOError(IoError::new(
-                IoErrorKind::Other,
-                "parsing table does not exist",
-            ))
-        })?;
+        let parsing_table = elf
+            .section_headers()
+            .ok_or_else(|| ParseError::IOError(IoError::other("parsing table does not exist")))?;
         Ok(Self {
             rels: parsing_table
                 .iter()

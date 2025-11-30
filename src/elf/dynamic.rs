@@ -1,6 +1,6 @@
 use crate::elf::Property;
 use elf::{dynamic::Dyn, endian::AnyEndian, parse::ParsingTable, ParseError};
-use std::io::{Error as IoError, ErrorKind as IoErrorKind};
+use std::io::Error as IoError;
 
 /// ELF dynamic section wrapper.
 #[derive(Clone, Debug, Default)]
@@ -12,12 +12,8 @@ pub struct Dynamic {
 impl<'a> TryFrom<Option<ParsingTable<'a, AnyEndian, Dyn>>> for Dynamic {
     type Error = ParseError;
     fn try_from(value: Option<ParsingTable<'a, AnyEndian, Dyn>>) -> Result<Self, Self::Error> {
-        let parsing_table = value.ok_or_else(|| {
-            ParseError::IOError(IoError::new(
-                IoErrorKind::Other,
-                "parsing table does not exist",
-            ))
-        })?;
+        let parsing_table = value
+            .ok_or_else(|| ParseError::IOError(IoError::other("parsing table does not exist")))?;
         Ok(Self {
             dynamics: parsing_table.iter().collect(),
         })
