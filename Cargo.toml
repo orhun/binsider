@@ -10,7 +10,7 @@ repository = "https://github.com/orhun/binsider"
 keywords = ["analyze", "binary", "tui", "elf"]
 categories = ["command-line-utilities"]
 edition = "2021"
-rust-version = "1.85.0"
+rust-version = "1.88.0"
 include = [
   "src/**/*",
   "Cargo.*",
