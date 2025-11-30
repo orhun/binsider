@@ -24,7 +24,6 @@ default = ["dynamic-analysis"]
 dynamic-analysis = ["lurk-cli"]
 
 [dependencies]
-
 ratatui = "0.28.1"
 clap = { version = "4.5.53", features = ["derive", "env", "wrap_help", "cargo"] }
 thiserror = "2.0.17"
