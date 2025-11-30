@@ -2,6 +2,52 @@
 
 [**binsider**](https://binsider.dev): Analyze ELF binaries like a boss 😼🕵️‍♂️
 
+## 0.3.0 - 2025-11-30
+
+### 🚀 Features
+
+- *(static)* Add human readable option for Static/Section headers/ Size by @dacianpascu06 in [#96](https://github.com/orhun/binsider/pull/96)
+- *(static)* Add human readable option for program headers by @dacianpascu06 in [#77](https://github.com/orhun/binsider/pull/77)
+
+### 🐛 Bug Fixes
+
+- Fix compilation and CI errors by @ibidani in [#136](https://github.com/orhun/binsider/pull/136)
+- *(ui)* Don't exit when typing 'q' in hexdump search and jump by @MykBamberg in [#132](https://github.com/orhun/binsider/pull/132)
+- *(fileinfo)* Remove unsupported Windows calls by @orhun
+- *(fileinfo)* Fix the Windows fs handling by @orhun
+- *(fileinfo)* Implement for Windows target by @orhun in [#120](https://github.com/orhun/binsider/pull/120)
+- *(clippy)* Apply clippy suggestions by @nyurik
+- *(strings)* Check for string length to avoid overflow by @godzie44 in [#91](https://github.com/orhun/binsider/pull/91)
+- *(dynamic)* Only allow tracing calls while on the dynamic analysis tab by @orhun in [#83](https://github.com/orhun/binsider/pull/83)
+
+### 📚 Documentation
+
+- *(readme)* Update github link to @harunocaksiz by @orhun
+- *(website)* Add 180x180 `apple-touch-icon.png` by @fujiapple852 in [#108](https://github.com/orhun/binsider/pull/108)
+- *(website)* Remove duplicate architecture.md by @mandarvaze in [#94](https://github.com/orhun/binsider/pull/94)
+- *(architecture)* Polish the diagram by @orhun
+- *(architecture)* Add architecture diagram by @mandarvaze in [#88](https://github.com/orhun/binsider/pull/88)
+
+### ⚙️ Miscellaneous Tasks
+
+- *(flake)* Update flake.lock by @osbm
+- *(funding)* Add wellKnown directory by @orhun
+- *(github)* Create PRs for nix flake updates automatically by @ch4og in [#85](https://github.com/orhun/binsider/pull/85)
+- *(ci)* Track dependencies updates to add them to Nix cache by @ch4og in [#84](https://github.com/orhun/binsider/pull/84)
+
+## New Contributors
+
+* @ibidani made their first contribution in [#136](https://github.com/orhun/binsider/pull/136)
+* @MykBamberg made their first contribution in [#132](https://github.com/orhun/binsider/pull/132)
+* @nyurik made their first contribution in [#116](https://github.com/orhun/binsider/pull/116)
+* @fujiapple852 made their first contribution in [#108](https://github.com/orhun/binsider/pull/108)
+* @osbm made their first contribution
+* @dacianpascu06 made their first contribution in [#96](https://github.com/orhun/binsider/pull/96)
+* @mandarvaze made their first contribution in [#94](https://github.com/orhun/binsider/pull/94)
+* @godzie44 made their first contribution in [#91](https://github.com/orhun/binsider/pull/91)
+
+**Full Changelog**: https://github.com/orhun/binsider/compare/v0.2.1...0.3.0
+
 ## 0.2.1 - 2024-10-10
 
 ### 🚀 Features
