@@ -539,7 +539,7 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
                     .right_aligned(),
                 ),
         )
-        .highlight_style(Style::default().fg(Color::Green)),
+        .row_highlight_style(Style::default().fg(Color::Green)),
         table_area,
         &mut state.list.state,
     );
@@ -762,7 +762,7 @@ pub fn render_static_analysis(state: &mut State, frame: &mut Frame, rect: Rect) 
                     )
                     .title_bottom(get_input_line(state)),
             )
-            .highlight_style(Style::default().fg(Color::Green)),
+            .row_highlight_style(Style::default().fg(Color::Green)),
             area,
             &mut table_state,
         );
@@ -906,7 +906,7 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
                 )
                 .title_bottom(get_input_line(state)),
         )
-        .highlight_style(Style::default().fg(Color::Green).bold()),
+        .row_highlight_style(Style::default().fg(Color::Green).bold()),
         rect,
         &mut list_state,
     );
