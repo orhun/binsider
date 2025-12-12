@@ -29,7 +29,7 @@ clap = { version = "4.5.53", features = ["derive", "env", "wrap_help", "cargo"] 
 thiserror = "2.0.17"
 elf = "0.7.1"
 rust-strings = "0.6.0"
-heh = {git = "https://github.com/ndd7xv/heh"}
+heh = "0.6.2"
 tui-input = "0.11.1"
 tui-popup = "0.6.2"
 unicode-width = "0.2.0"
