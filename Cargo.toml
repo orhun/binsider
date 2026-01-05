@@ -24,22 +24,22 @@ default = ["dynamic-analysis"]
 dynamic-analysis = ["lurk-cli"]
 
 [dependencies]
-ratatui = "0.29"
+ratatui = "=0.29.0"
 clap = { version = "4.5.53", features = ["derive", "env", "wrap_help", "cargo"] }
 thiserror = "2.0.17"
 elf = "0.7.1"
 rust-strings = "0.6.0"
 heh = "0.6.2"
 tui-input = "0.11.1"
-tui-popup = "0.6.2"
-unicode-width = "0.2.0"
+tui-popup = "0.6"
+unicode-width = "=0.2.0"
 textwrap = "0.16.2"
-lurk-cli = { version = "=0.3.10", optional = true }
-serde = { version = "=1.0.217" }
-serde_derive = { version = "=1.0.217" }
-nix = { version = "0.29.0", features = ["ptrace", "signal"] }
+lurk-cli = { version = "0.3.11", optional = true }
+serde = "1.0.228" 
+serde_derive = "1.0.228"
+nix = { version = "0.30.1", features = ["ptrace", "signal"] }
 ansi-to-tui = "7.0.0"
-console = "0.15.11"
+console = "0.16.2"
 which = "8.0.0"
 better-panic = "0.3.0"
 tui-big-text = "0.7.3"
