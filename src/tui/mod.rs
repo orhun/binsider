@@ -13,7 +13,7 @@ pub mod widgets;
 /// Possible commands.
 pub mod command;
 
-use crate::error::Result;
+use crate::error::{Error, Result};
 use event::EventHandler;
 use ratatui::backend::{Backend, CrosstermBackend};
 use ratatui::crossterm::event::{DisableMouseCapture, EnableMouseCapture};
@@ -37,7 +37,11 @@ pub struct Tui<B: Backend> {
     pub paused: bool,
 }
 
-impl<B: Backend> Tui<B> {
+impl<B> Tui<B>
+where
+    B: Backend,
+    Error: From<B::Error>,
+{
     /// Constructs a new instance of [`Tui`].
     pub fn new(terminal: Terminal<B>, events: EventHandler) -> Self {
         Self {
