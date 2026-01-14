@@ -1,7 +1,13 @@
 use std::time::Instant;
 
 use ansi_to_tui::IntoText;
-use ratatui::{buffer::Buffer, layout::Rect, style::{Color, Style}, text::Text, widgets::Widget};
+use ratatui::{
+    buffer::Buffer,
+    layout::Rect,
+    style::{Color, Style},
+    text::Text,
+    widgets::Widget,
+};
 
 const LOGO: &str = "
 \x1b[49m   \x1b[48;2;22;22;22m  \x1b[38;2;22;22;22;49m▄\x1b[49m        \x1b[38;2;22;22;22;49m▄\x1b[48;2;22;22;22m  \x1b[49m   \x1b[m
