@@ -43,7 +43,7 @@ console = "0.16.2"
 which = "8.0.0"
 better-panic = "0.3.0"
 tui-big-text = "0.8.1"
-chrono = "0.4.42"
+chrono = "0.4.43"
 bytesize = "2.3.0"
 sysinfo = { version = "0.37.2", default-features = false, features = ["user"] }
 webbrowser = "1.0.6"
