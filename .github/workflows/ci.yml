@@ -316,4 +316,6 @@ jobs:
         run: cargo binstall -y --force cargo-msrv
 
       - name: Run cargo-msrv
-        run: cargo msrv --output-format json verify | tail -n 1 | jq --exit-status '.success'
+        run: |
+          cargo msrv --output-format json verify 2>&1 \
+            | jq -e 'select(.type=="subcommand_result") | .result.is_compatible'
