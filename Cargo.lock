@@ -1014,7 +1014,8 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 [[package]]
 name = "heh"
 version = "0.6.3"
-source = "git+https://github.com/orhun/heh#57bfc3b22418915874854a0e2130f5a5a2ed99ba"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "368619991e5fc39d1e3ba64fe2f6fc0a248c3ca268c1a7c298c62c0649e8d5ff"
 dependencies = [
  "arboard",
  "clap",
