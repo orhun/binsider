@@ -2,6 +2,7 @@
   "name": "website",
   "type": "module",
   "version": "0.0.1",
+  "packageManager": "npm@11.6.0",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -10,15 +11,15 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.2",
-    "@astrojs/starlight": "^0.25.4",
+    "@astrojs/check": "^0.9.9",
+    "@astrojs/starlight": "^0.25.5",
     "@astrojs/starlight-tailwind": "^2.0.3",
-    "@astrojs/tailwind": "^5.1.0",
-    "@fontsource/dejavu-sans": "^5.0.11",
-    "astro": "^4.10.2",
-    "nanostores": "^0.11.2",
-    "sharp": "^0.32.5",
-    "tailwindcss": "^3.4.9",
-    "typescript": "^5.5.4"
+    "@astrojs/tailwind": "^5.1.5",
+    "@fontsource/dejavu-sans": "^5.2.5",
+    "astro": "^4.16.19",
+    "nanostores": "^0.11.4",
+    "sharp": "^0.32.6",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3"
   }
 }
