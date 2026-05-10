@@ -381,14 +381,13 @@ impl<'a> State<'a> {
                 self.list = SelectableList::with_items(
                     self.analyzer
                         .dependencies
-                        .clone()
-                        .into_iter()
+                        .iter()
                         .filter(|(name, lib)| {
                             search_query.is_empty()
                                 || name.to_lowercase().contains(&search_query)
                                 || lib.to_lowercase().contains(&search_query)
                         })
-                        .map(|(name, lib)| vec![name, lib])
+                        .map(|(name, lib)| vec![name.clone(), lib.clone()])
                         .collect(),
                 );
             }
