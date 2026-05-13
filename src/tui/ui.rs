@@ -501,11 +501,7 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
         Line::from(vec![
             "|".fg(Color::Rgb(100, 100, 100)),
             "search: ".yellow(),
-            state
-                .input
-                .value()
-                .to_string()
-                .fg(state.accent_color),
+            state.input.value().to_string().fg(state.accent_color),
             if state.input_mode { " " } else { "" }.into(),
             "|".fg(Color::Rgb(100, 100, 100)),
         ])
