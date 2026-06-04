@@ -1338,9 +1338,9 @@ dependencies = [
 
 [[package]]
 name = "lurk-cli"
-version = "0.3.12"
+version = "0.3.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7b1022a90d065e8d770674b51ea42f7f4ed3a7a82f1f3d932b1ad63764fa958c"
+checksum = "d4b7e2dacc544da6208f262c3cf30640a1d67cde6c5e15374d4678ffd0f0d872"
 dependencies = [
  "anyhow",
  "byteorder",
@@ -2297,9 +2297,9 @@ dependencies = [
 
 [[package]]
 name = "syscalls"
-version = "0.7.0"
+version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90db46b5b4962319605d435986c775ea45a0ad2561c09e1d5372b89afeb49cf4"
+checksum = "81c645a4de0d803ced6ef0388a2646aa1ef8467173b5d59a2c33c88de4ab76e7"
 dependencies = [
  "serde",
  "serde_repr",
