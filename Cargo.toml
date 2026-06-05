@@ -34,7 +34,7 @@ tui-input = "0.15.0"
 tui-popup = "0.7.2"
 unicode-width = "0.2.2"
 textwrap = "0.16.2"
-lurk-cli = { version = "0.3.12", optional = true }
+lurk-cli = { version = "0.3.14", optional = true }
 serde = "1.0.228" 
 serde_derive = "1.0.228"
 nix = { version = "0.30.1", features = ["ptrace", "signal"] }
