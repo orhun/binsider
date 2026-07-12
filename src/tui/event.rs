@@ -1,6 +1,8 @@
 use crate::error::Result;
 use crate::TraceData;
-use ratatui::crossterm::event::{self, Event as CrosstermEvent, KeyEvent, MouseEvent};
+use ratatui::crossterm::event::{
+    self, Event as CrosstermEvent, KeyEvent, KeyEventKind, MouseEvent,
+};
 use std::path::PathBuf;
 use std::sync::{
     atomic::{AtomicBool, Ordering},
@@ -68,7 +70,10 @@ impl EventHandler {
                         continue;
                     } else if event::poll(timeout).expect("no events available") {
                         match event::read().expect("unable to read event") {
-                            CrosstermEvent::Key(e) => sender.send(Event::Key(e)),
+                            CrosstermEvent::Key(e) if e.kind == KeyEventKind::Press => {
+                                sender.send(Event::Key(e))
+                            }
+                            CrosstermEvent::Key(_) => Ok(()),
                             CrosstermEvent::Mouse(e) => sender.send(Event::Mouse(e)),
                             CrosstermEvent::Resize(w, h) => sender.send(Event::Resize(w, h)),
                             _ => unimplemented!(),
