@@ -377,12 +377,17 @@ impl<'a> State<'a> {
         self.show_heh = false;
         match self.tab {
             Tab::General => {
+                let search_query = self.input.value().to_lowercase();
                 self.list = SelectableList::with_items(
                     self.analyzer
                         .dependencies
-                        .clone()
-                        .into_iter()
-                        .map(|(name, lib)| vec![name, lib])
+                        .iter()
+                        .filter(|(name, lib)| {
+                            search_query.is_empty()
+                                || name.to_lowercase().contains(&search_query)
+                                || lib.to_lowercase().contains(&search_query)
+                        })
+                        .map(|(name, lib)| vec![name.clone(), lib.clone()])
                         .collect(),
                 );
             }
@@ -455,6 +460,7 @@ impl<'a> State<'a> {
                 vec![
                     ("o", "Open docs"),
                     ("⏎ ", "Analyze lib"),
+                    ("/", "Search"),
                     ("h/j/k/l", "Scroll"),
                     ("Tab", "Next"),
                     ("⇧+Tab", "Previous"),
