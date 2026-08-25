@@ -383,6 +383,13 @@ impl<'a> State<'a> {
                         .clone()
                         .into_iter()
                         .map(|(name, lib)| vec![name, lib])
+                        .filter(|items| {
+                            self.input.value().is_empty()
+                                || items.iter().any(|item| {
+                                    item.to_lowercase()
+                                        .contains(&self.input.value().to_lowercase())
+                                })
+                        })
                         .collect(),
                 );
             }
@@ -455,6 +462,7 @@ impl<'a> State<'a> {
                 vec![
                     ("o", "Open docs"),
                     ("⏎ ", "Analyze lib"),
+                    ("/", "Search"),
                     ("h/j/k/l", "Scroll"),
                     ("Tab", "Next"),
                     ("⇧+Tab", "Previous"),
