@@ -47,6 +47,27 @@ pub enum Command {
     Nothing,
     /// Change data to human readable format
     HumanReadable,
+    /// Command prompt command.
+    CommandPrompt(CommandPromptCommand),
+}
+
+impl Command {
+    /// Parses a command typed in the command prompt (e.g. `:quit`).
+    ///
+    /// Returns [`None`] if the input does not match any known command.
+    pub fn parse_prompt(input: &str) -> Option<Self> {
+        match input.trim() {
+            "q" | "quit" | "exit" => Some(Self::Exit),
+            "top" => Some(Self::Top),
+            "bottom" => Some(Self::Bottom),
+            "next" => Some(Self::Next(ScrollType::Tab, 1)),
+            "previous" | "prev" => Some(Self::Previous(ScrollType::Tab, 1)),
+            "readability" => Some(Self::HumanReadable),
+            "docs" | "help" => Some(Self::OpenRepo),
+            "trace" => Some(Self::TraceCalls),
+            _ => None,
+        }
+    }
 }
 
 impl From<KeyEvent> for Command {
@@ -89,6 +110,7 @@ impl From<KeyEvent> for Command {
                 }
             }
             KeyCode::Char('/') => Self::Input(InputCommand::Enter),
+            KeyCode::Char(':') => Self::CommandPrompt(CommandPromptCommand::Enter),
             KeyCode::Char('f') => {
                 if key_event.modifiers == KeyModifiers::CONTROL {
                     Self::Input(InputCommand::Enter)
@@ -132,6 +154,34 @@ pub enum InputCommand {
 }
 
 impl InputCommand {
+    /// Parses the event.
+    pub fn parse(key_event: KeyEvent, input: &Input) -> Self {
+        if key_event.code == KeyCode::Esc
+            || (key_event.code == KeyCode::Backspace && input.value().is_empty())
+        {
+            Self::Exit
+        } else if key_event.code == KeyCode::Enter {
+            Self::Confirm
+        } else {
+            Self::Handle(Event::Key(key_event))
+        }
+    }
+}
+
+/// Command prompt (`:`) mode command.
+#[derive(Debug, PartialEq, Eq)]
+pub enum CommandPromptCommand {
+    /// Handle a key event while typing a command.
+    Handle(Event),
+    /// Enter command prompt mode.
+    Enter,
+    /// Run the typed command.
+    Confirm,
+    /// Exit command prompt mode.
+    Exit,
+}
+
+impl CommandPromptCommand {
     /// Parses the event.
     pub fn parse(key_event: KeyEvent, input: &Input) -> Self {
         if key_event.code == KeyCode::Esc
@@ -190,5 +240,73 @@ impl HexdumpCommand {
             ),
             _ => Self::Handle(Event::Key(key_event)),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_enter_command_prompt() {
+        assert_eq!(
+            Command::from(KeyEvent::new(KeyCode::Char(':'), KeyModifiers::NONE)),
+            Command::CommandPrompt(CommandPromptCommand::Enter)
+        );
+    }
+
+    #[test]
+    fn test_parse_command_prompt_command() {
+        let input = Input::default().with_value(String::from("quit"));
+        assert_eq!(
+            CommandPromptCommand::parse(
+                KeyEvent::new(KeyCode::Char('t'), KeyModifiers::NONE),
+                &input
+            ),
+            CommandPromptCommand::Handle(Event::Key(KeyEvent::new(
+                KeyCode::Char('t'),
+                KeyModifiers::NONE
+            )))
+        );
+        assert_eq!(
+            CommandPromptCommand::parse(KeyEvent::new(KeyCode::Enter, KeyModifiers::NONE), &input),
+            CommandPromptCommand::Confirm
+        );
+        assert_eq!(
+            CommandPromptCommand::parse(KeyEvent::new(KeyCode::Esc, KeyModifiers::NONE), &input),
+            CommandPromptCommand::Exit
+        );
+        assert_eq!(
+            CommandPromptCommand::parse(
+                KeyEvent::new(KeyCode::Backspace, KeyModifiers::NONE),
+                &Input::default()
+            ),
+            CommandPromptCommand::Exit
+        );
+    }
+
+    #[test]
+    fn test_parse_prompt() {
+        assert_eq!(Command::parse_prompt("quit"), Some(Command::Exit));
+        assert_eq!(Command::parse_prompt("q"), Some(Command::Exit));
+        assert_eq!(Command::parse_prompt("  exit  "), Some(Command::Exit));
+        assert_eq!(Command::parse_prompt("top"), Some(Command::Top));
+        assert_eq!(Command::parse_prompt("bottom"), Some(Command::Bottom));
+        assert_eq!(
+            Command::parse_prompt("next"),
+            Some(Command::Next(ScrollType::Tab, 1))
+        );
+        assert_eq!(
+            Command::parse_prompt("prev"),
+            Some(Command::Previous(ScrollType::Tab, 1))
+        );
+        assert_eq!(
+            Command::parse_prompt("readability"),
+            Some(Command::HumanReadable)
+        );
+        assert_eq!(Command::parse_prompt("docs"), Some(Command::OpenRepo));
+        assert_eq!(Command::parse_prompt("trace"), Some(Command::TraceCalls));
+        assert_eq!(Command::parse_prompt("bogus"), None);
+        assert_eq!(Command::parse_prompt(""), None);
     }
 }

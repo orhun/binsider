@@ -62,3 +62,16 @@ This table shows the common sections found in the binary file, similar to the ou
 You can press <kbd>h</kbd> and <kbd>l</kbd> to scroll horizontally and <kbd>/</kbd> to search for a specific value.
 
 ![static table](../../assets/static-table.gif)
+
+You can also press <kbd>:</kbd> to open the command prompt and run a command by name, then press <kbd>enter</kbd> to run it or <kbd>esc</kbd> to cancel. The following commands are available:
+
+| Command                    | Action                    |
+| -------------------------- | ------------------------- |
+| `quit` (`q`, `exit`)       | Quit the application.     |
+| `top`                      | Go to the top.            |
+| `bottom`                   | Go to the bottom.         |
+| `next`                     | Switch to the next tab.   |
+| `previous` (`prev`)        | Switch to the previous tab.|
+| `readability`              | Toggle human readable format.|
+| `trace`                    | Trace system calls.       |
+| `docs` (`help`)            | Open the documentation.   |
