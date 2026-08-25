@@ -395,7 +395,7 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
     });
     let area = Layout::new(
         Direction::Vertical,
-        if state.list.items.is_empty() {
+        if state.analyzer.dependencies.is_empty() {
             vec![Constraint::Max(lines.len() as u16 + 2)]
         } else if (lines.len() as u16).saturating_sub(2) < rect.height / 2 {
             vec![
@@ -458,7 +458,7 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
         &mut ScrollbarState::new(max_height).position(state.general_scroll_index),
     );
 
-    if state.list.items.is_empty() {
+    if state.analyzer.dependencies.is_empty() {
         return;
     }
 
@@ -537,7 +537,8 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
                         Line::default()
                     }
                     .right_aligned(),
-                ),
+                )
+                .title_bottom(get_input_line(state)),
         )
         .row_highlight_style(Style::default().fg(Color::Green)),
         table_area,
@@ -554,6 +555,7 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
         &mut ScrollbarState::new(items.len())
             .position(state.list.state.selected().unwrap_or_default()),
     );
+    render_cursor(state, table_area, frame);
 }
 
 /// Renders the static analysis tab.
@@ -1120,12 +1122,12 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
 }
 
 /// Returns the input line.
-fn get_input_line<'a>(state: &'a State) -> Line<'a> {
+fn get_input_line(state: &State) -> Line<'static> {
     if !state.input.value().is_empty() || state.input_mode {
         Line::from(vec![
             "|".fg(Color::Rgb(100, 100, 100)),
             "search: ".yellow(),
-            state.input.value().fg(state.accent_color),
+            state.input.value().to_string().fg(state.accent_color),
             if state.input_mode { " " } else { "" }.into(),
             "|".fg(Color::Rgb(100, 100, 100)),
         ])
