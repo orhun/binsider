@@ -37,6 +37,12 @@ pub struct State<'a> {
     pub input: Input,
     /// Enable input.
     pub input_mode: bool,
+    /// Command prompt input.
+    pub command_input: Input,
+    /// Enable command prompt.
+    pub command_mode: bool,
+    /// Message shown when a typed command is not recognized.
+    pub command_error: Option<String>,
     /// Strings call completed.
     pub strings_loaded: bool,
     /// System calls completed.
@@ -69,6 +75,9 @@ impl<'a> State<'a> {
             show_details: false,
             input: Input::default(),
             input_mode: false,
+            command_input: Input::default(),
+            command_mode: false,
+            command_error: None,
             strings_loaded: false,
             system_calls_loaded: false,
             dynamic_scroll_index: 0,
@@ -124,6 +133,35 @@ impl<'a> State<'a> {
                 }
                 self.handle_tab()?;
             }
+            Command::CommandPrompt(command) => match command {
+                CommandPromptCommand::Enter => {
+                    self.command_mode = true;
+                    self.command_error = None;
+                }
+                CommandPromptCommand::Handle(event) => {
+                    self.command_input.handle_event(&event);
+                }
+                CommandPromptCommand::Confirm => {
+                    let value = self.command_input.value().to_string();
+                    self.command_input = Input::default();
+                    self.command_mode = false;
+                    match Command::parse_prompt(&value) {
+                        Some(command) => {
+                            self.command_error = None;
+                            return self.run_command(command, event_sender);
+                        }
+                        None => {
+                            if !value.trim().is_empty() {
+                                self.command_error = Some(format!("unknown command: {value}"));
+                            }
+                        }
+                    }
+                }
+                CommandPromptCommand::Exit => {
+                    self.command_input = Input::default();
+                    self.command_mode = false;
+                }
+            },
             Command::Hexdump(command) => match command {
                 HexdumpCommand::Handle(event) => {
                     self.analyzer
