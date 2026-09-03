@@ -71,6 +71,19 @@ impl<T> SelectableList<T> {
         };
         self.state.select(Some(i));
     }
+
+    /// Restores a previously selected index, clamping it to the current items.
+    ///
+    /// Useful after replacing `items` (e.g. via `with_items`) with data that
+    /// did not actually reorder or resize the list, where resetting the
+    /// selection back to the top would otherwise be surprising.
+    pub fn reselect(&mut self, index: Option<usize>) {
+        if let Some(index) = index {
+            if !self.items.is_empty() {
+                self.state.select(Some(index.min(self.items.len() - 1)));
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -93,5 +106,30 @@ mod tests {
         list.state.select(None);
         list.previous(1);
         assert_eq!(Some(0), list.state.selected());
+    }
+
+    #[test]
+    fn test_reselect() {
+        let mut list = SelectableList::with_items(vec!["data1", "data2", "data3"]);
+        list.state.select(Some(1));
+        let previous = list.state.selected();
+
+        // Rebuilding via `with_items` resets the selection to the top.
+        list = SelectableList::with_items(vec!["data1", "data2", "data3"]);
+        assert_eq!(Some(0), list.state.selected());
+
+        // `reselect` restores the previously selected index.
+        list.reselect(previous);
+        assert_eq!(Some(1), list.state.selected());
+
+        // An out-of-range index is clamped to the last item.
+        list.reselect(Some(10));
+        assert_eq!(Some(2), list.state.selected());
+
+        // Reselecting on an empty list is a no-op.
+        let mut empty = SelectableList::<&str>::with_items(vec![]);
+        empty.state.select(None);
+        empty.reselect(Some(1));
+        assert_eq!(None, empty.state.selected());
     }
 }
