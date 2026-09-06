@@ -364,7 +364,9 @@ impl<'a> State<'a> {
                 if self.tab == Tab::StaticAnalysis {
                     self.analyzer.elf.program_headers.toggle_readability();
                     self.analyzer.elf.section_headers.toggle_readability();
+                    let selected = self.list.state.selected();
                     self.handle_tab()?;
+                    self.list.reselect(selected);
                 }
             }
             Command::Nothing => {}
