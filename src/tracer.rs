@@ -16,7 +16,7 @@ use crate::TraceData;
 use nix::unistd::{fork, ForkResult};
 
 /// Trace system calls and signals.
-pub fn trace_syscalls(file: &FileInfo, event_sender: mpsc::Sender<Event>) {
+pub fn trace_syscalls(file: &FileInfo, args: Args, event_sender: mpsc::Sender<Event>) {
     let event_sender = event_sender.clone();
     let mut command = vec![file.path.to_string()];
     if let Some(args) = &file.arguments {
@@ -35,7 +35,7 @@ pub fn trace_syscalls(file: &FileInfo, event_sender: mpsc::Sender<Event>) {
             let mut syscalls = Vec::new();
             let mut tracer = Tracer::new(
                 pid,
-                Args::default(),
+                args,
                 Box::new(Cursor::new(&mut syscalls)),
                 StyleConfig {
                     pid: Style::new().cyan(),
