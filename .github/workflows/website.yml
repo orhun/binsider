@@ -41,7 +41,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install, build, and upload
-        uses: withastro/action@v3
+        uses: withastro/action@v4
         with:
           path: ./website
 
