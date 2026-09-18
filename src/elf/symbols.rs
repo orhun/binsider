@@ -5,6 +5,18 @@ use elf::{
 };
 use std::io::Error as IoError;
 
+// Sorting criteria.
+#[derive(Clone, Debug, Default)]
+enum SortBy {
+    /// Elf encounter order.
+    #[default]
+    None = 0,
+    /// Name.
+    Name = 1,
+    /// Value.
+    Value = 2,
+}
+
 /// ELF symbols wrapper.
 #[derive(Clone, Debug, Default)]
 pub struct Symbols {
@@ -12,6 +24,8 @@ pub struct Symbols {
     symbols: Vec<Symbol>,
     /// Symbol names.
     names: Vec<String>,
+    /// Sort by.
+    sort: SortBy,
 }
 
 impl<'a> TryFrom<Option<(ParsingTable<'a, AnyEndian, Symbol>, StringTable<'a>)>> for Symbols {
@@ -32,34 +46,55 @@ impl<'a> TryFrom<Option<(ParsingTable<'a, AnyEndian, Symbol>, StringTable<'a>)>>
                         .unwrap_or_else(|_| String::from("unknown"))
                 })
                 .collect(),
+            sort: SortBy::default(),
         })
     }
 }
 
 impl Property<'_> for Symbols {
     fn items(&self) -> Vec<Vec<String>> {
-        self.symbols
+        let mut indices: Vec<usize> = (0..self.symbols.len()).collect();
+        match self.sort {
+            SortBy::Name => {
+                indices.sort_by(|&a, &b| self.names[a].cmp(&self.names[b]));
+            }
+            SortBy::Value => {
+                indices.sort_by(|&a, &b| self.symbols[a].st_value.cmp(&self.symbols[b].st_value));
+            }
+            SortBy::None => {}
+        }
+
+        indices
             .iter()
-            .enumerate()
-            .map(|(i, symbol)| {
-                let name = self.names[i].to_string();
+            .map(|&i| {
                 vec![
-                    name,
-                    elf::to_str::st_symtype_to_string(symbol.st_symtype())
+                    self.names[i].to_string(),
+                    elf::to_str::st_symtype_to_string(self.symbols[i].st_symtype())
                         .trim_start_matches("STT_")
                         .to_string(),
-                    format!("{:#x}", symbol.st_value),
-                    symbol.st_size.to_string(),
-                    elf::to_str::st_bind_to_string(symbol.st_bind())
+                    format!("{:#x}", self.symbols[i].st_value),
+                    self.symbols[i].st_size.to_string(),
+                    elf::to_str::st_bind_to_string(self.symbols[i].st_bind())
                         .trim_start_matches("STB_")
                         .to_string(),
-                    elf::to_str::st_vis_to_string(symbol.st_vis())
+                    elf::to_str::st_vis_to_string(self.symbols[i].st_vis())
                         .trim_start_matches("STV_")
                         .to_string(),
-                    symbol.st_shndx.to_string(),
+                    self.symbols[i].st_shndx.to_string(),
                 ]
             })
             .collect()
+    }
+}
+
+impl Symbols {
+    /// Cycle sorting criteria.
+    pub fn cycle_sort(&mut self) {
+        match self.sort {
+            SortBy::None => self.sort = SortBy::Name,
+            SortBy::Name => self.sort = SortBy::Value,
+            SortBy::Value => self.sort = SortBy::None,
+        }
     }
 }
 
@@ -72,6 +107,8 @@ pub struct DynamicSymbols {
     names: Vec<String>,
     /// Requirements.
     requirements: Vec<String>,
+    /// Sort by.
+    sort: SortBy,
 }
 
 impl<'a>
@@ -121,33 +158,55 @@ impl<'a>
                     .to_string()
                 })
                 .collect(),
+            sort: SortBy::default(),
         })
     }
 }
 
 impl Property<'_> for DynamicSymbols {
     fn items(&self) -> Vec<Vec<String>> {
-        self.symbols
+        let mut indices: Vec<usize> = (0..self.symbols.len()).collect();
+        match self.sort {
+            SortBy::Name => {
+                indices.sort_by(|&a, &b| self.names[a].cmp(&self.names[b]));
+            }
+            SortBy::Value => {
+                indices.sort_by(|&a, &b| self.symbols[a].st_value.cmp(&self.symbols[b].st_value));
+            }
+            SortBy::None => {}
+        }
+
+        indices
             .iter()
-            .enumerate()
-            .map(|(i, symbol)| {
+            .map(|&i| {
                 vec![
                     self.names[i].to_string(),
                     self.requirements[i].to_string(),
-                    elf::to_str::st_symtype_to_string(symbol.st_symtype())
+                    elf::to_str::st_symtype_to_string(self.symbols[i].st_symtype())
                         .trim_start_matches("STT_")
                         .to_string(),
-                    format!("{:#x}", symbol.st_value),
-                    symbol.st_size.to_string(),
-                    elf::to_str::st_bind_to_string(symbol.st_bind())
+                    format!("{:#x}", self.symbols[i].st_value),
+                    self.symbols[i].st_size.to_string(),
+                    elf::to_str::st_bind_to_string(self.symbols[i].st_bind())
                         .trim_start_matches("STB_")
                         .to_string(),
-                    elf::to_str::st_vis_to_string(symbol.st_vis())
+                    elf::to_str::st_vis_to_string(self.symbols[i].st_vis())
                         .trim_start_matches("STV_")
                         .to_string(),
-                    symbol.st_shndx.to_string(),
+                    self.symbols[i].st_shndx.to_string(),
                 ]
             })
             .collect()
+    }
+}
+
+impl DynamicSymbols {
+    /// Cycle sorting criteria.
+    pub fn cycle_sort(&mut self) {
+        match self.sort {
+            SortBy::None => self.sort = SortBy::Name,
+            SortBy::Name => self.sort = SortBy::Value,
+            SortBy::Value => self.sort = SortBy::None,
+        }
     }
 }
