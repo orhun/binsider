@@ -115,7 +115,11 @@ pub fn start_tui(analyzer: Analyzer, args: Args) -> Result<()> {
             Event::Trace => {
                 state.system_calls_loaded = false;
                 tui.toggle_pause()?;
-                tracer::trace_syscalls(&state.analyzer.file, tui.events.sender.clone());
+                tracer::trace_syscalls(
+                    &state.analyzer.file,
+                    args.trace.clone().into(),
+                    tui.events.sender.clone(),
+                );
             }
             #[cfg(feature = "dynamic-analysis")]
             Event::TraceResult(syscalls) => {

@@ -44,6 +44,20 @@ You can use the following keys to interact with the dynamic analysis:
 | <kbd>r</kbd>                | Re-run executable    |
 | <kbd>enter</kbd>            | Show details         |
 
+### Trace options
+
+You can configure the trace output when starting `binsider`:
+
+```sh
+binsider --syscall-number --string-limit 128 /bin/ls
+```
+
+- `--syscall-number` displays system call numbers.
+- `--string-limit <SIZE>` limits the number of bytes shown for string arguments.
+- `--no-abbrev` prints strings without abbreviation. It cannot be combined with `--string-limit`.
+
+These options apply each time you run dynamic analysis and are available only in builds with the `dynamic-analysis` feature.
+
 ### Details
 
 When you press <kbd>enter</kbd>, you will get a summary output of the execution:
