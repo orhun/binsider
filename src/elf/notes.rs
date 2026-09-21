@@ -77,9 +77,7 @@ impl<'a> TryFrom<&'a ElfBytes<'a, AnyEndian>> for Notes {
                             ]);
                             note.text.extend(vec![
                                 any.n_type.to_string(),
-                                any.name_str()
-                                    .expect("failed to parse note name")
-                                    .to_string(),
+                                any.name_str().unwrap_or("INVALID_NOTE_NAME").to_string(),
                                 format!("{:02X?}", any.desc),
                             ]);
                         }
