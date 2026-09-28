@@ -926,13 +926,16 @@ pub fn render_strings(state: &mut State, frame: &mut Frame, rect: Rect) {
 
 /// Renders the cursor.
 fn render_cursor(state: &mut State<'_>, area: Rect, frame: &mut Frame<'_>) {
-    if state.input_mode {
+    let cursor_value = if state.input_mode {
+        Some(format!("search: {}", state.input.value()))
+    } else if state.command_mode {
+        Some(format!(":{}", state.command_input.value()))
+    } else {
+        None
+    };
+    if let Some(value) = cursor_value {
         let (x, y) = (
-            area.x
-                + Input::default()
-                    .with_value(format!("search: {}", state.input.value()))
-                    .visual_cursor() as u16
-                + 2,
+            area.x + Input::default().with_value(value).visual_cursor() as u16 + 2,
             area.bottom().saturating_sub(1),
         );
         frame.render_widget(
@@ -1121,12 +1124,26 @@ pub fn render_dynamic_analysis(state: &mut State, frame: &mut Frame, rect: Rect)
 
 /// Returns the input line.
 fn get_input_line<'a>(state: &'a State) -> Line<'a> {
-    if !state.input.value().is_empty() || state.input_mode {
+    if state.command_mode {
+        Line::from(vec![
+            "|".fg(Color::Rgb(100, 100, 100)),
+            ":".yellow(),
+            state.command_input.value().fg(state.accent_color),
+            " ".into(),
+            "|".fg(Color::Rgb(100, 100, 100)),
+        ])
+    } else if !state.input.value().is_empty() || state.input_mode {
         Line::from(vec![
             "|".fg(Color::Rgb(100, 100, 100)),
             "search: ".yellow(),
             state.input.value().fg(state.accent_color),
             if state.input_mode { " " } else { "" }.into(),
+            "|".fg(Color::Rgb(100, 100, 100)),
+        ])
+    } else if let Some(error) = &state.command_error {
+        Line::from(vec![
+            "|".fg(Color::Rgb(100, 100, 100)),
+            error.as_str().fg(Color::Red),
             "|".fg(Color::Rgb(100, 100, 100)),
         ])
     } else {

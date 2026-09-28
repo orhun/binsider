@@ -90,6 +90,11 @@ pub fn start_tui(analyzer: Analyzer, args: Args) -> Result<()> {
             Event::Key(key_event) => {
                 let command = if state.input_mode {
                     Command::Input(InputCommand::parse(key_event, &state.input))
+                } else if state.command_mode {
+                    Command::CommandPrompt(CommandPromptCommand::parse(
+                        key_event,
+                        &state.command_input,
+                    ))
                 } else if state.show_heh {
                     Command::Hexdump(HexdumpCommand::parse(
                         key_event,
