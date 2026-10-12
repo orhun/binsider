@@ -497,6 +497,18 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
         .map(Row::new)
         .collect::<Vec<Row>>();
 
+    let input_line: Line = if !state.input.value().is_empty() || state.input_mode {
+        Line::from(vec![
+            "|".fg(Color::Rgb(100, 100, 100)),
+            "search: ".yellow(),
+            state.input.value().to_string().fg(state.accent_color),
+            if state.input_mode { " " } else { "" }.into(),
+            "|".fg(Color::Rgb(100, 100, 100)),
+        ])
+    } else {
+        Line::default()
+    };
+
     frame.render_stateful_widget(
         Table::new(
             items.clone(),
@@ -537,12 +549,14 @@ pub fn render_general_info(state: &mut State, frame: &mut Frame, rect: Rect) {
                         Line::default()
                     }
                     .right_aligned(),
-                ),
+                )
+                .title_bottom(input_line),
         )
         .row_highlight_style(Style::default().fg(Color::Green)),
         table_area,
         &mut state.list.state,
     );
+    render_cursor(state, table_area, frame);
     frame.render_stateful_widget(
         Scrollbar::new(ScrollbarOrientation::VerticalRight)
             .begin_symbol(Some("↑"))
